@@ -1,0 +1,159 @@
+.navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e1e5e9;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 60px;
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+.nav-item:hover::before {
+  opacity: 0.1;
+}
+
+.nav-item.active {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-item.active::before {
+  opacity: 0.15;
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+  transition: transform 0.3s ease;
+}
+
+.nav-item:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+.nav-item.active .nav-icon {
+  transform: scale(1.15);
+}
+
+.nav-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover .nav-label {
+  transform: translateY(-1px);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 8px;
+  }
+  
+  .nav-item {
+    padding: 6px 8px;
+    min-width: 50px;
+  }
+  
+  .nav-icon {
+    font-size: 1.3rem;
+  }
+  
+  .nav-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .nav-container {
+    max-width: 800px;
+    padding: 0 24px;
+  }
+  
+  .nav-item {
+    padding: 10px 16px;
+    min-width: 80px;
+  }
+  
+  .nav-icon {
+    font-size: 1.6rem;
+  }
+  
+  .nav-label {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation for active state */
+@keyframes navPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.nav-item.active {
+  animation: navPulse 0.6s ease-in-out;
+}
+
+/* Hover effects */
+.nav-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.nav-item:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+} 
