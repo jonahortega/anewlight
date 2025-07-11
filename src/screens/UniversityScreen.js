@@ -222,7 +222,7 @@ const UniversityScreen = ({ onUniversitySelect }) => {
       type: 'Private University',
       initials: 'VU'
     }
-  ];
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   const filteredUniversities = universities.filter(university =>
     university.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -254,6 +254,27 @@ const UniversityScreen = ({ onUniversitySelect }) => {
           />
         </div>
 
+        {selectedUniversity && (
+          <div className="continue-section">
+            <div className="selected-preview">
+              <div className="selected-university">
+                <div className="university-logo">
+                  <div className="logo-initials">
+                    {selectedUniversity.initials}
+                  </div>
+                </div>
+                <div className="university-info">
+                  <h4>Selected: {selectedUniversity.name}</h4>
+                  <p>{selectedUniversity.type}</p>
+                </div>
+              </div>
+            </div>
+            <button onClick={handleConfirm} className="confirm-button">
+              Continue with {selectedUniversity.name}
+            </button>
+          </div>
+        )}
+
         <div className="universities-list">
           {filteredUniversities.map((university) => (
             <div
@@ -273,26 +294,6 @@ const UniversityScreen = ({ onUniversitySelect }) => {
             </div>
           ))}
         </div>
-
-        {selectedUniversity && (
-          <div className="selected-info">
-            <h3>Selected University:</h3>
-            <div className="selected-university">
-              <div className="university-logo">
-                <div className="logo-initials">
-                  {selectedUniversity.initials}
-                </div>
-              </div>
-              <div className="university-info">
-                <h4>{selectedUniversity.name}</h4>
-                <p>{selectedUniversity.type}</p>
-              </div>
-            </div>
-            <button onClick={handleConfirm} className="confirm-button">
-              Continue
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

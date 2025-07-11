@@ -273,13 +273,13 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
   return (
     <div className="organizations-screen">
       <div className="organizations-header">
+        <button className="back-button" onClick={() => onNavigate('home')}>
+          ← Back to Home
+        </button>
         <div className="header-content">
           <h1 className="organizations-title">Organizations</h1>
           <p className="organizations-subtitle">Manage your memberships and discover new opportunities</p>
         </div>
-        <button className="back-button" onClick={() => onNavigate('home')}>
-          ← Back to Home
-        </button>
       </div>
 
       <div className="tab-navigation">

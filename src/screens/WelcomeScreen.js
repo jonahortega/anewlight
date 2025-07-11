@@ -7,6 +7,22 @@ const WelcomeScreen = ({ onNavigate }) => {
     onNavigate('user-info');
   };
 
+  const handleLogin = () => {
+    // Navigate to login screen
+    onNavigate('login');
+  };
+
+  const handleButtonClick = (action) => {
+    // Add a small delay to show the click animation
+    setTimeout(() => {
+      if (action === 'signup') {
+        handleGetStarted();
+      } else if (action === 'login') {
+        handleLogin();
+      }
+    }, 150);
+  };
+
   return (
     <div className="welcome-screen">
       <div className="welcome-container">
@@ -40,9 +56,14 @@ const WelcomeScreen = ({ onNavigate }) => {
             </div>
           </div>
           
-          <button className="welcome-btn" onClick={handleGetStarted}>
-            Get Started
-          </button>
+          <div className="welcome-actions">
+            <button className="welcome-btn primary" onClick={() => handleButtonClick('signup')}>
+              Get Started
+            </button>
+            <button className="welcome-btn secondary" onClick={() => handleButtonClick('login')}>
+              Login
+            </button>
+          </div>
         </div>
       </div>
     </div>

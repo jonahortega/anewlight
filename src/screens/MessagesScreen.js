@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import './MessagesScreen.css';
 
-const MessagesScreen = ({ user, onNavigate }) => {
+const MessagesScreen = ({ user, onNavigate, conversations, setConversations, activeConversation, setActiveConversation }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -204,10 +204,38 @@ const MessagesScreen = ({ user, onNavigate }) => {
   ];
 
   // Combine organization chats with individual conversations
-  const allConversations = [...generateOrganizationChats(), ...individualConversations];
+  const allConversations = useMemo(() => 
+    [...conversations, ...generateOrganizationChats(), ...individualConversations], 
+    [conversations]
+  );
+
+  // Set active conversation if provided from props
+  useEffect(() => {
+    if (activeConversation && !selectedConversation) {
+      const conversation = allConversations.find(conv => conv.id === activeConversation);
+      if (conversation) {
+        setSelectedConversation(conversation);
+      }
+    }
+  }, [activeConversation, allConversations, selectedConversation]);
+
+
 
   // Enhanced messages for different conversations
   const getConversationMessages = (conversation) => {
+    // Handle new organization conversations from props
+    if (conversation.type === 'organization' && conversation.messages) {
+      return conversation.messages.map(msg => ({
+        id: msg.id,
+        sender: msg.sender === 'system' ? 'System' : conversation.name,
+        senderRole: msg.sender === 'system' ? 'System' : 'Organization',
+        message: msg.content,
+        time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isOwn: false,
+        type: msg.type || 'message'
+      }));
+    }
+    
     if (conversation.id === 'theta-ki' || conversation.id === 'user-greek-1') {
       return [
         { 
@@ -439,8 +467,36 @@ const MessagesScreen = ({ user, onNavigate }) => {
   );
 
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // In a real app, this would send the message to the server
+    if (newMessage.trim() && selectedConversation) {
+      const messageId = Date.now();
+      const timestamp = new Date().toISOString();
+      
+      // Handle organization conversations
+      if (selectedConversation.type === 'organization') {
+        const updatedConversations = conversations.map(conv => {
+          if (conv.id === selectedConversation.id) {
+            return {
+              ...conv,
+              messages: [
+                ...conv.messages,
+                {
+                  id: messageId,
+                  sender: 'user',
+                  content: newMessage,
+                  timestamp,
+                  type: 'message'
+                }
+              ],
+              lastMessage: newMessage,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+          }
+          return conv;
+        });
+        
+        setConversations(updatedConversations);
+      }
+      
       setNewMessage('');
       setIsTyping(false);
     }

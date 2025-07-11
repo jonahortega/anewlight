@@ -5,7 +5,6 @@ const Navigation = ({ currentScreen, onNavigate }) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'events', label: 'Events', icon: '📅' },
-    { id: 'organizations', label: 'Organizations', icon: '🏛️' },
     { id: 'messages', label: 'Messages', icon: '💬' },
     { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }

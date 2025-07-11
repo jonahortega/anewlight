@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SettingsScreen.css';
 
-const SettingsScreen = ({ userData, onBack }) => {
+const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([
@@ -33,18 +33,32 @@ const SettingsScreen = ({ userData, onBack }) => {
 
   // Enhanced profile form state
   const [profileForm, setProfileForm] = useState({
-    name: userData?.name || "Alex Johnson",
-    email: userData?.email || "alex.johnson@email.com",
-    university: userData?.university || "University of California, Berkeley",
-    organization: userData?.organization || "Alpha Beta Gamma",
-    year: userData?.year || "Junior",
-    major: userData?.major || "Computer Science",
-    minor: userData?.minor || "Mathematics",
-    phone: userData?.phone || "(555) 123-4567",
-    address: userData?.address || "123 Greek Row, University City, ST 12345",
-    bio: userData?.bio || "Passionate about technology and Greek life. Currently serving as the chapter's social media coordinator and love organizing events that bring our community together.",
-    interests: userData?.interests || ["Technology", "Leadership", "Community Service", "Networking"],
-    skills: userData?.skills || ["Event Planning", "Social Media Management", "Public Speaking", "Team Leadership"]
+    name: user?.name || "Alex Johnson",
+    username: user?.username || "alex.johnson",
+    email: user?.email || "alex.johnson@email.com",
+    university: user?.university || "University of California, Berkeley",
+    organization: user?.organization?.name || user?.organization || "Alpha Beta Gamma",
+    year: user?.year || "Junior",
+    major: user?.major || "Computer Science",
+    bio: user?.bio || "Passionate about technology and Greek life. Currently serving as the chapter's social media coordinator and love organizing events that bring our community together.",
+    image: user?.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face"
+  });
+
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [originalProfile, setOriginalProfile] = useState(profileForm);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [twoFAData, setTwoFAData] = useState({
+    phoneNumber: '',
+    verificationCode: '',
+    step: 'phone' // 'phone' or 'code'
   });
 
   const handleProfileChange = (e) => {
@@ -55,43 +69,57 @@ const SettingsScreen = ({ userData, onBack }) => {
     }));
   };
 
-  const addInterest = () => {
-    const newInterest = prompt("Enter a new interest:");
-    if (newInterest && newInterest.trim()) {
-      setProfileForm(prev => ({
-        ...prev,
-        interests: [...prev.interests, newInterest.trim()]
-      }));
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileForm(prev => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const removeInterest = (index) => {
-    setProfileForm(prev => ({
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm(prev => ({
       ...prev,
-      interests: prev.interests.filter((_, i) => i !== index)
+      [name]: value
     }));
   };
 
-  const addSkill = () => {
-    const newSkill = prompt("Enter a new skill:");
-    if (newSkill && newSkill.trim()) {
-      setProfileForm(prev => ({
-        ...prev,
-        skills: [...prev.skills, newSkill.trim()]
-      }));
+  const handleChangePassword = () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('New passwords do not match!');
+      return;
     }
-  };
-
-  const removeSkill = (index) => {
-    setProfileForm(prev => ({
-      ...prev,
-      skills: prev.skills.filter((_, i) => i !== index)
-    }));
+    if (passwordForm.newPassword.length < 6) {
+      alert('New password must be at least 6 characters!');
+      return;
+    }
+    // In a real app, this would update the password in the backend
+    alert('Password changed successfully!');
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setShowPasswordModal(false);
   };
 
   const handleSaveProfile = () => {
-    // In a real app, this would save to the backend
-    alert("Profile updated successfully!");
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      setSuccess(true);
+      setOriginalProfile(profileForm);
+      if (onProfileUpdate) onProfileUpdate(profileForm);
+      setTimeout(() => setSuccess(false), 2000);
+    }, 1000);
+  };
+
+  const handleCancel = () => {
+    setProfileForm(originalProfile);
   };
 
   const handleAddPaymentMethod = () => {
@@ -139,14 +167,58 @@ const SettingsScreen = ({ userData, onBack }) => {
     setPaymentMethods(paymentMethods.filter(method => method.id !== id));
   };
 
-  const formatCardNumber = (number) => {
-    return number.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      onLogout();
+    }
+  };
+
+  const handle2FAChange = (e) => {
+    const { name, value } = e.target;
+    setTwoFAData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSendCode = () => {
+    if (twoFAData.phoneNumber.length < 10) {
+      alert('Please enter a valid phone number');
+      return;
+    }
+    // In a real app, this would send a verification code
+    alert(`Verification code sent to ${twoFAData.phoneNumber}`);
+    setTwoFAData(prev => ({ ...prev, step: 'code' }));
+  };
+
+  const handleVerifyCode = () => {
+    if (twoFAData.verificationCode.length !== 6) {
+      alert('Please enter the 6-digit verification code');
+      return;
+    }
+    // In a real app, this would verify the code
+    alert('Two-factor authentication setup successfully!');
+    setShow2FAModal(false);
+    setTwoFAData({
+      phoneNumber: '',
+      verificationCode: '',
+      step: 'phone'
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      if (window.confirm('This will permanently delete all your data. Are you absolutely sure?')) {
+        alert('Account deletion initiated. You will be logged out.');
+        onLogout();
+      }
+    }
   };
 
   return (
     <div className="settings-screen">
       <header className="settings-header">
-        <button className="back-btn" onClick={onBack}>
+        <button className="back-btn" onClick={() => onNavigate('home')}>
           ← Back
         </button>
         <h1>Settings</h1>
@@ -194,26 +266,39 @@ const SettingsScreen = ({ userData, onBack }) => {
               </div>
 
               <div className="profile-form">
+                <div className="profile-picture-group">
+                  <img src={profileForm.image} alt="Profile" className="profile-picture-preview" />
+                  <input type="file" accept="image/*" onChange={handleImageChange} />
+                </div>
                 <div className="form-row">
                   <div className="form-group">
                     <label>Full Name</label>
                     <input 
-                      type="text" 
+                      type="text"
                       name="name"
                       value={profileForm.name}
                       onChange={handleProfileChange}
-                      className="form-input"
+                      placeholder="Enter your full name"
                     />
                   </div>
-
                   <div className="form-group">
-                    <label>Email Address</label>
+                    <label>Username</label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={profileForm.username}
+                      onChange={handleProfileChange}
+                      placeholder="Enter your username"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
                     <input 
-                      type="email" 
+                      type="email"
                       name="email"
                       value={profileForm.email}
                       onChange={handleProfileChange}
-                      className="form-input"
+                      placeholder="Enter your email"
                     />
                   </div>
                 </div>
@@ -222,22 +307,21 @@ const SettingsScreen = ({ userData, onBack }) => {
                   <div className="form-group">
                     <label>University</label>
                     <input 
-                      type="text" 
+                      type="text"
                       name="university"
                       value={profileForm.university}
                       onChange={handleProfileChange}
-                      className="form-input"
+                      placeholder="Enter your university"
                     />
                   </div>
-
                   <div className="form-group">
                     <label>Organization</label>
                     <input 
-                      type="text" 
+                      type="text"
                       name="organization"
                       value={profileForm.organization}
                       onChange={handleProfileChange}
-                      className="form-input"
+                      placeholder="Enter your organization"
                     />
                   </div>
                 </div>
@@ -245,63 +329,22 @@ const SettingsScreen = ({ userData, onBack }) => {
                 <div className="form-row">
                   <div className="form-group">
                     <label>Year</label>
-                    <select
-                      name="year"
-                      value={profileForm.year}
-                      onChange={handleProfileChange}
-                      className="form-input"
-                    >
+                    <select name="year" value={profileForm.year} onChange={handleProfileChange}>
                       <option value="Freshman">Freshman</option>
                       <option value="Sophomore">Sophomore</option>
                       <option value="Junior">Junior</option>
                       <option value="Senior">Senior</option>
+                      <option value="Graduate">Graduate</option>
                     </select>
                   </div>
-
                   <div className="form-group">
                     <label>Major</label>
                     <input 
-                      type="text" 
+                      type="text"
                       name="major"
                       value={profileForm.major}
                       onChange={handleProfileChange}
-                      className="form-input"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Minor</label>
-                    <input 
-                      type="text" 
-                      name="minor"
-                      value={profileForm.minor}
-                      onChange={handleProfileChange}
-                      className="form-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Phone Number</label>
-                    <input 
-                      type="tel" 
-                      name="phone"
-                      value={profileForm.phone}
-                      onChange={handleProfileChange}
-                      placeholder="(555) 123-4567"
-                      className="form-input"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Address</label>
-                    <textarea 
-                      name="address"
-                      value={profileForm.address}
-                      onChange={handleProfileChange}
-                      className="form-textarea"
-                      rows="2"
+                      placeholder="Enter your major"
                     />
                   </div>
                 </div>
@@ -312,61 +355,15 @@ const SettingsScreen = ({ userData, onBack }) => {
                     name="bio"
                     value={profileForm.bio}
                     onChange={handleProfileChange}
-                    placeholder="Tell us about yourself..."
-                    className="form-textarea"
+                    placeholder="Tell us about yourself"
                     rows="4"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Interests</label>
-                  <div className="tags-container">
-                    {profileForm.interests.map((interest, index) => (
-                      <span key={index} className="tag">
-                        {interest}
-                        <button
-                          type="button"
-                          onClick={() => removeInterest(index)}
-                          className="tag-remove"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                    <button type="button" onClick={addInterest} className="btn btn-secondary add-tag">
-                      + Add Interest
-                    </button>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Skills</label>
-                  <div className="tags-container">
-                    {profileForm.skills.map((skill, index) => (
-                      <span key={index} className="tag">
-                        {skill}
-                        <button
-                          type="button"
-                          onClick={() => removeSkill(index)}
-                          className="tag-remove"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                    <button type="button" onClick={addSkill} className="btn btn-secondary add-tag">
-                      + Add Skill
-                    </button>
-                  </div>
-                </div>
-
                 <div className="form-actions">
-                  <button className="btn btn-primary" onClick={handleSaveProfile}>
-                    Save Changes
-                  </button>
-                  <button className="btn btn-secondary" onClick={onBack}>
-                    Cancel
-                  </button>
+                  <button className="save-btn" onClick={handleSaveProfile} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+                  <button className="cancel-btn" onClick={handleCancel} disabled={saving}>Cancel</button>
+                  {success && <span className="success-message">Profile updated!</span>}
                 </div>
               </div>
             </div>
@@ -376,43 +373,29 @@ const SettingsScreen = ({ userData, onBack }) => {
             <div className="payments-section">
               <div className="payments-header">
                 <h2>Payment Methods</h2>
-                <p>Manage your payment methods for events and donations</p>
-                <button 
-                  className="btn btn-primary"
-                  onClick={() => setShowAddPayment(true)}
-                >
-                  + Add Payment Method
-                </button>
+                <p>Manage your payment methods for events and dues</p>
               </div>
 
               <div className="payment-methods">
                 {paymentMethods.map(method => (
-                  <div key={method.id} className="payment-method-card">
-                    <div className="payment-method-info">
-                      <div className="card-icon">
-                        {method.brand === 'Visa' ? '💳' : 
-                         method.brand === 'Mastercard' ? '💳' : '💳'}
+                  <div key={method.id} className="payment-method">
+                    <div className="method-info">
+                      <div className="method-icon">
+                        {method.brand === 'Visa' ? '💳' : method.brand === 'Mastercard' ? '💳' : '💳'}
                       </div>
-                      <div className="card-details">
+                      <div className="method-details">
                         <h4>{method.brand} •••• {method.last4}</h4>
                         <p>Expires {method.expiry}</p>
                         {method.isDefault && <span className="default-badge">Default</span>}
                       </div>
                     </div>
-                    
-                    <div className="payment-method-actions">
+                    <div className="method-actions">
                       {!method.isDefault && (
-                        <button 
-                          className="btn btn-outline"
-                          onClick={() => setDefaultPayment(method.id)}
-                        >
+                        <button onClick={() => setDefaultPayment(method.id)}>
                           Set Default
                         </button>
                       )}
-                      <button 
-                        className="btn btn-danger"
-                        onClick={() => removePaymentMethod(method.id)}
-                      >
+                      <button onClick={() => removePaymentMethod(method.id)} className="remove-btn">
                         Remove
                       </button>
                     </div>
@@ -420,98 +403,119 @@ const SettingsScreen = ({ userData, onBack }) => {
                 ))}
               </div>
 
-              <div className="payment-features">
-                <h3>Payment Features</h3>
-                <div className="features-grid">
-                  <div className="feature-card">
-                    <div className="feature-icon">🎫</div>
-                    <h4>Event Tickets</h4>
-                    <p>Purchase tickets for campus events and activities</p>
+              {!showAddPayment ? (
+                <button className="add-payment-btn" onClick={() => setShowAddPayment(true)}>
+                  + Add Payment Method
+                </button>
+              ) : (
+                <div className="add-payment-form">
+                  <h3>Add New Payment Method</h3>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Card Number</label>
+                      <input 
+                        type="text"
+                        value={newPaymentMethod.cardNumber}
+                        onChange={(e) => setNewPaymentMethod({...newPaymentMethod, cardNumber: e.target.value})}
+                        placeholder="1234 5678 9012 3456"
+                        maxLength="19"
+                      />
+                    </div>
                   </div>
-                  <div className="feature-card">
-                    <div className="feature-icon">🎁</div>
-                    <h4>Donations</h4>
-                    <p>Support your favorite organizations and causes</p>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Expiry Date</label>
+                      <input 
+                        type="text"
+                        value={newPaymentMethod.expiryDate}
+                        onChange={(e) => setNewPaymentMethod({...newPaymentMethod, expiryDate: e.target.value})}
+                        placeholder="MM/YY"
+                        maxLength="5"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>CVV</label>
+                      <input 
+                        type="text"
+                        value={newPaymentMethod.cvv}
+                        onChange={(e) => setNewPaymentMethod({...newPaymentMethod, cvv: e.target.value})}
+                        placeholder="123"
+                        maxLength="4"
+                      />
+                    </div>
                   </div>
-                  <div className="feature-card">
-                    <div className="feature-icon">🏪</div>
-                    <h4>Merchandise</h4>
-                    <p>Buy official organization merchandise and gear</p>
+                  <div className="form-group">
+                    <label>Cardholder Name</label>
+                    <input 
+                      type="text"
+                      value={newPaymentMethod.cardholderName}
+                      onChange={(e) => setNewPaymentMethod({...newPaymentMethod, cardholderName: e.target.value})}
+                      placeholder="John Doe"
+                    />
                   </div>
-                  <div className="feature-card">
-                    <div className="feature-icon">📊</div>
-                    <h4>Transaction History</h4>
-                    <p>View all your payment history and receipts</p>
+                  <div className="form-actions">
+                    <button onClick={handleAddPaymentMethod} className="save-btn">
+                      Add Payment Method
+                    </button>
+                    <button onClick={() => setShowAddPayment(false)} className="cancel-btn">
+                      Cancel
+                    </button>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
           {activeTab === 'notifications' && (
             <div className="notifications-section">
               <div className="notifications-header">
-                <h2>Notification Preferences</h2>
-                <p>Choose how you want to be notified about events and updates</p>
+                <h2>Notification Settings</h2>
+                <p>Choose what notifications you want to receive</p>
               </div>
 
               <div className="notification-settings">
-                <div className="notification-group">
-                  <h3>Event Notifications</h3>
-                  <div className="notification-item">
-                    <div className="notification-info">
-                      <h4>New Events</h4>
-                      <p>Get notified when new events are posted</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <h4>Event Reminders</h4>
+                    <p>Get notified about upcoming events</p>
                   </div>
-                  <div className="notification-item">
-                    <div className="notification-info">
-                      <h4>Event Reminders</h4>
-                      <p>Receive reminders for events you're attending</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="notification-item">
-                    <div className="notification-info">
-                      <h4>Event Updates</h4>
-                      <p>Get notified about changes to events</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
+                  <label className="toggle">
+                    <input type="checkbox" defaultChecked />
+                    <span className="slider"></span>
+                  </label>
                 </div>
 
-                <div className="notification-group">
-                  <h3>Organization Updates</h3>
-                  <div className="notification-item">
-                    <div className="notification-info">
-                      <h4>New Members</h4>
-                      <p>When new members join your organization</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <h4>New Messages</h4>
+                    <p>Receive notifications for new messages</p>
                   </div>
-                  <div className="notification-item">
-                    <div className="notification-info">
-                      <h4>Group Messages</h4>
-                      <p>New messages in organization group chats</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
+                  <label className="toggle">
+                    <input type="checkbox" defaultChecked />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <h4>Organization Updates</h4>
+                    <p>Get updates about your organization</p>
                   </div>
+                  <label className="toggle">
+                    <input type="checkbox" defaultChecked />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+
+                <div className="setting-item">
+                  <div className="setting-info">
+                    <h4>Payment Reminders</h4>
+                    <p>Reminders for dues and payments</p>
+                  </div>
+                  <label className="toggle">
+                    <input type="checkbox" />
+                    <span className="slider"></span>
+                  </label>
                 </div>
               </div>
             </div>
@@ -526,44 +530,46 @@ const SettingsScreen = ({ userData, onBack }) => {
 
               <div className="privacy-settings">
                 <div className="privacy-group">
-                  <h3>Profile Visibility</h3>
-                  <div className="privacy-item">
-                    <div className="privacy-info">
-                      <h4>Public Profile</h4>
-                      <p>Allow other users to see your profile information</p>
+                  <h3>Privacy Settings</h3>
+                  <div className="setting-item">
+                    <div className="setting-info">
+                      <h4>Profile Visibility</h4>
+                      <p>Control who can see your profile</p>
                     </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="privacy-item">
-                    <div className="privacy-info">
-                      <h4>Show Online Status</h4>
-                      <p>Display when you're active on the platform</p>
-                    </div>
-                    <label className="toggle">
-                      <input type="checkbox" defaultChecked />
-                      <span className="slider"></span>
-                    </label>
+                    <select defaultValue="organization" className="privacy-select">
+                      <option value="public">Public</option>
+                      <option value="organization">Organization Only</option>
+                      <option value="private">Private</option>
+                    </select>
                   </div>
                 </div>
 
                 <div className="privacy-group">
-                  <h3>Security</h3>
-                  <div className="security-item">
-                    <div className="security-info">
+                  <h3>Security Settings</h3>
+                  <div className="setting-item">
+                    <div className="setting-info">
                       <h4>Two-Factor Authentication</h4>
-                      <p>Add an extra layer of security to your account</p>
+                      <p>Add an extra layer of security</p>
                     </div>
-                    <button className="btn btn-outline">Enable</button>
+                    <button className="setup-btn" onClick={() => setShow2FAModal(true)}>Setup 2FA</button>
                   </div>
-                  <div className="security-item">
-                    <div className="security-info">
+
+                  <div className="setting-item">
+                    <div className="setting-info">
                       <h4>Change Password</h4>
                       <p>Update your account password</p>
                     </div>
-                    <button className="btn btn-outline">Change</button>
+                    <button className="setup-btn" onClick={() => setShowPasswordModal(true)}>
+                      Change Password
+                    </button>
+                  </div>
+
+                  <div className="setting-item">
+                    <div className="setting-info">
+                      <h4>Delete Account</h4>
+                      <p>Permanently delete your account</p>
+                    </div>
+                    <button className="delete-btn" onClick={handleDeleteAccount}>Delete Account</button>
                   </div>
                 </div>
               </div>
@@ -572,86 +578,116 @@ const SettingsScreen = ({ userData, onBack }) => {
         </div>
       </div>
 
-      {/* Add Payment Method Modal */}
-      {showAddPayment && (
-        <div className="modal-overlay" onClick={() => setShowAddPayment(false)}>
+      {/* Logout Section */}
+      <div className="logout-section">
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add Payment Method</h3>
-              <button className="close-btn" onClick={() => setShowAddPayment(false)}>×</button>
+              <h2>Change Password</h2>
+              <button className="modal-close" onClick={() => setShowPasswordModal(false)}>×</button>
             </div>
             
             <div className="modal-body">
-              <div className="payment-form">
-                <div className="form-group">
-                  <label>Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="1234 5678 9012 3456"
-                    value={formatCardNumber(newPaymentMethod.cardNumber)}
-                    onChange={(e) => setNewPaymentMethod({
-                      ...newPaymentMethod,
-                      cardNumber: e.target.value.replace(/\s/g, '')
-                    })}
-                    maxLength="19"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Expiry Date</label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      value={newPaymentMethod.expiryDate}
-                      onChange={(e) => setNewPaymentMethod({
-                        ...newPaymentMethod,
-                        expiryDate: e.target.value
-                      })}
-                      maxLength="5"
-                      className="form-input"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>CVV</label>
-                    <input
-                      type="text"
-                      placeholder="123"
-                      value={newPaymentMethod.cvv}
-                      onChange={(e) => setNewPaymentMethod({
-                        ...newPaymentMethod,
-                        cvv: e.target.value
-                      })}
-                      maxLength="4"
-                      className="form-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Cardholder Name</label>
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    value={newPaymentMethod.cardholderName}
-                    onChange={(e) => setNewPaymentMethod({
-                      ...newPaymentMethod,
-                      cardholderName: e.target.value
-                    })}
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="modal-actions">
-                  <button className="btn btn-secondary" onClick={() => setShowAddPayment(false)}>
-                    Cancel
-                  </button>
-                  <button className="btn btn-primary" onClick={handleAddPaymentMethod}>
-                    Add Payment Method
-                  </button>
-                </div>
+              <div className="form-group">
+                <label>Current Password</label>
+                <input 
+                  type="password"
+                  name="currentPassword"
+                  value={passwordForm.currentPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter current password"
+                />
               </div>
+              <div className="form-group">
+                <label>New Password</label>
+                <input 
+                  type="password"
+                  name="newPassword"
+                  value={passwordForm.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div className="form-group">
+                <label>Confirm New Password</label>
+                <input 
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordForm.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirm new password"
+                />
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="change-password-btn" onClick={handleChangePassword}>
+                Change Password
+              </button>
+              <button className="cancel-btn" onClick={() => setShowPasswordModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2FA Setup Modal */}
+      {show2FAModal && (
+        <div className="modal-overlay" onClick={() => setShow2FAModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Setup Two-Factor Authentication</h2>
+              <button className="modal-close" onClick={() => setShow2FAModal(false)}>×</button>
+            </div>
+            
+            <div className="modal-body">
+              {twoFAData.step === 'phone' ? (
+                <div className="form-group">
+                  <label>Phone Number</label>
+                  <input 
+                    type="tel"
+                    name="phoneNumber"
+                    value={twoFAData.phoneNumber}
+                    onChange={handle2FAChange}
+                    placeholder="Enter your phone number"
+                  />
+                  <p className="form-help">We'll send a verification code to this number</p>
+                </div>
+              ) : (
+                <div className="form-group">
+                  <label>Verification Code</label>
+                  <input 
+                    type="text"
+                    name="verificationCode"
+                    value={twoFAData.verificationCode}
+                    onChange={handle2FAChange}
+                    placeholder="Enter 6-digit code"
+                    maxLength="6"
+                  />
+                  <p className="form-help">Enter the 6-digit code sent to your phone</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-footer">
+              {twoFAData.step === 'phone' ? (
+                <button className="setup-btn" onClick={handleSendCode}>
+                  Send Code
+                </button>
+              ) : (
+                <button className="setup-btn" onClick={handleVerifyCode}>
+                  Verify Code
+                </button>
+              )}
+              <button className="cancel-btn" onClick={() => setShow2FAModal(false)}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>

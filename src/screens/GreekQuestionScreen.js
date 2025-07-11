@@ -4,6 +4,21 @@ import './GreekQuestionScreen.css';
 const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
   const [showGreekSelection, setShowGreekSelection] = useState(false);
   const [selectedGreek, setSelectedGreek] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
+
+  // Function to get reliable image URL with fallbacks
+  const getImageUrl = (organizationName, defaultUrl) => {
+    const fallbackImages = {
+      "Delta Gamma": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Alpha Order": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Chi Phi": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Theta Chi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Delta Pi": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Phi Epsilon": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80"
+    };
+    
+    return fallbackImages[organizationName] || defaultUrl;
+  };
 
   // University-specific Greek organizations database
   const universityGreekOrganizations = {
@@ -15,9 +30,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity",
         founded: 1824,
         description: "One of the oldest fraternities in the United States, focused on brotherhood, scholarship, and character development.",
-        image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
         members: 45,
-        isMember: false
+        isMember: false,
+        colors: ["#1e3a8a", "#3b82f6"],
+        motto: "Brotherhood, Scholarship, Character"
       },
       {
         id: 2,
@@ -25,9 +42,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity", 
         founded: 1856,
         description: "A brotherhood dedicated to developing leaders through academic excellence, community service, and lifelong friendships.",
-        image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
         members: 52,
-        isMember: false
+        isMember: false,
+        colors: ["#dc2626", "#ef4444"],
+        motto: "An Assisting Hand"
       },
       {
         id: 3,
@@ -35,9 +54,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Sorority",
         founded: 1851,
         description: "The first secret society for college women, promoting sisterhood, scholarship, and service to others.",
-        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
         members: 38,
-        isMember: false
+        isMember: false,
+        colors: ["#7c3aed", "#a855f7"],
+        motto: "We Live for Each Other"
       },
       {
         id: 4,
@@ -45,9 +66,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity",
         founded: 1901,
         description: "Building balanced men through sound mind and sound body, emphasizing leadership and academic achievement.",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
         members: 48,
-        isMember: false
+        isMember: false,
+        colors: ["#059669", "#10b981"],
+        motto: "Building Balanced Men"
       },
       {
         id: 5,
@@ -55,9 +78,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Sorority",
         founded: 1873,
         description: "Fostering high ideals of friendship, promoting educational and cultural interests, and creating a true sense of social responsibility.",
-        image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
         members: 42,
-        isMember: false
+        isMember: false,
+        colors: ["#f59e0b", "#fbbf24"],
+        motto: "Do Good"
       },
       {
         id: 6,
@@ -65,9 +90,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity",
         founded: 1865,
         description: "A brotherhood of gentlemen, scholars, and leaders committed to the highest ideals of character and achievement.",
-        image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
         members: 55,
-        isMember: false
+        isMember: false,
+        colors: ["#dc2626", "#991b1b"],
+        motto: "Dieu et les Dames"
       }
     ],
     
@@ -79,9 +106,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity",
         founded: 1913,
         description: "A Jewish fraternity focused on leadership development, academic excellence, and community service.",
-        image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
         members: 65,
-        isMember: false
+        isMember: false,
+        colors: ["#1e40af", "#3b82f6"],
+        motto: "The Jewish Fraternity"
       },
       {
         id: 102,
@@ -89,9 +118,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Sorority",
         founded: 1888,
         description: "Promoting scholarship, leadership, and sisterhood while developing strong, confident women.",
-        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
         members: 58,
-        isMember: false
+        isMember: false,
+        colors: ["#7c3aed", "#a855f7"],
+        motto: "Let Us Steadfastly Love One Another"
       },
       {
         id: 103,
@@ -99,9 +130,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity",
         founded: 1855,
         description: "Building enduring friendships and developing character through leadership and service.",
-        image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
         members: 72,
-        isMember: false
+        isMember: false,
+        colors: ["#dc2626", "#ef4444"],
+        motto: "In Hoc Signo Vinces"
       },
       {
         id: 104,
@@ -109,9 +142,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Sorority",
         founded: 1870,
         description: "Empowering women to be their authentic selves through leadership, scholarship, and service.",
-        image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
         members: 61,
-        isMember: false
+        isMember: false,
+        colors: ["#059669", "#10b981"],
+        motto: "Leading Women"
       },
       {
         id: 105,
@@ -119,9 +154,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Fraternity",
         founded: 1848,
         description: "Building men of character through friendship, sound learning, and moral rectitude.",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
         members: 68,
-        isMember: false
+        isMember: false,
+        colors: ["#f59e0b", "#fbbf24"],
+        motto: "One Man is No Man"
       },
       {
         id: 106,
@@ -129,9 +166,11 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         type: "Sorority",
         founded: 1872,
         description: "Advancing women's lives through leadership, scholarship, and sisterhood.",
-        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=200&fit=crop",
+        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
         members: 55,
-        isMember: false
+        isMember: false,
+        colors: ["#dc2626", "#991b1b"],
+        motto: "Union Hand in Hand"
       }
     ],
 
@@ -831,19 +870,54 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
 
         <div className="greek-selection-content">
           <div className="greek-organizations-grid">
-            {greekOrganizations.map(greek => (
+            {greekOrganizations.map((greek, index) => (
               <div 
                 key={greek.id} 
                 className={`greek-organization-card ${selectedGreek?.id === greek.id ? 'selected' : ''}`}
                 onClick={() => handleGreekSelect(greek)}
+                style={{
+                  animationDelay: `${index * 0.1}s`
+                }}
               >
                 <div className="greek-organization-image">
-                  <img src={greek.image} alt={greek.name} />
-                  <div className="greek-type-badge">{greek.type}</div>
+                  <img 
+                    src={getImageUrl(greek.name, greek.image)} 
+                    alt={greek.name}
+                    onError={(e) => {
+                      console.log(`Image failed to load for ${greek.name}:`, e.target.src);
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                      setImageErrors(prev => ({ ...prev, [greek.id]: true }));
+                    }}
+                    onLoad={(e) => {
+                      e.target.style.opacity = '1';
+                      setImageErrors(prev => ({ ...prev, [greek.id]: false }));
+                    }}
+                    style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
+                  />
+                  <div className="image-fallback" style={{ display: imageErrors[greek.id] ? 'flex' : 'none' }}>
+                    <span className="fallback-icon">🏛️</span>
+                    <span className="fallback-text">{greek.name}</span>
+                  </div>
+                  <div className="greek-type-badge">
+                    {greek.type}
+                  </div>
+                  <div className="greek-overlay">
+                    <div className="overlay-content">
+                      <span className="overlay-icon">✓</span>
+                      <span className="overlay-text">Selected</span>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="greek-organization-content">
-                  <h3>{greek.name}</h3>
+                  <div className="greek-header">
+                    <h3>{greek.name}</h3>
+                    {greek.motto && (
+                      <p className="greek-motto">"{greek.motto}"</p>
+                    )}
+                  </div>
+                  
                   <p className="greek-description">{greek.description}</p>
                   
                   <div className="greek-details">
@@ -859,7 +933,7 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
 
                   <div className="greek-actions">
                     <button className="btn btn-outline">
-                      Select This Organization
+                      {selectedGreek?.id === greek.id ? '✓ Selected' : 'Select This Organization'}
                     </button>
                   </div>
                 </div>
@@ -891,7 +965,18 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
               
               <div className="modal-body">
                 <div className="modal-image">
-                  <img src={selectedGreek.image} alt={selectedGreek.name} />
+                  <img 
+                    src={getImageUrl(selectedGreek.name, selectedGreek.image)} 
+                    alt={selectedGreek.name}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="image-fallback" style={{ display: 'none' }}>
+                    <span className="fallback-icon">🏛️</span>
+                    <span className="fallback-text">{selectedGreek.name}</span>
+                  </div>
                 </div>
                 
                 <div className="modal-info">
@@ -940,15 +1025,13 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
   return (
     <div className="greek-question-screen">
       <div className="greek-question-header">
+        <button className="back-button" onClick={onBack}>
+          ← Back
+        </button>
         <div className="header-content">
           <div className="header-left">
             <h1>Greek Life Involvement</h1>
             <p>Tell us about your Greek life experience at {user?.university || 'your university'}</p>
-          </div>
-          <div className="header-right">
-            <button className="btn btn-outline" onClick={onBack}>
-              ← Back
-            </button>
           </div>
         </div>
       </div>

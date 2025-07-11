@@ -8,6 +8,13 @@
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
   z-index: 1000;
   padding: 8px 0;
+  transition: all 0.3s ease;
+}
+
+.dark-mode .navigation {
+  background: #2d3748;
+  border-top-color: #4a5568;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .nav-container {
@@ -38,6 +45,10 @@
   overflow: hidden;
 }
 
+.dark-mode .nav-item {
+  color: #a0aec0;
+}
+
 .nav-item::before {
   content: '';
   position: absolute;
@@ -59,6 +70,10 @@
   color: #667eea;
   background: rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
+}
+
+.dark-mode .nav-item.active {
+  background: rgba(102, 126, 234, 0.2);
 }
 
 .nav-item.active::before {
@@ -88,6 +103,33 @@
 
 .nav-item:hover .nav-label {
   transform: translateY(-1px);
+}
+
+/* Logout button specific styles */
+.logout-btn {
+  color: #e53e3e !important;
+}
+
+.dark-mode .logout-btn {
+  color: #fc8181 !important;
+}
+
+.logout-btn:hover {
+  background: rgba(229, 62, 62, 0.1) !important;
+}
+
+.dark-mode .logout-btn:hover {
+  background: rgba(252, 129, 129, 0.2) !important;
+}
+
+.logout-btn.active {
+  color: #e53e3e !important;
+  background: rgba(229, 62, 62, 0.1) !important;
+}
+
+.dark-mode .logout-btn.active {
+  color: #fc8181 !important;
+  background: rgba(252, 129, 129, 0.2) !important;
 }
 
 /* Responsive design */

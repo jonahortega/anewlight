@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './OrganizationProfileScreen.css';
 
-const OrganizationProfileScreen = ({ organization, onNavigate }) => {
+const OrganizationProfileScreen = ({ organization, onNavigate, onStartConversation }) => {
   const [activeTab, setActiveTab] = useState('events');
   const [rsvpStatus, setRsvpStatus] = useState({});
 
@@ -565,54 +565,75 @@ const OrganizationProfileScreen = ({ organization, onNavigate }) => {
 
   return (
     <div className="organization-profile-screen">
-      {/* Header Section */}
+      {/* Header */}
       <div className="profile-header">
-        <div className="header-background">
-          <img src={organization.image} alt={organization.name} />
-          <div className="header-overlay"></div>
-        </div>
-        
-        <div className="header-content">
-          <button className="back-button" onClick={() => onNavigate('organizations')}>
-            ← Back
-          </button>
-          
-          <div className="profile-info">
+        <button className="back-button" onClick={() => onNavigate('organizations')}>
+          ← Back
+        </button>
+        <div className="settings-button">⋯</div>
+      </div>
+
+      {/* Profile Container */}
+      <div className="profile-container">
+        <div className="profile-info-section">
+          <div className="profile-avatar-section">
             <div className="profile-avatar">
               <img src={organization.image} alt={organization.name} />
             </div>
+          </div>
+          
+          <div className="profile-details">
+            <div className="profile-name-section">
+              <h1 className="profile-name">{organization.name}</h1>
+              <span className="profile-username">{organization.type}</span>
+            </div>
             
-            <div className="profile-details">
-              <h1>{organization.name}</h1>
-              <p className="organization-type">{organization.type}</p>
-              <p className="organization-description">{organization.description}</p>
-              
-              <div className="profile-stats">
-                <div className="stat-item">
-                  <span className="stat-number">{organization.members}</span>
-                  <span className="stat-label">Members</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">{organizationEvents.length}</span>
-                  <span className="stat-label">Events</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">{organization.category}</span>
-                  <span className="stat-label">Category</span>
-                </div>
+            <div className="profile-stats">
+              <div className="stat-item">
+                <span className="stat-number">{organization.members}</span>
+                <span className="stat-label">Members</span>
               </div>
+              <div className="stat-item">
+                <span className="stat-number">{organizationEvents.length}</span>
+                <span className="stat-label">Events</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{organization.category}</span>
+                <span className="stat-label">Category</span>
+              </div>
+            </div>
+            
+            <div className="profile-bio-section">
+              <p className="profile-bio">{organization.description}</p>
+              <div className="profile-location">
+                <span className="location-icon">📍</span>
+                <span>University Campus</span>
+              </div>
+              <div className="profile-organization">
+                <span className="org-icon">🏛️</span>
+                <span>Founded 2020</span>
+              </div>
+            </div>
+            
+            <div className="profile-actions">
+              <button className="btn btn-primary" onClick={() => onNavigate('events')}>
+                View Events
+              </button>
+              <button className="btn btn-secondary" onClick={() => onStartConversation(organization)}>
+                Message
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
+      {/* Tab Navigation */}
       <div className="profile-tabs">
         <button 
           className={`tab-button ${activeTab === 'events' ? 'active' : ''}`}
           onClick={() => setActiveTab('events')}
         >
-          📅 Upcoming Events
+          📅 Events
         </button>
         <button 
           className={`tab-button ${activeTab === 'members' ? 'active' : ''}`}
@@ -628,7 +649,7 @@ const OrganizationProfileScreen = ({ organization, onNavigate }) => {
         </button>
       </div>
 
-      {/* Content Section */}
+      {/* Tab Content */}
       <div className="profile-content">
         {activeTab === 'events' && (
           <div className="events-section">

@@ -3,8 +3,8 @@ import './LoginScreen.css';
 
 const LoginScreen = ({ onLoginSuccess, onBack }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: ''
+    emailOrUsername: '',
+    password: ''
   });
   const [errors, setErrors] = useState({});
 
@@ -26,16 +26,14 @@ const LoginScreen = ({ onLoginSuccess, onBack }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+    if (!formData.emailOrUsername.trim()) {
+      newErrors.emailOrUsername = 'Email or username is required';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
@@ -63,35 +61,35 @@ const LoginScreen = ({ onLoginSuccess, onBack }) => {
 
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Full Name</label>
+              <label htmlFor="emailOrUsername">Email or Username</label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="emailOrUsername"
+                name="emailOrUsername"
+                value={formData.emailOrUsername}
                 onChange={handleInputChange}
-                className={`form-input ${errors.name ? 'error' : ''}`}
-                placeholder="Enter your full name"
+                className={`form-input ${errors.emailOrUsername ? 'error' : ''}`}
+                placeholder="Enter your email or username"
               />
-              {errors.name && <span className="error-message">{errors.name}</span>}
+              {errors.emailOrUsername && <span className="error-message">{errors.emailOrUsername}</span>}
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="password">Password</label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
                 onChange={handleInputChange}
-                className={`form-input ${errors.email ? 'error' : ''}`}
-                placeholder="Enter your email address"
+                className={`form-input ${errors.password ? 'error' : ''}`}
+                placeholder="Enter your password"
               />
-              {errors.email && <span className="error-message">{errors.email}</span>}
+              {errors.password && <span className="error-message">{errors.password}</span>}
             </div>
 
             <button type="submit" className="login-btn">
-              Continue
+              Login
             </button>
           </form>
 
