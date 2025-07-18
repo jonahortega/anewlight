@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Greek Life Connect</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard {
+            padding: 100px 0 40px;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+        
+        .dashboard-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .submissions-table {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-header {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            align-items: center;
+        }
+        
+        .table-row:hover {
+            background: #f9fafb;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-contact {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-contact:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-users"></i>
+                <span>Greek Life Connect</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Website</a>
+                <a href="/dashboard" class="nav-link admin-link">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Admin Dashboard</h1>
+                <p>View and manage website submissions</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSubmissions">2</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="newSubmissions">1</div>
+                    <div class="stat-label">New This Week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="universities">2</div>
+                    <div class="stat-label">Universities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="conversionRate">100%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+            </div>
+
+            <!-- Submissions Table -->
+            <div class="submissions-table">
+                <div class="table-header">
+                    <div class="table-row">
+                        <div>Name</div>
+                        <div>University</div>
+                        <div>Role</div>
+                        <div>Organization</div>
+                        <div>Date</div>
+                        <div>Actions</div>
+                    </div>
+                </div>
+                <div id="submissionsList">
+                    <!-- Submissions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Load dashboard data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Load submissions
+                const submissionsResponse = await fetch('/api/data/users');
+                const submissions = await submissionsResponse.json();
+                
+                displaySubmissions(submissions.users || []);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showNotification('Error loading dashboard data', 'error');
+            }
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissionsList');
+            container.innerHTML = '';
+
+            if (submissions.length === 0) {
+                container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #6b7280;">No submissions yet</div>';
+                return;
+            }
+
+            submissions.forEach(submission => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                
+                const date = new Date(submission.createdAt).toLocaleDateString();
+                
+                row.innerHTML = `
+                    <div>${submission.name}</div>
+                    <div>${submission.university}</div>
+                    <div>${submission.role || 'N/A'}</div>
+                    <div>${submission.organization || 'N/A'}</div>
+                    <div>${date}</div>
+                    <div>
+                        <button class="action-btn btn-view" onclick="viewSubmission('${submission.id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn btn-contact" onclick="contactSubmission('${submission.id}')">
+                            <i class="fas fa-envelope"></i> Contact
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+
+        function viewSubmission(id) {
+            alert(`Viewing submission ${id}. This would show detailed information.`);
+        }
+
+        function contactSubmission(id) {
+            alert(`Contacting submission ${id}. This would open email or CRM integration.`);
+        }
+
+        function showNotification(message, type = 'info') {
+            alert(message);
+        }
+    </script>
+</body>
+</html> 

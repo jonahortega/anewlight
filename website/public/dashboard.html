@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Greek Life Connect</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard {
+            padding: 100px 0 40px;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+        
+        .dashboard-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .submissions-table {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-header {
+            background: #f9fafb;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            align-items: center;
+        }
+        
+        .table-row:hover {
+            background: #f9fafb;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-new {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .status-contacted {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status-converted {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-contact {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-contact:hover {
+            background: #059669;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .detail-value {
+            color: #6b7280;
+        }
+        
+        @media (max-width: 768px) {
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .table-header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-users"></i>
+                <span>Greek Life Connect</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Website</a>
+                <a href="/dashboard" class="nav-link admin-link">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Admin Dashboard</h1>
+                <p>View and manage website submissions</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSubmissions">0</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="newSubmissions">0</div>
+                    <div class="stat-label">New This Week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="universities">0</div>
+                    <div class="stat-label">Universities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="conversionRate">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+            </div>
+
+            <!-- Submissions Table -->
+            <div class="submissions-table">
+                <div class="table-header">
+                    <div class="table-row">
+                        <div>Name</div>
+                        <div>University</div>
+                        <div>Role</div>
+                        <div>Organization</div>
+                        <div>Date</div>
+                        <div>Actions</div>
+                    </div>
+                </div>
+                <div id="submissionsList">
+                    <!-- Submissions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for viewing submission details -->
+    <div id="submissionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Submission Details</h3>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load dashboard data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const statsResponse = await fetch('/api/analytics/stats');
+                const stats = await statsResponse.json();
+                
+                document.getElementById('totalSubmissions').textContent = stats.totalUsers || 0;
+                document.getElementById('newSubmissions').textContent = stats.newUsers || 0;
+                document.getElementById('universities').textContent = stats.topUniversities?.length || 0;
+                
+                // Load submissions
+                const submissionsResponse = await fetch('/api/data/users');
+                const submissions = await submissionsResponse.json();
+                
+                displaySubmissions(submissions.users || []);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showNotification('Error loading dashboard data', 'error');
+            }
+        }
+
+        function displaySubmissions(submissions) {
+            const container = document.getElementById('submissionsList');
+            container.innerHTML = '';
+
+            if (submissions.length === 0) {
+                container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #6b7280;">No submissions yet</div>';
+                return;
+            }
+
+            submissions.forEach(submission => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                
+                const date = new Date(submission.createdAt).toLocaleDateString();
+                
+                row.innerHTML = `
+                    <div>${submission.name}</div>
+                    <div>${submission.university}</div>
+                    <div>${submission.role || 'N/A'}</div>
+                    <div>${submission.organization || 'N/A'}</div>
+                    <div>${date}</div>
+                    <div>
+                        <button class="action-btn btn-view" onclick="viewSubmission('${submission._id}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn btn-contact" onclick="contactSubmission('${submission._id}')">
+                            <i class="fas fa-envelope"></i> Contact
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+
+        function viewSubmission(id) {
+            fetch(`/api/data/user/${id}`)
+                .then(response => response.json())
+                .then(submission => {
+                    const modal = document.getElementById('submissionModal');
+                    const modalBody = document.getElementById('modalBody');
+                    
+                    modalBody.innerHTML = `
+                        <div class="detail-row">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">${submission.name}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${submission.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">University:</span>
+                            <span class="detail-value">${submission.university}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Role:</span>
+                            <span class="detail-value">${submission.role || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Organization:</span>
+                            <span class="detail-value">${submission.organization || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Greek Organizations:</span>
+                            <span class="detail-value">${submission.greekCount || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Message:</span>
+                            <span class="detail-value">${submission.message || 'No additional message'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Submitted:</span>
+                            <span class="detail-value">${new Date(submission.createdAt).toLocaleString()}</span>
+                        </div>
+                    `;
+                    
+                    modal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error loading submission:', error);
+                    showNotification('Error loading submission details', 'error');
+                });
+        }
+
+        function contactSubmission(id) {
+            // This could open email client or integrate with CRM
+            alert('Contact functionality would integrate with your email system or CRM');
+        }
+
+        function closeModal() {
+            document.getElementById('submissionModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('submissionModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification - you can enhance this
+            alert(message);
+        }
+    </script>
+</body>
+</html> 

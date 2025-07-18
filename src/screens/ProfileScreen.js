@@ -152,6 +152,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
 
   const handleLikePost = (postId) => {
     // In a real app, this would update the backend
+    // eslint-disable-next-line no-unused-vars
     const updatedPosts = posts.map(post => 
       post.id === postId 
         ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 }
@@ -162,6 +163,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
 
   const handleAddComment = (postId, commentText) => {
     // In a real app, this would add to the backend
+    // eslint-disable-next-line no-unused-vars
     const newComment = {
       id: Date.now(),
       user: profile.username,

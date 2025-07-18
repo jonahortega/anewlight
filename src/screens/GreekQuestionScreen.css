@@ -4,6 +4,8 @@
   background: #f8f9fa;
   padding: 2rem 1rem;
   padding-bottom: 100px;
+  overflow-y: auto;
+  position: relative;
 }
 
 .greek-question-header,
@@ -96,10 +98,14 @@
 .greek-selection-content {
   max-width: 1200px;
   margin: 0 auto;
+  overflow-y: auto;
+  min-height: calc(100vh - 200px);
+  scroll-behavior: smooth;
 }
 
 .greek-selection-content {
   padding-top: 1rem;
+  padding-bottom: 2rem;
 }
 
 .question-card {
@@ -229,6 +235,7 @@
   gap: 2.5rem;
   margin-bottom: 3rem;
   margin-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .greek-organization-card {
@@ -254,6 +261,7 @@
   border-color: #667eea;
   box-shadow: 0 25px 50px rgba(102, 126, 234, 0.25);
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  transform: scale(1.02);
 }
 
 @keyframes fadeInUp {
@@ -482,7 +490,11 @@
   border: 2px solid #667eea;
   text-align: center;
   animation: slideInUp 0.5s ease-out;
-  margin-top: 2rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
 }
 
 @keyframes slideInUp {
@@ -511,6 +523,13 @@
   line-height: 1.6;
 }
 
+.summary-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -520,10 +539,11 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 1000;
   padding: 2rem;
+  overflow-y: auto;
 }
 
 .modal-content {
@@ -534,6 +554,10 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  margin: 2rem auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -542,6 +566,7 @@
   align-items: center;
   padding: 2rem 2rem 1rem;
   border-bottom: 1px solid #e1e5e9;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -574,6 +599,8 @@
 
 .modal-body {
   padding: 1rem 2rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .modal-image {
@@ -666,12 +693,16 @@
   gap: 1rem;
   padding: 1rem 2rem 2rem;
   border-top: 1px solid #e1e5e9;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
   .greek-question-screen,
   .greek-selection-screen {
     padding: 1.5rem 1rem;
+    overflow-y: auto;
   }
   
   .back-button {
@@ -758,6 +789,11 @@
     padding-right: 1.5rem;
   }
   
+  .summary-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
   .modal-header h2 {
     font-size: 1.5rem;
   }
@@ -771,6 +807,7 @@
   .greek-question-screen,
   .greek-selection-screen {
     padding: 1rem;
+    overflow-y: auto;
   }
   
   .header-left h1 {
@@ -814,6 +851,11 @@
   .modal-footer {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+  
+  .summary-actions {
+    flex-direction: column;
+    align-items: center;
   }
   
   .modal-header h2 {

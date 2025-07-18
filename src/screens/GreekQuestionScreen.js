@@ -4,6 +4,7 @@ import './GreekQuestionScreen.css';
 const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
   const [showGreekSelection, setShowGreekSelection] = useState(false);
   const [selectedGreek, setSelectedGreek] = useState(null);
+  const [showJoinModal, setShowJoinModal] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
 
   // Function to get reliable image URL with fallbacks
@@ -95,6 +96,54 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         isMember: false,
         colors: ["#dc2626", "#991b1b"],
         motto: "Dieu et les Dames"
+      },
+      {
+        id: 7,
+        name: "Alpha Kappa Alpha",
+        type: "Sorority",
+        founded: 1908,
+        description: "The first African-American Greek-lettered sorority, promoting sisterhood, scholarship, and service to all mankind.",
+        image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+        members: 48,
+        isMember: false,
+        colors: ["#7c3aed", "#a855f7"],
+        motto: "By Culture and By Merit"
+      },
+      {
+        id: 8,
+        name: "Phi Beta Sigma",
+        type: "Fraternity",
+        founded: 1914,
+        description: "A brotherhood of college men dedicated to the principles of brotherhood, scholarship, and service.",
+        image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+        members: 52,
+        isMember: false,
+        colors: ["#059669", "#10b981"],
+        motto: "Culture for Service and Service for Humanity"
+      },
+      {
+        id: 9,
+        name: "Zeta Phi Beta",
+        type: "Sorority",
+        founded: 1920,
+        description: "A community-conscious, action-oriented organization promoting scholarship, service, sisterly love, and finer womanhood.",
+        image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+        members: 44,
+        isMember: false,
+        colors: ["#f59e0b", "#fbbf24"],
+        motto: "A Community-Conscious, Action-Oriented Organization"
+      },
+      {
+        id: 10,
+        name: "Sigma Gamma Rho",
+        type: "Sorority",
+        founded: 1922,
+        description: "An international collegiate sorority committed to enhancing the quality of life for women and their families.",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+        members: 46,
+        isMember: false,
+        colors: ["#dc2626", "#991b1b"],
+        motto: "Greater Service, Greater Progress"
       }
     ],
     
@@ -814,9 +863,15 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
 
   const handleGreekSelect = (greek) => {
     setSelectedGreek(greek);
+    // Scroll to top to show selection summary
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleJoinRequest = () => {
+    setShowJoinModal(true);
+  };
+
+  const handleSubmitJoinRequest = () => {
     if (selectedGreek) {
       // In a real app, you'd send the join request to the server
       console.log('Join request sent for:', selectedGreek.name);
@@ -843,12 +898,27 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
   };
 
   const handleCloseModal = () => {
-    setSelectedGreek(null);
+    setShowJoinModal(false);
   };
+
+  // Handle escape key to close modal
+  React.useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && showJoinModal) {
+        handleCloseModal();
+      }
+    };
+
+    if (showJoinModal) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [showJoinModal]);
 
   const handleBackToSelection = () => {
     setShowGreekSelection(false);
     setSelectedGreek(null);
+    setShowJoinModal(false);
   };
 
   if (showGreekSelection) {
@@ -869,6 +939,26 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
         </div>
 
         <div className="greek-selection-content">
+          {selectedGreek && (
+            <div className="selection-summary">
+              <div className="summary-content">
+                <h3>✓ Selected: {selectedGreek.name}</h3>
+                <p>You've selected {selectedGreek.name} ({selectedGreek.type}). You can now request to join or continue browsing other organizations.</p>
+                <div className="summary-actions">
+                  <button className="btn btn-primary" onClick={handleJoinRequest}>
+                    Request to Join {selectedGreek.name}
+                  </button>
+                  <button className="btn btn-outline" onClick={() => setSelectedGreek(null)}>
+                    Clear Selection
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => setSelectedGreek(null)}>
+                    Continue Browsing
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="greek-organizations-grid">
             {greekOrganizations.map((greek, index) => (
               <div 
@@ -932,7 +1022,13 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
                   </div>
 
                   <div className="greek-actions">
-                    <button className="btn btn-outline">
+                    <button 
+                      className="btn btn-outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGreekSelect(greek);
+                      }}
+                    >
                       {selectedGreek?.id === greek.id ? '✓ Selected' : 'Select This Organization'}
                     </button>
                   </div>
@@ -940,22 +1036,10 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
               </div>
             ))}
           </div>
-
-          {selectedGreek && (
-            <div className="selection-summary">
-              <div className="summary-content">
-                <h3>Selected: {selectedGreek.name}</h3>
-                <p>You've selected {selectedGreek.name} ({selectedGreek.type}). Click below to submit your join request.</p>
-                <button className="btn btn-primary" onClick={handleJoinRequest}>
-                  Request to Join {selectedGreek.name}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Join Request Modal */}
-        {selectedGreek && (
+        {showJoinModal && selectedGreek && (
           <div className="modal-overlay" onClick={handleCloseModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
@@ -1008,7 +1092,7 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
               </div>
               
               <div className="modal-footer">
-                <button className="btn btn-primary" onClick={handleJoinRequest}>
+                <button className="btn btn-primary" onClick={handleSubmitJoinRequest}>
                   Submit Request
                 </button>
                 <button className="btn btn-outline" onClick={handleCloseModal}>

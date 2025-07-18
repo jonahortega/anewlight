@@ -54,6 +54,7 @@ const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
   const [success, setSuccess] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [twoFAData, setTwoFAData] = useState({
     phoneNumber: '',
