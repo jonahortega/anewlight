@@ -256,6 +256,7 @@ const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
             <span className="tab-icon">🔒</span>
             Privacy & Security
           </button>
+
         </div>
 
         <div className="settings-content">
@@ -582,6 +583,15 @@ const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
       {/* Logout Section */}
       <div className="logout-section">
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
+
+      {/* Help Section */}
+      <div className="help-section">
+        <button className="help-btn" onClick={() => onNavigate('help')}>
+          <span className="help-icon">❓</span>
+          Help & Support
+        </button>
+        <p className="help-description">Get help with your account, reset your password, or request new organizations</p>
       </div>
 
       {/* Password Change Modal */}

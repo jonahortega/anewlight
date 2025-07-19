@@ -15,9 +15,18 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.university-screen h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
+.greekrank-logo {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.greekrank-logo h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
   color: #1a1a1a;
   text-align: center;
   margin-bottom: 8px;
@@ -25,6 +34,22 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.greekrank-logo p {
+  font-size: 1.2rem;
+  color: #666;
+  font-weight: 500;
+  margin: 0;
+}
+
+.university-screen h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+  margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
 
@@ -154,9 +179,24 @@
 .university-info p {
   font-size: 0.95rem;
   color: #666;
-  margin: 0;
+  margin: 0 0 8px 0;
   font-weight: 400;
   line-height: 1.4;
+}
+
+.greek-count {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.greek-count span {
+  font-size: 0.8rem;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: 500;
 }
 
 .continue-section {

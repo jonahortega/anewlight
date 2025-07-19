@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './OrganizationsScreen.css';
+import { getCollegeOrganizations } from '../data/collegesData';
 
 const OrganizationsScreen = ({ user, onNavigate }) => {
   const [selectedOrganization, setSelectedOrganization] = useState(null);
@@ -69,35 +70,43 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
     }
   ];
 
-  // Mock data for all available organizations
+  // Get college-specific organizations
+  const collegeOrganizations = getCollegeOrganizations(user?.university || '');
+  
+  // Convert college organizations to the expected format
+  const collegeFraternities = collegeOrganizations.fraternities.map((name, index) => ({
+    id: `fraternity-${index + 1}`,
+    name: name,
+    type: "Fraternity",
+    category: "Greek",
+    description: `${name} - Building brotherhood, leadership, and character through Greek life.`,
+    members: Math.floor(Math.random() * 50) + 30,
+    founded: "1800s",
+    contact: `${name.toLowerCase().replace(/\s+/g, '')}@${user?.university?.toLowerCase().replace(/\s+/g, '')}.edu`,
+    image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop",
+    icon: "🏛️"
+  }));
+
+  const collegeSororities = collegeOrganizations.sororities.map((name, index) => ({
+    id: `sorority-${index + 1}`,
+    name: name,
+    type: "Sorority",
+    category: "Greek",
+    description: `${name} - Empowering women through sisterhood, scholarship, and service.`,
+    members: Math.floor(Math.random() * 50) + 40,
+    founded: "1800s",
+    contact: `${name.toLowerCase().replace(/\s+/g, '')}@${user?.university?.toLowerCase().replace(/\s+/g, '')}.edu`,
+    image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop",
+    icon: "🌸"
+  }));
+
+  // Mock data for all available organizations (combining user orgs with college-specific orgs)
   const allOrganizations = [
     ...userOrganizations,
+    ...collegeFraternities,
+    ...collegeSororities,
     {
-      id: 5,
-      name: "Sigma Chi",
-      type: "Fraternity",
-      category: "Greek",
-      description: "Building enduring friendships and developing character through leadership and service.",
-      members: 52,
-      founded: "1855",
-      contact: "sigmachi@university.edu",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop",
-      icon: "🏛️"
-    },
-    {
-      id: 6,
-      name: "Delta Gamma",
-      type: "Sorority",
-      category: "Greek",
-      description: "Do Good through sisterhood, scholarship, and service to others.",
-      members: 58,
-      founded: "1873",
-      contact: "deltagamma@university.edu",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop",
-      icon: "🌸"
-    },
-    {
-      id: 7,
+      id: "env-club",
       name: "Environmental Club",
       type: "Club",
       category: "Club",
@@ -109,7 +118,7 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
       icon: "🌱"
     },
     {
-      id: 8,
+      id: "business-assoc",
       name: "Business Association",
       type: "Professional Club",
       category: "Club",
@@ -121,7 +130,7 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
       icon: "💼"
     },
     {
-      id: 9,
+      id: "phi-beta-kappa",
       name: "Phi Beta Kappa",
       type: "Honor Society",
       category: "Academic",
@@ -133,7 +142,7 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
       icon: "🎓"
     },
     {
-      id: 10,
+      id: "chess-club",
       name: "Chess Club",
       type: "Recreational Club",
       category: "Club",

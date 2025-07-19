@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './GreekQuestionScreen.css';
+import { getCollegeOrganizations } from '../data/collegesData';
 
 const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
   const [showGreekSelection, setShowGreekSelection] = useState(false);
@@ -7,18 +8,77 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
 
-  // Function to get reliable image URL with fallbacks
-  const getImageUrl = (organizationName, defaultUrl) => {
-    const fallbackImages = {
-      "Delta Gamma": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
-      "Kappa Alpha Order": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+  // Comprehensive image mapping for Greek organizations with party/frat themes
+  const getGreekImage = (organizationName) => {
+    const greekImages = {
+      // Fraternities - Party & Brotherhood Themes
+      "Alpha Epsilon Pi": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Gamma Rho": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Kappa Lambda": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Phi Alpha": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Sigma Phi": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Tau Omega": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Beta Theta Pi": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Beta Upsilon Chi": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
       "Chi Phi": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Chi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Kappa Epsilon": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Tau Delta": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Upsilon": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Farmhouse": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Alpha Order": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Alpha Psi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Sigma": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Lambda Chi Alpha": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Omega Psi Phi": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Beta Sigma": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Delta Theta": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Gamma Delta": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Kappa Psi": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Kappa Tau": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Sigma Kappa": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Pi Kappa Alpha": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Pi Kappa Phi": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Alpha Epsilon": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Chi": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Nu": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Pi": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Tau Gamma": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Tau Kappa Epsilon": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
       "Theta Chi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Theta Xi": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Zeta Beta Tau": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Zeta Psi": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      
+      // Sororities - Sisterhood & Social Themes
+      "Alpha Chi Omega": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
       "Alpha Delta Pi": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
-      "Sigma Phi Epsilon": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80"
+      "Alpha Gamma Delta": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Kappa Alpha": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Omicron Pi": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Phi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Alpha Xi Delta": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Chi Omega": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Delta Delta": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Gamma": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Sigma Theta": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Delta Zeta": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Gamma Phi Beta": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Alpha Theta": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Delta": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Kappa Kappa Gamma": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Phi Mu": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Pi Beta Phi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Kappa": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Sigma Sigma": "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=300&fit=crop&crop=center&q=80",
+      "Zeta Phi Beta": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80",
+      "Zeta Tau Alpha": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop&crop=center&q=80",
+      "Sigma Gamma Rho": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&h=300&fit=crop&crop=center&q=80"
     };
     
-    return fallbackImages[organizationName] || defaultUrl;
+    // Extract the base name without Greek letters for matching
+    const baseName = organizationName.split(' - ')[0];
+    return greekImages[baseName] || "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=300&fit=crop&crop=center&q=80";
   };
 
   // University-specific Greek organizations database
@@ -840,14 +900,42 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
 
   // Get the appropriate Greek organizations based on the user's university
   const getGreekOrganizations = () => {
-    const userUniversity = user?.university;
+    const collegeData = getCollegeOrganizations(user?.university || '');
     
-    if (userUniversity && universityGreekOrganizations[userUniversity]) {
-      return universityGreekOrganizations[userUniversity];
+    // If no college data or no organizations, return defaults
+    if (!collegeData.fraternities.length && !collegeData.sororities.length) {
+      return universityGreekOrganizations.default;
     }
-    
-    // Fallback to default organizations if university not found
-    return universityGreekOrganizations.default;
+
+    // Generate fraternities from college data
+    const fraternities = collegeData.fraternities.map((name, index) => ({
+      id: `fraternity-${index + 1}`,
+      name: name,
+      type: "Fraternity",
+      founded: 1800 + Math.floor(Math.random() * 200),
+      description: `${name} - Building brotherhood, leadership, and character through Greek life.`,
+      image: getGreekImage(name),
+      members: Math.floor(Math.random() * 50) + 30,
+      isMember: false,
+      colors: ["#1e3a8a", "#3b82f6"],
+      motto: "Brotherhood, Scholarship, Character"
+    }));
+
+    // Generate sororities from college data
+    const sororities = collegeData.sororities.map((name, index) => ({
+      id: `sorority-${index + 1}`,
+      name: name,
+      type: "Sorority",
+      founded: 1800 + Math.floor(Math.random() * 200),
+      description: `${name} - Empowering women through sisterhood, scholarship, and service.`,
+      image: getGreekImage(name),
+      members: Math.floor(Math.random() * 50) + 40,
+      isMember: false,
+      colors: ["#7c3aed", "#a855f7"],
+      motto: "Sisterhood, Scholarship, Service"
+    }));
+
+    return [...fraternities, ...sororities];
   };
 
   const greekOrganizations = getGreekOrganizations();
@@ -971,7 +1059,7 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
               >
                 <div className="greek-organization-image">
                   <img 
-                    src={getImageUrl(greek.name, greek.image)} 
+                    src={getGreekImage(greek.name)} 
                     alt={greek.name}
                     onError={(e) => {
                       console.log(`Image failed to load for ${greek.name}:`, e.target.src);
@@ -1050,7 +1138,7 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
               <div className="modal-body">
                 <div className="modal-image">
                   <img 
-                    src={getImageUrl(selectedGreek.name, selectedGreek.image)} 
+                    src={getGreekImage(selectedGreek.name)} 
                     alt={selectedGreek.name}
                     onError={(e) => {
                       e.target.style.display = 'none';

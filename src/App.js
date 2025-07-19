@@ -14,6 +14,7 @@ import EventsScreen from './screens/EventsScreen';
 import MessagesScreen from './screens/MessagesScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import HelpScreen from './screens/HelpScreen';
 import Navigation from './components/Navigation';
 import Notifications from './components/Notifications';
 import DarkModeToggle from './components/DarkModeToggle';
@@ -244,6 +245,8 @@ function App() {
         return <ProfileScreen user={user} onNavigate={handleNavigate} />;
       case 'settings':
         return <SettingsScreen user={user} onNavigate={handleNavigate} onLogout={handleLogout} onProfileUpdate={updatedProfile => setUser(prev => ({ ...prev, ...updatedProfile }))} />;
+      case 'help':
+        return <HelpScreen user={user} onNavigate={handleNavigate} />;
       default:
         return <HomeScreen user={user} onNavigate={handleNavigate} />;
     }
