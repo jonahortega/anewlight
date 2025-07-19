@@ -24,10 +24,6 @@ const UniversityScreen = ({ onUniversitySelect }) => {
   return (
     <div className="university-screen">
       <div className="university-container">
-        <div className="greekrank-logo">
-          <h1>🏛️ GreekRank</h1>
-          <p>Your Greek Life Connection</p>
-        </div>
         <h2>Select Your University</h2>
         <p>Choose your university to connect with campus organizations</p>
         

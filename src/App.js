@@ -11,13 +11,14 @@ import OrganizationProfileScreen from './screens/OrganizationProfileScreen';
 import ClubsScreen from './screens/ClubsScreen';
 import HomeScreen from './screens/HomeScreen';
 import EventsScreen from './screens/EventsScreen';
-import MessagesScreen from './screens/MessagesScreen';
+// import MessagesScreen from './screens/MessagesScreen'; // REMOVED - MESSAGING FEATURE
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import HelpScreen from './screens/HelpScreen';
 import Navigation from './components/Navigation';
 import Notifications from './components/Notifications';
 import DarkModeToggle from './components/DarkModeToggle';
+import WelcomeModal from './components/WelcomeModal';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('welcome');
@@ -25,36 +26,14 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [navigationData, setNavigationData] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'event',
-      title: 'New Event Created',
-      message: 'Spring Formal 2024 has been added to your calendar',
-      time: '2 hours ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'member',
-      title: 'New Member Joined',
-      message: 'Jeremiah joined Alpha Beta Gamma',
-      time: '4 hours ago',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'reminder',
-      title: 'Event Reminder',
-      message: 'Charity Fundraiser starts in 2 hours',
-      time: '1 day ago',
-      read: true
-    }
-  ]);
-
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  
+  // Default notifications state (empty for now)
+  const [notifications, setNotifications] = useState([]);
+  
   // Messaging state
-  const [conversations, setConversations] = useState([]);
-  const [activeConversation, setActiveConversation] = useState(null);
+  // const [conversations, setConversations] = useState([]); // REMOVED - MESSAGING FEATURE
+  // const [activeConversation, setActiveConversation] = useState(null); // REMOVED - MESSAGING FEATURE
 
   // Apply dark mode class to body
   useEffect(() => {
@@ -110,6 +89,7 @@ function App() {
     setUser(mockUserData);
     setIsAuthenticated(true);
     setCurrentScreen('home');
+    setShowWelcomeModal(true);
   };
 
   const handleUniversitySelect = (universityData) => {
@@ -139,12 +119,14 @@ function App() {
     setUser(prev => ({ ...prev, organization }));
     setIsAuthenticated(true);
     setCurrentScreen('home');
+    setShowWelcomeModal(true);
   };
 
   const handleClubSelect = (club) => {
     setUser(prev => ({ ...prev, club }));
     setIsAuthenticated(true);
     setCurrentScreen('home');
+    setShowWelcomeModal(true);
   };
 
   const handleLogout = () => {
@@ -158,6 +140,7 @@ function App() {
     setIsDarkMode(!isDarkMode);
   };
 
+  // Notification handlers
   const handleNotificationDismiss = (notificationId) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
@@ -168,43 +151,47 @@ function App() {
     );
   };
 
-  const handleStartConversation = (organization) => {
-    // Check if conversation already exists
-    const existingConversation = conversations.find(conv => conv.id === `org-${organization.id}`);
-    
-    if (!existingConversation) {
-      const newConversation = {
-        id: `org-${organization.id}`,
-        type: 'organization',
-        name: organization.name,
-        shortName: organization.name,
-        avatar: organization.image,
-        members: organization.members,
-        isOnline: true,
-        lastMessage: '',
-        time: 'Now',
-        unread: 0,
-        color: '#667eea',
-        messages: [
-          {
-            id: 1,
-            sender: 'system',
-            content: `You started a conversation with ${organization.name}`,
-            timestamp: new Date().toISOString(),
-            type: 'system'
-          }
-        ]
-      };
-      
-      setConversations(prev => [newConversation, ...prev]);
-      setActiveConversation(newConversation.id);
-    } else {
-      setActiveConversation(existingConversation.id);
-    }
-    
-    // Navigate to messages screen
-    setCurrentScreen('messages');
+  const handleCloseWelcomeModal = () => {
+    setShowWelcomeModal(false);
   };
+
+  // const handleStartConversation = (organization) => { // REMOVED - MESSAGING FEATURE
+  //   // Check if conversation already exists // REMOVED - MESSAGING FEATURE
+  //   const existingConversation = conversations.find(conv => conv.id === `org-${organization.id}`); // REMOVED - MESSAGING FEATURE
+  //   
+  //   if (!existingConversation) { // REMOVED - MESSAGING FEATURE
+  //     const newConversation = { // REMOVED - MESSAGING FEATURE
+  //       id: `org-${organization.id}`, // REMOVED - MESSAGING FEATURE
+  //       type: 'organization', // REMOVED - MESSAGING FEATURE
+  //       name: organization.name, // REMOVED - MESSAGING FEATURE
+  //       shortName: organization.name, // REMOVED - MESSAGING FEATURE
+  //       avatar: organization.image, // REMOVED - MESSAGING FEATURE
+  //       members: organization.members, // REMOVED - MESSAGING FEATURE
+  //       isOnline: true, // REMOVED - MESSAGING FEATURE
+  //       lastMessage: '', // REMOVED - MESSAGING FEATURE
+  //       time: 'Now', // REMOVED - MESSAGING FEATURE
+  //       unread: 0, // REMOVED - MESSAGING FEATURE
+  //       color: '#667eea', // REMOVED - MESSAGING FEATURE
+  //       messages: [ // REMOVED - MESSAGING FEATURE
+  //         { // REMOVED - MESSAGING FEATURE
+  //           id: 1, // REMOVED - MESSAGING FEATURE
+  //           sender: 'system', // REMOVED - MESSAGING FEATURE
+  //           content: `You started a conversation with ${organization.name}`, // REMOVED - MESSAGING FEATURE
+  //           timestamp: new Date().toISOString(), // REMOVED - MESSAGING FEATURE
+  //           type: 'system' // REMOVED - MESSAGING FEATURE
+  //         } // REMOVED - MESSAGING FEATURE
+  //       ] // REMOVED - MESSAGING FEATURE
+  //     }; // REMOVED - MESSAGING FEATURE
+  //     
+  //     setConversations(prev => [newConversation, ...prev]); // REMOVED - MESSAGING FEATURE
+  //     setActiveConversation(newConversation.id); // REMOVED - MESSAGING FEATURE
+  //   } else { // REMOVED - MESSAGING FEATURE
+  //     setActiveConversation(existingConversation.id); // REMOVED - MESSAGING FEATURE
+  //   } // REMOVED - MESSAGING FEATURE
+  //   
+  //   // Navigate to messages screen // REMOVED - MESSAGING FEATURE
+  //   setCurrentScreen('messages'); // REMOVED - MESSAGING FEATURE
+  // }; // REMOVED - MESSAGING FEATURE
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -224,7 +211,7 @@ function App() {
         return <OrganizationProfileScreen 
           organization={navigationData?.organization} 
           onNavigate={handleNavigate} 
-          onStartConversation={handleStartConversation}
+          // onStartConversation={handleStartConversation} // REMOVED - MESSAGING FEATURE
         />;
       case 'clubs':
         return <ClubsScreen user={user} onSelect={handleClubSelect} onBack={() => setCurrentScreen('greek-question')} />;
@@ -232,15 +219,15 @@ function App() {
         return <HomeScreen user={user} onNavigate={handleNavigate} />;
       case 'events':
         return <EventsScreen user={user} onNavigate={handleNavigate} />;
-      case 'messages':
-        return <MessagesScreen 
-          user={user} 
-          onNavigate={handleNavigate} 
-          conversations={conversations}
-          setConversations={setConversations}
-          activeConversation={activeConversation}
-          setActiveConversation={setActiveConversation}
-        />;
+      // case 'messages': // REMOVED - MESSAGING FEATURE
+      //   return <MessagesScreen  // REMOVED - MESSAGING FEATURE
+      //     user={user}  // REMOVED - MESSAGING FEATURE
+      //     onNavigate={handleNavigate}  // REMOVED - MESSAGING FEATURE
+      //     conversations={conversations} // REMOVED - MESSAGING FEATURE
+      //     setConversations={setConversations} // REMOVED - MESSAGING FEATURE
+      //     activeConversation={activeConversation} // REMOVED - MESSAGING FEATURE
+      //     setActiveConversation={setActiveConversation} // REMOVED - MESSAGING FEATURE
+      //   />; // REMOVED - MESSAGING FEATURE
       case 'profile':
         return <ProfileScreen user={user} onNavigate={handleNavigate} />;
       case 'settings':
@@ -278,10 +265,6 @@ function App() {
                   onDismiss={handleNotificationDismiss}
                   onMarkAsRead={handleNotificationMarkAsRead}
                 />
-                <DarkModeToggle 
-                  isDarkMode={isDarkMode}
-                  onToggle={handleDarkModeToggle}
-                />
               </div>
             </div>
           </div>
@@ -297,6 +280,12 @@ function App() {
         <main className="main-content">
           {renderScreen()}
         </main>
+        
+        <WelcomeModal 
+          isOpen={showWelcomeModal}
+          onClose={handleCloseWelcomeModal}
+          user={user}
+        />
       </div>
     </ErrorBoundary>
   );

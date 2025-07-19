@@ -463,7 +463,6 @@ const EventsScreen = ({ user, onNavigate }) => {
           </div>
           
           <h1>Discover Events</h1>
-          <p>Connect with your Greek community through amazing events and experiences</p>
           
           {/* Search and Filter Bar */}
           <div className="search-filter-bar">

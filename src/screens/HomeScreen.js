@@ -398,15 +398,10 @@ const HomeScreen = ({ user, onNavigate }) => {
 
   return (
     <div className="home-screen">
-      <div className="home-header">
-        <div className="welcome-section">
-          <h1>Welcome back, {user?.name || 'User'}! 👋</h1>
-          <p>Stay connected with your Greek life community and never miss an important event.</p>
-        </div>
-
-        <div className="user-info">
+      <div className="user-info-section">
+        <div className="user-info-card">
           <div className="user-avatar">
-            <img src={user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"} alt="User" />
+            <img src={user?.avatar || user?.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"} alt="User" />
           </div>
           <div className="user-details">
             <h3>{user?.name || 'User Name'}</h3>
@@ -424,40 +419,11 @@ const HomeScreen = ({ user, onNavigate }) => {
           </div>
         </div>
       </div>
-
+      
       <div className="home-content">
-        <div className="main-section">
-          <div className="community-feed">
-            <h2>Community Feed</h2>
-            <div className="feed-list">
-              {feedPosts.map(renderFeedPost)}
-            </div>
-          </div>
-        </div>
-
-        <div className="quick-actions">
-          <h2>Quick Actions</h2>
-          <div className="actions-grid">
-            <div className="action-card" onClick={() => handleActionClick('profile')}>
-              <span className="action-icon">👤</span>
-              <h3>Profile</h3>
-              <p>Manage your profile and organizations</p>
-            </div>
-            <div className="action-card" onClick={() => handleActionClick('events')}>
-              <span className="action-icon">📅</span>
-              <h3>Events</h3>
-              <p>Browse and RSVP to upcoming events</p>
-            </div>
-            <div className="action-card" onClick={() => handleActionClick('messages')}>
-              <span className="action-icon">💬</span>
-              <h3>Messages</h3>
-              <p>Chat with your organization members</p>
-            </div>
-            <div className="action-card" onClick={() => handleActionClick('clubs')}>
-              <span className="action-icon">🎯</span>
-              <h3>Clubs</h3>
-              <p>Join and manage campus clubs</p>
-            </div>
+        <div className="community-feed-full">
+          <div className="feed-list">
+            {feedPosts.map(renderFeedPost)}
           </div>
         </div>
       </div>

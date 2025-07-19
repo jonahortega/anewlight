@@ -1031,16 +1031,10 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
             <div className="selection-summary">
               <div className="summary-content">
                 <h3>✓ Selected: {selectedGreek.name}</h3>
-                <p>You've selected {selectedGreek.name} ({selectedGreek.type}). You can now request to join or continue browsing other organizations.</p>
+                <p>You've selected {selectedGreek.name} ({selectedGreek.type}). You can now request to join this organization.</p>
                 <div className="summary-actions">
                   <button className="btn btn-primary" onClick={handleJoinRequest}>
                     Request to Join {selectedGreek.name}
-                  </button>
-                  <button className="btn btn-outline" onClick={() => setSelectedGreek(null)}>
-                    Clear Selection
-                  </button>
-                  <button className="btn btn-secondary" onClick={() => setSelectedGreek(null)}>
-                    Continue Browsing
                   </button>
                 </div>
               </div>
@@ -1196,18 +1190,6 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
 
   return (
     <div className="greek-question-screen">
-      <div className="greek-question-header">
-        <button className="back-button" onClick={onBack}>
-          ← Back
-        </button>
-        <div className="header-content">
-          <div className="header-left">
-            <h1>Greek Life Involvement</h1>
-            <p>Tell us about your Greek life experience at {user?.university || 'your university'}</p>
-          </div>
-        </div>
-      </div>
-
       <div className="greek-question-content">
         <div className="question-card">
           <div className="question-header">

@@ -619,9 +619,9 @@ const OrganizationProfileScreen = ({ organization, onNavigate, onStartConversati
               <button className="btn btn-primary" onClick={() => onNavigate('events')}>
                 View Events
               </button>
-              <button className="btn btn-secondary" onClick={() => onStartConversation(organization)}>
+              {/* <button className="btn btn-secondary" onClick={() => onStartConversation(organization)}>
                 Message
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -733,9 +733,9 @@ const OrganizationProfileScreen = ({ organization, onNavigate, onStartConversati
                     </div>
                   </div>
                   
-                  <button className="btn btn-outline member-message">
+                  {/* <button className="btn btn-outline member-message">
                     Message
-                  </button>
+                  </button> */}
                 </div>
               ))}
             </div>

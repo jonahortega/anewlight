@@ -1,7 +1,7 @@
 {
-  "name": "greek-life-app",
+  "name": "react-app-template",
   "version": "1.0.0",
-  "description": "Greek Life Connect Application",
+  "description": "React App Template - Clone and customize for your projects",
   "main": "server.js",
   "scripts": {
     "start": "react-scripts start",
@@ -31,10 +31,11 @@
     "sass": "^1.64.1"
   },
   "keywords": [
-    "greek-life",
-    "website",
-    "marketing",
-    "lead-generation"
+    "react",
+    "template",
+    "app",
+    "prototype",
+    "mockup"
   ],
   "author": "Your Name",
   "license": "MIT",

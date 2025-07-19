@@ -37,25 +37,6 @@ const WelcomeScreen = ({ onNavigate }) => {
             <p>Welcome to the ultimate platform for interacting with college communities. Connect with your Greek organization, campus clubs, or discover events, and stay engaged with your organization.</p>
           </div>
           
-          <div className="welcome-features">
-            <div className="feature-item">
-              <span className="feature-icon">📅</span>
-              <span className="feature-text">Discover Events</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">🏛️</span>
-              <span className="feature-text">Join Organizations</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">💬</span>
-              <span className="feature-text">Stay Connected</span>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">🗺️</span>
-              <span className="feature-text">Campus Map</span>
-            </div>
-          </div>
-          
           <div className="welcome-actions">
             <button className="welcome-btn primary" onClick={() => handleButtonClick('signup')}>
               Get Started

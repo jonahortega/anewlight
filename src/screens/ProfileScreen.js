@@ -175,16 +175,6 @@ const ProfileScreen = ({ user, onNavigate }) => {
 
   return (
     <div className="profile-screen">
-      <div className="profile-header">
-        <button className="back-button" onClick={() => onNavigate('home')}>
-          ← Back to Home
-        </button>
-        <h1>Profile</h1>
-        <button className="settings-button" onClick={() => onNavigate('settings')}>
-          ⚙️
-        </button>
-      </div>
-
       <div className="profile-container">
         {/* Instagram-style Profile Header */}
         <div className="profile-info-section">
@@ -402,9 +392,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
                     </button>
                     <button className="action-btn">💬</button>
                     <button className="action-btn">📤</button>
-                    <button className="action-btn">🔖</button>
                   </div>
-                  <button className="action-btn">📌</button>
                 </div>
                 
                 <div className="post-likes">

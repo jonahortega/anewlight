@@ -76,14 +76,6 @@ const UserInfoScreen = ({ onContinue, onBack }) => {
     <div className="user-info-screen">
       <div className="user-info-container">
         <div className="user-info-content">
-          <div className="user-info-header">
-            <button className="back-btn" onClick={onBack}>
-              ← Back
-            </button>
-            <h1>Create Your Account</h1>
-            <p>Join the Greek Life community and start connecting with your campus</p>
-          </div>
-
           <form onSubmit={handleSubmit} className="user-info-form">
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
