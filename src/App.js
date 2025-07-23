@@ -11,12 +11,13 @@ import OrganizationProfileScreen from './screens/OrganizationProfileScreen';
 import ClubsScreen from './screens/ClubsScreen';
 import HomeScreen from './screens/HomeScreen';
 import EventsScreen from './screens/EventsScreen';
-// import MessagesScreen from './screens/MessagesScreen'; // REMOVED - MESSAGING FEATURE
+import MessagesScreen from './screens/MessagesScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import HelpScreen from './screens/HelpScreen';
 import Navigation from './components/Navigation';
 import Notifications from './components/Notifications';
+import MessagesDropdown from './components/MessagesDropdown';
 import DarkModeToggle from './components/DarkModeToggle';
 import WelcomeModal from './components/WelcomeModal';
 
@@ -28,12 +29,78 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   
-  // Default notifications state (empty for now)
-  const [notifications, setNotifications] = useState([]);
+  // Mock notifications with event invitations and messages
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'event-invitation',
+      title: 'Event Invitation: Spring Formal 2024',
+      message: 'Alpha Beta Gamma has invited you to their Spring Formal event on March 15th at 8:00 PM.',
+      time: '2 hours ago',
+      read: false,
+      organization: 'Alpha Beta Gamma',
+      eventDetails: {
+        date: 'March 15, 2024',
+        time: '8:00 PM',
+        location: 'Grand Ballroom',
+        description: 'Join us for an unforgettable night of dancing, great food, and amazing company!'
+      }
+    },
+    {
+      id: 2,
+      type: 'message',
+      title: 'New Message from Sarah Johnson',
+      message: 'Hey! Are you going to the philanthropy event this weekend?',
+      time: '1 hour ago',
+      read: false,
+      sender: 'Sarah Johnson',
+      senderAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
+    },
+    {
+      id: 3,
+      type: 'event-invitation',
+      title: 'Event Invitation: Leadership Workshop',
+      message: 'Theta Iota Kappa is hosting a leadership development workshop and would love for you to attend.',
+      time: '3 hours ago',
+      read: true,
+      organization: 'Theta Iota Kappa',
+      eventDetails: {
+        date: 'March 20, 2024',
+        time: '6:30 PM',
+        location: 'Student Union Building',
+        description: 'Develop your leadership skills with interactive workshops and guest speakers.'
+      }
+    },
+    {
+      id: 4,
+      type: 'message',
+      title: 'New Message from Michael Chen',
+      message: 'Thanks for sharing that post! The event looks amazing.',
+      time: '4 hours ago',
+      read: true,
+      sender: 'Michael Chen',
+      senderAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    },
+    {
+      id: 5,
+      type: 'event-invitation',
+      title: 'Event Invitation: Philanthropy Fundraiser',
+      message: 'Delta Epsilon Zeta invites you to support breast cancer awareness at their annual fundraiser.',
+      time: '1 day ago',
+      read: false,
+      organization: 'Delta Epsilon Zeta',
+      eventDetails: {
+        date: 'March 22, 2024',
+        time: '6:30 PM',
+        location: 'Delta Epsilon Zeta House',
+        description: 'Support breast cancer awareness with gourmet food, silent auctions, and inspiring speakers.'
+      }
+    }
+  ]);
   
   // Messaging state
-  // const [conversations, setConversations] = useState([]); // REMOVED - MESSAGING FEATURE
-  // const [activeConversation, setActiveConversation] = useState(null); // REMOVED - MESSAGING FEATURE
+  const [conversations, setConversations] = useState([]);
+  const [activeConversation, setActiveConversation] = useState(null);
 
   // Apply dark mode class to body
   useEffect(() => {
@@ -60,7 +127,7 @@ function App() {
       name: userData.name,
       email: userData.email,
       university: userData.university || 'University of California, Berkeley',
-      organization: userData.organization || { name: 'Alpha Beta Gamma', type: 'Fraternity' },
+      organization: userData.organization || null, // Don't default to any organization
       year: userData.year || 'Junior',
       major: userData.major || 'Computer Science',
       bio: userData.bio || 'Passionate about technology and Greek life.',
@@ -80,7 +147,7 @@ function App() {
       username,
       email,
       university: 'University of California, Berkeley',
-      organization: { name: 'Alpha Beta Gamma', type: 'Fraternity' },
+      organization: null, // Don't default to any organization
       year: 'Junior',
       major: 'Computer Science',
       bio: 'Passionate about technology and Greek life.',
@@ -103,15 +170,18 @@ function App() {
       // User selected "Not currently involved"
       setIsAuthenticated(true);
       setCurrentScreen('home');
+      setShowWelcomeModal(true);
     } else if (answer && typeof answer === 'object') {
       // User submitted a join request
       setUser(answer);
       setIsAuthenticated(true);
       setCurrentScreen('home');
+      setShowWelcomeModal(true);
     } else {
       // Fallback for any other case
       setIsAuthenticated(true);
       setCurrentScreen('home');
+      setShowWelcomeModal(true);
     }
   };
 
@@ -151,47 +221,52 @@ function App() {
     );
   };
 
+  // Function to add a new notification (for demo purposes)
+  const addNotification = (notification) => {
+    setNotifications(prev => [notification, ...prev]);
+  };
+
   const handleCloseWelcomeModal = () => {
     setShowWelcomeModal(false);
   };
 
-  // const handleStartConversation = (organization) => { // REMOVED - MESSAGING FEATURE
-  //   // Check if conversation already exists // REMOVED - MESSAGING FEATURE
-  //   const existingConversation = conversations.find(conv => conv.id === `org-${organization.id}`); // REMOVED - MESSAGING FEATURE
-  //   
-  //   if (!existingConversation) { // REMOVED - MESSAGING FEATURE
-  //     const newConversation = { // REMOVED - MESSAGING FEATURE
-  //       id: `org-${organization.id}`, // REMOVED - MESSAGING FEATURE
-  //       type: 'organization', // REMOVED - MESSAGING FEATURE
-  //       name: organization.name, // REMOVED - MESSAGING FEATURE
-  //       shortName: organization.name, // REMOVED - MESSAGING FEATURE
-  //       avatar: organization.image, // REMOVED - MESSAGING FEATURE
-  //       members: organization.members, // REMOVED - MESSAGING FEATURE
-  //       isOnline: true, // REMOVED - MESSAGING FEATURE
-  //       lastMessage: '', // REMOVED - MESSAGING FEATURE
-  //       time: 'Now', // REMOVED - MESSAGING FEATURE
-  //       unread: 0, // REMOVED - MESSAGING FEATURE
-  //       color: '#667eea', // REMOVED - MESSAGING FEATURE
-  //       messages: [ // REMOVED - MESSAGING FEATURE
-  //         { // REMOVED - MESSAGING FEATURE
-  //           id: 1, // REMOVED - MESSAGING FEATURE
-  //           sender: 'system', // REMOVED - MESSAGING FEATURE
-  //           content: `You started a conversation with ${organization.name}`, // REMOVED - MESSAGING FEATURE
-  //           timestamp: new Date().toISOString(), // REMOVED - MESSAGING FEATURE
-  //           type: 'system' // REMOVED - MESSAGING FEATURE
-  //         } // REMOVED - MESSAGING FEATURE
-  //       ] // REMOVED - MESSAGING FEATURE
-  //     }; // REMOVED - MESSAGING FEATURE
-  //     
-  //     setConversations(prev => [newConversation, ...prev]); // REMOVED - MESSAGING FEATURE
-  //     setActiveConversation(newConversation.id); // REMOVED - MESSAGING FEATURE
-  //   } else { // REMOVED - MESSAGING FEATURE
-  //     setActiveConversation(existingConversation.id); // REMOVED - MESSAGING FEATURE
-  //   } // REMOVED - MESSAGING FEATURE
-  //   
-  //   // Navigate to messages screen // REMOVED - MESSAGING FEATURE
-  //   setCurrentScreen('messages'); // REMOVED - MESSAGING FEATURE
-  // }; // REMOVED - MESSAGING FEATURE
+  const handleStartConversation = (organization) => {
+    // Check if conversation already exists
+    const existingConversation = conversations.find(conv => conv.id === `org-${organization.id}`);
+    
+    if (!existingConversation) {
+      const newConversation = {
+        id: `org-${organization.id}`,
+        type: 'organization',
+        name: organization.name,
+        shortName: organization.name,
+        avatar: organization.image,
+        members: organization.members,
+        isOnline: true,
+        lastMessage: '',
+        time: 'Now',
+        unread: 0,
+        color: '#667eea',
+        messages: [
+          {
+            id: 1,
+            sender: 'system',
+            content: `You started a conversation with ${organization.name}`,
+            timestamp: new Date().toISOString(),
+            type: 'system'
+          }
+        ]
+      };
+      
+      setConversations(prev => [newConversation, ...prev]);
+      setActiveConversation(newConversation.id);
+    } else {
+      setActiveConversation(existingConversation.id);
+    }
+    
+    // Navigate to messages screen
+    setCurrentScreen('messages');
+  };
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -210,24 +285,26 @@ function App() {
       case 'organization-profile':
         return <OrganizationProfileScreen 
           organization={navigationData?.organization} 
+          user={user}
           onNavigate={handleNavigate} 
-          // onStartConversation={handleStartConversation} // REMOVED - MESSAGING FEATURE
+          onStartConversation={handleStartConversation}
         />;
       case 'clubs':
         return <ClubsScreen user={user} onSelect={handleClubSelect} onBack={() => setCurrentScreen('greek-question')} />;
       case 'home':
         return <HomeScreen user={user} onNavigate={handleNavigate} />;
       case 'events':
-        return <EventsScreen user={user} onNavigate={handleNavigate} />;
-      // case 'messages': // REMOVED - MESSAGING FEATURE
-      //   return <MessagesScreen  // REMOVED - MESSAGING FEATURE
-      //     user={user}  // REMOVED - MESSAGING FEATURE
-      //     onNavigate={handleNavigate}  // REMOVED - MESSAGING FEATURE
-      //     conversations={conversations} // REMOVED - MESSAGING FEATURE
-      //     setConversations={setConversations} // REMOVED - MESSAGING FEATURE
-      //     activeConversation={activeConversation} // REMOVED - MESSAGING FEATURE
-      //     setActiveConversation={setActiveConversation} // REMOVED - MESSAGING FEATURE
-      //   />; // REMOVED - MESSAGING FEATURE
+        return <EventsScreen user={user} onNavigate={handleNavigate} navigationData={navigationData} />;
+      case 'messages':
+        return <MessagesScreen 
+          user={user} 
+          onNavigate={handleNavigate} 
+          conversations={conversations} 
+          setConversations={setConversations} 
+          activeConversation={activeConversation} 
+          setActiveConversation={setActiveConversation}
+          navigationData={navigationData}
+        />;
       case 'profile':
         return <ProfileScreen user={user} onNavigate={handleNavigate} />;
       case 'settings':
@@ -260,10 +337,16 @@ function App() {
                 <h2 className="app-title">Greek Life</h2>
               </div>
               <div className="top-bar-right">
+                <MessagesDropdown 
+                  conversations={conversations}
+                  onNavigate={handleNavigate}
+                  onStartConversation={handleStartConversation}
+                />
                 <Notifications 
                   notifications={notifications}
                   onDismiss={handleNotificationDismiss}
                   onMarkAsRead={handleNotificationMarkAsRead}
+          onNavigate={handleNavigate}
                 />
               </div>
             </div>

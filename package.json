@@ -1,7 +1,7 @@
 {
-  "name": "react-app-template",
+  "name": "theGreekLifeapp",
   "version": "1.0.0",
-  "description": "React App Template - Clone and customize for your projects",
+  "description": "The Greek Life App - A comprehensive platform for Greek life organizations",
   "main": "server.js",
   "scripts": {
     "start": "react-scripts start",

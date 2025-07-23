@@ -26,9 +26,32 @@
   margin-bottom: 3rem;
 }
 
-.welcome-icon {
-  font-size: 5rem;
+.welcome-logo {
   margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.logo-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 8px;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2));
+}
+
+.logo-fallback {
+  font-size: 5rem;
   display: block;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
@@ -76,18 +99,19 @@
 }
 
 .welcome-btn {
-  padding: 20px 40px;
-  border-radius: 16px;
-  font-size: 1.2rem;
-  font-weight: 700;
+  padding: 24px 48px;
+  border-radius: 20px;
+  font-size: 1.3rem;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.3s ease;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   border: none;
-  min-width: 160px;
+  min-width: 180px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .welcome-btn::before {
@@ -108,39 +132,41 @@
 .welcome-btn.primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+  transform: translateY(-2px);
 }
 
 .welcome-btn.primary:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 25px 50px rgba(102, 126, 234, 0.7);
 }
 
 .welcome-btn.secondary {
   background: transparent;
   color: #667eea;
-  border: 2px solid #667eea;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+  border: 3px solid #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
   animation: pulse 2s infinite;
+  transform: translateY(-1px);
 }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
   }
   50% {
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
   }
   100% {
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
   }
 }
 
 .welcome-btn.secondary:hover {
   background: #667eea;
   color: white;
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
 }
 
 .welcome-btn:active {

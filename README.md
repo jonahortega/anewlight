@@ -1,112 +1,99 @@
-# React App Template
+# The Greek Life App
 
-A comprehensive React application template with modern UI components, routing, and state management. Perfect for creating mock apps and prototypes quickly.
+A comprehensive platform for Greek life organizations to manage events, communications, and member engagement.
 
-## 🚀 Quick Start
+## Features
 
-1. **Clone this template** for your new project:
-   ```bash
-   cp -r /path/to/this/template your-new-project-name
-   cd your-new-project-name
-   ```
+- **Event Management**: Create, manage, and track Greek life events
+- **Member Communication**: Real-time messaging and announcements
+- **Dashboard Analytics**: Track engagement and participation metrics
+- **Responsive Design**: Works seamlessly across all devices
+- **Real-time Updates**: Live notifications and updates using Socket.IO
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+## Quick Start
 
-3. **Start development server**:
-   ```bash
-   npm start
-   ```
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
 
-4. **Customize for your project**:
-   - Update `package.json` name and description
-   - Modify `src/App.js` for your app's navigation
-   - Replace content in `src/screens/` with your screens
-   - Update styling in `src/` CSS files
+### Installation
 
-## 📁 Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-├── screens/            # Main application screens
-├── data/              # Static data and configurations
-├── App.js             # Main application component
-└── index.js           # Application entry point
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd theGreekLifeapp
 ```
 
-## 🎨 Features Included
+2. Install dependencies:
+```bash
+npm install
+```
 
-- **Modern React Hooks** - useState, useEffect, custom hooks
-- **Responsive Design** - Mobile-first CSS with dark mode support
-- **Component Library** - Navigation, modals, forms, cards
-- **State Management** - Context API and local state patterns
-- **Routing System** - Screen-based navigation
-- **Data Management** - Static data with dynamic loading patterns
-- **Error Handling** - Error boundaries and fallbacks
-- **Image Management** - Dynamic image loading with fallbacks
+3. Start the development servers:
+```bash
+# Start both frontend and backend
+./start-app.sh
 
-## 🔧 Customization Guide
+# Or start them separately:
+npm start          # Frontend (React) on port 3000
+npm run server     # Backend (Express) on port 3001
+```
 
-### 1. Update App Information
-- Edit `package.json` name, description, and keywords
-- Update `public/index.html` title and meta tags
+### Access Points
 
-### 2. Modify Navigation
-- Edit `src/App.js` to change screen routing
-- Update `src/components/Navigation.js` for menu items
+- **Frontend Application**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **Admin Dashboard**: http://localhost:3001/dashboard
+- **API Health Check**: http://localhost:3001/api/health
 
-### 3. Replace Content
-- Replace screen content in `src/screens/`
-- Update data in `src/data/` for your domain
-- Modify styling in CSS files
+## Project Structure
 
-### 4. Add New Features
-- Create new components in `src/components/`
-- Add new screens in `src/screens/`
-- Extend data structures in `src/data/`
+```
+theGreekLifeapp/
+├── src/                 # React frontend source code
+├── public/              # Static assets
+├── routes/              # Express API routes
+├── backend/             # Additional backend services
+├── server.js            # Express server entry point
+├── package.json         # Dependencies and scripts
+└── README.md           # This file
+```
 
-## 📱 Screen Templates
+## Development
 
-The template includes these screen patterns:
-- **Welcome/Onboarding** - User introduction flow
-- **Authentication** - Login/signup patterns
-- **Data Selection** - Dynamic list selection with images
-- **Dashboard** - Main app interface
-- **Profile/Settings** - User management
-- **Modal Systems** - Overlay interactions
+### Available Scripts
 
-## 🎯 Use Cases
+- `npm start` - Start React development server
+- `npm run server` - Start Express backend server
+- `npm run dev` - Start backend with nodemon for development
+- `npm run build` - Build production version
+- `npm test` - Run tests
 
-Perfect for creating:
-- **Mock Apps** - Rapid prototyping
-- **Portfolio Projects** - Showcase your skills
-- **Client Demos** - Interactive presentations
-- **Learning Projects** - React practice
-- **Startup MVPs** - Quick validation
+### Environment Variables
 
-## 🛠️ Development
+Copy `env.example` to `.env` and configure:
 
 ```bash
-# Start development server
-npm start
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-
-# Eject from Create React App
-npm run eject
+cp env.example .env
 ```
 
-## 📄 License
+Key environment variables:
+- `PORT` - Backend server port (default: 3001)
+- `CORS_ORIGIN` - Allowed origins for CORS
+- `NODE_ENV` - Environment (development/production)
 
-MIT License - Feel free to use this template for any project!
+## Deployment
 
-## 🤝 Contributing
+See `DEPLOYMENT.md` for detailed deployment instructions.
 
-This template is designed to be a starting point. Customize it to fit your specific needs and project requirements. 
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details. 

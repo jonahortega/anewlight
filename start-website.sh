@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Starting Greek Life Connect Website..."
+echo "🚀 Starting The Greek Life App..."
 echo "📍 Location: $(pwd)"
 echo ""
 

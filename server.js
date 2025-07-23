@@ -59,7 +59,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
-    message: 'Greek Life Connect Website API is running',
+    message: 'The Greek Life App API is running',
     timestamp: new Date().toISOString()
   });
 });
@@ -105,7 +105,7 @@ app.use('*', (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
-  console.log(`🚀 Greek Life Connect Website running on port ${PORT}`);
+  console.log(`🚀 The Greek Life App running on port ${PORT}`);
   console.log(`📍 Main website: http://localhost:${PORT}`);
   console.log(`📍 Admin dashboard: http://localhost:${PORT}/dashboard`);
   console.log(`📍 API health check: http://localhost:${PORT}/api/health`);

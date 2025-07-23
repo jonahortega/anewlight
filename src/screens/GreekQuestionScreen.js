@@ -1009,114 +1009,125 @@ const GreekQuestionScreen = ({ user, onAnswer, onBack }) => {
     setShowJoinModal(false);
   };
 
+  const [activeTab, setActiveTab] = useState('fraternities'); // 'fraternities' or 'sororities'
+  const [searchTerm, setSearchTerm] = useState('');
+
   if (showGreekSelection) {
+    const fraternities = greekOrganizations.filter(org => org.type === 'Fraternity');
+    const sororities = greekOrganizations.filter(org => org.type === 'Sorority');
+    
+    const filteredFraternities = searchTerm 
+      ? fraternities.filter(org => org.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      : fraternities;
+    
+    const filteredSororities = searchTerm 
+      ? sororities.filter(org => org.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      : sororities;
+
     return (
       <div className="greek-selection-screen">
+        <div className="greek-selection-container">
         <div className="greek-selection-header">
-          <div className="header-content">
-            <div className="header-left">
-              <h1>Select Your Greek Organization</h1>
+            <h2>Select Your Greek Organization</h2>
               <p>Choose the Greek organization you're a member of or request to join at {user?.university || 'your university'}</p>
+            
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search organizations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
             </div>
-            <div className="header-right">
-              <button className="btn btn-outline" onClick={handleBackToSelection}>
-                ← Back
+
+            <div className="tab-buttons">
+              <button 
+                className={`tab-button ${activeTab === 'fraternities' ? 'active' : ''}`}
+                onClick={() => setActiveTab('fraternities')}
+              >
+                Fraternities ({filteredFraternities.length})
               </button>
-            </div>
+              <button 
+                className={`tab-button ${activeTab === 'sororities' ? 'active' : ''}`}
+                onClick={() => setActiveTab('sororities')}
+              >
+                Sororities ({filteredSororities.length})
+              </button>
           </div>
         </div>
 
-        <div className="greek-selection-content">
           {selectedGreek && (
-            <div className="selection-summary">
-              <div className="summary-content">
-                <h3>✓ Selected: {selectedGreek.name}</h3>
-                <p>You've selected {selectedGreek.name} ({selectedGreek.type}). You can now request to join this organization.</p>
-                <div className="summary-actions">
-                  <button className="btn btn-primary" onClick={handleJoinRequest}>
-                    Request to Join {selectedGreek.name}
-                  </button>
+            <div className="continue-section">
+              <div className="selected-preview">
+                <div className="selected-organization">
+                  <div className="organization-logo">
+                    <div className="logo-initials">
+                      {selectedGreek.name.split(' ').map(word => word[0]).join('')}
                 </div>
               </div>
+                  <div className="organization-info">
+                    <h4>Selected: {selectedGreek.name}</h4>
+                    <p>{selectedGreek.type} • Founded {selectedGreek.founded}</p>
+                  </div>
+                </div>
+              </div>
+              <button onClick={handleJoinRequest} className="confirm-button">
+                Request to Join {selectedGreek.name}
+              </button>
             </div>
           )}
           
-          <div className="greek-organizations-grid">
-            {greekOrganizations.map((greek, index) => (
+          <div className="organizations-list">
+            {activeTab === 'fraternities' ? (
+              filteredFraternities.map((greek) => (
               <div 
                 key={greek.id} 
-                className={`greek-organization-card ${selectedGreek?.id === greek.id ? 'selected' : ''}`}
+                  className={`organization-item ${selectedGreek?.id === greek.id ? 'selected' : ''}`}
                 onClick={() => handleGreekSelect(greek)}
-                style={{
-                  animationDelay: `${index * 0.1}s`
-                }}
               >
-                <div className="greek-organization-image">
-                  <img 
-                    src={getGreekImage(greek.name)} 
-                    alt={greek.name}
-                    onError={(e) => {
-                      console.log(`Image failed to load for ${greek.name}:`, e.target.src);
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                      setImageErrors(prev => ({ ...prev, [greek.id]: true }));
-                    }}
-                    onLoad={(e) => {
-                      e.target.style.opacity = '1';
-                      setImageErrors(prev => ({ ...prev, [greek.id]: false }));
-                    }}
-                    style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
-                  />
-                  <div className="image-fallback" style={{ display: imageErrors[greek.id] ? 'flex' : 'none' }}>
-                    <span className="fallback-icon">🏛️</span>
-                    <span className="fallback-text">{greek.name}</span>
+                  <div className="organization-logo">
+                    <div className="logo-initials">
+                      {greek.name.split(' ').map(word => word[0]).join('')}
                   </div>
-                  <div className="greek-type-badge">
-                    {greek.type}
                   </div>
-                  <div className="greek-overlay">
-                    <div className="overlay-content">
-                      <span className="overlay-icon">✓</span>
-                      <span className="overlay-text">Selected</span>
+                  <div className="organization-info">
+                    <h3>{greek.name}</h3>
+                    <p>Founded {greek.founded} • {greek.members} members</p>
+                    {greek.motto && (
+                      <p className="organization-motto">"{greek.motto}"</p>
+                    )}
                     </div>
                   </div>
+              ))
+            ) : (
+              filteredSororities.map((greek) => (
+                <div
+                  key={greek.id}
+                  className={`organization-item ${selectedGreek?.id === greek.id ? 'selected' : ''}`}
+                  onClick={() => handleGreekSelect(greek)}
+                >
+                  <div className="organization-logo">
+                    <div className="logo-initials">
+                      {greek.name.split(' ').map(word => word[0]).join('')}
                 </div>
-                
-                <div className="greek-organization-content">
-                  <div className="greek-header">
+                  </div>
+                  <div className="organization-info">
                     <h3>{greek.name}</h3>
+                    <p>Founded {greek.founded} • {greek.members} members</p>
                     {greek.motto && (
-                      <p className="greek-motto">"{greek.motto}"</p>
+                      <p className="organization-motto">"{greek.motto}"</p>
                     )}
                   </div>
-                  
-                  <p className="greek-description">{greek.description}</p>
-                  
-                  <div className="greek-details">
-                    <div className="detail-item">
-                      <span className="detail-icon">🏛️</span>
-                      <span>Founded {greek.founded}</span>
                     </div>
-                    <div className="detail-item">
-                      <span className="detail-icon">👥</span>
-                      <span>{greek.members} members</span>
-                    </div>
+              ))
+            )}
                   </div>
 
-                  <div className="greek-actions">
-                    <button 
-                      className="btn btn-outline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleGreekSelect(greek);
-                      }}
-                    >
-                      {selectedGreek?.id === greek.id ? '✓ Selected' : 'Select This Organization'}
+          <div className="back-section">
+            <button className="btn btn-outline" onClick={handleBackToSelection}>
+              ← Back to Question
                     </button>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 

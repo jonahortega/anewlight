@@ -1,65 +1,149 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HomeScreen.css';
 
 const HomeScreen = ({ user, onNavigate }) => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [feedPosts, setFeedPosts] = useState([
-    {
-      id: 1,
-      type: 'event',
-      author: {
-        name: 'Alpha Beta Gamma',
-        avatar: '🏛️',
-        isOrganization: true,
-        university: 'UC Berkeley'
-      },
-      content: {
-        caption: 'Spring Formal 2024 is just around the corner! 🎉 Join us for an unforgettable night of dancing, great food, and amazing company. Early bird tickets are selling fast! #SpringFormal #GreekLife #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&h=400&fit=crop&crop=center&q=80',
-        eventDetails: {
-          date: 'March 15, 2024',
-          time: '8:00 PM',
-          location: 'Grand Ballroom',
-          attendees: 127
-        }
-      },
-      likes: 89,
-      comments: [
-        {
-          id: 1,
-          author: 'Sarah Johnson',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-          text: 'Can\'t wait for this! Already got my ticket! 🎉',
-          timestamp: '1 hour ago'
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [sharePost, setSharePost] = useState(null);
+  const [shareMessage, setShareMessage] = useState('');
+  const [selectedRecipient, setSelectedRecipient] = useState('');
+  const [recipientType, setRecipientType] = useState('person'); // 'person' or 'organization'
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  // Function to generate feed posts based on user's university
+  const generateFeedPosts = (userUniversity) => {
+    const university = userUniversity || 'University of California, Berkeley';
+    const universityShort = university.includes('UC Berkeley') ? 'UC Berkeley' : 
+                           university.includes('Stanford') ? 'Stanford' :
+                           university.includes('UCLA') ? 'UCLA' :
+                           university.includes('USC') ? 'USC' :
+                           university.includes('NYU') ? 'NYU' :
+                           university.includes('Harvard') ? 'Harvard' :
+                           university.includes('MIT') ? 'MIT' :
+                           university.includes('Yale') ? 'Yale' :
+                           university.includes('Princeton') ? 'Princeton' :
+                           university.includes('Columbia') ? 'Columbia' :
+                           university.split(',')[0]; // Use first part of university name
+
+    return [
+      {
+        id: 1,
+        type: 'event',
+        author: {
+          name: 'Alpha Beta Gamma',
+          avatar: '🏛️',
+          isOrganization: true,
+          university: university
         },
-        {
-          id: 2,
-          author: 'Michael Chen',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-          text: 'This is going to be epic! Who else is going?',
-          timestamp: '30 minutes ago'
-        }
-      ],
-      shares: 12,
-      timestamp: '2 hours ago',
-      isLiked: false,
-      isSaved: false
-    },
-    {
-      id: 2,
-      type: 'photo',
-      author: {
-        name: 'Sarah Johnson',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-        isOrganization: false,
-        university: 'UC Berkeley',
-        organization: 'Delta Epsilon Zeta'
+        content: {
+          caption: `Spring Formal 2024 is just around the corner! 🎉 Join us for an unforgettable night of dancing, great food, and amazing company. Early bird tickets are selling fast! #SpringFormal #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+          image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&h=400&fit=crop&crop=center&q=80',
+          eventDetails: {
+            date: 'March 15, 2024',
+            time: '8:00 PM',
+            location: 'Grand Ballroom',
+            attendees: 127,
+            maxAttendees: 200,
+            isPaid: true,
+            price: 25,
+            category: 'Social'
+          }
+        },
+        likes: 89,
+        comments: [
+          {
+            id: 1,
+            author: 'Sarah Johnson',
+            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+            text: 'Can\'t wait for this! Already got my ticket! 🎉',
+            timestamp: '1 hour ago'
+          },
+          {
+            id: 2,
+            author: 'Michael Chen',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+            text: 'This is going to be epic! Who else is going?',
+            timestamp: '30 minutes ago'
+          }
+        ],
+        shares: 12,
+        timestamp: '2 hours ago',
+        isLiked: false,
+        isSaved: false
       },
+      {
+        id: 2,
+        type: 'past-event',
+        author: {
+          name: 'Delta Epsilon Zeta',
+          avatar: '🏛️',
+          isOrganization: true,
+          university: university
+        },
+        content: {
+          caption: `What an incredible philanthropy fundraiser last night! 🎗️ Thank you to everyone who came out to support breast cancer awareness. We raised over $3,500! The silent auction was amazing and the guest speakers were truly inspiring. Can't wait for our next event! #Philanthropy #Charity #DEZ #${universityShort.replace(/\s+/g, '')}`,
+          image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop&crop=center&q=80',
+          eventDetails: {
+            date: 'March 8, 2024',
+            time: '6:30 PM',
+            location: 'Delta Epsilon Zeta House',
+            attendees: 156,
+            maxAttendees: 150,
+            isPaid: true,
+            price: 35,
+            category: 'Philanthropy',
+            isPast: true,
+            fundsRaised: 3500,
+            nextEvent: 'March 22, 2024'
+          }
+        },
+        likes: 234,
+        comments: [
+          {
+            id: 1,
+            author: 'Rachel Green',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
+            text: 'Such an amazing night! The energy was incredible! 💕',
+            timestamp: '2 hours ago'
+          },
+          {
+            id: 2,
+            author: 'Alex Thompson',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+            text: 'Proud to be part of such an impactful event!',
+            timestamp: '3 hours ago'
+          }
+        ],
+        shares: 45,
+        timestamp: '1 day ago',
+        isLiked: true,
+        isSaved: false
+      },
+      {
+        id: 3,
+        type: 'photo',
+        author: {
+          name: 'Sarah Johnson',
+          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+          isOrganization: false,
+          university: university,
+          organization: 'Delta Epsilon Zeta'
+        },
       content: {
         caption: 'Amazing time at our sisterhood retreat this weekend! 💕 The bonds we create here are truly special. Can\'t wait for our next adventure together! #Sisterhood #GreekLife #Retreat #DEZ',
-        image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&h=400&fit=crop&crop=center&q=80'
+        image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&h=400&fit=crop&crop=center&q=80',
+        eventDetails: {
+          date: 'March 10-12, 2024',
+          time: 'All Day Event',
+          location: 'Lake Tahoe Resort',
+          attendees: 45,
+          maxAttendees: 50,
+          isPaid: false,
+          price: null,
+          category: 'Retreat'
+        }
       },
       likes: 156,
       comments: [
@@ -83,8 +167,55 @@ const HomeScreen = ({ user, onNavigate }) => {
       isLiked: true,
       isSaved: false
     },
+      {
+        id: 4,
+        type: 'past-event',
+        author: {
+          name: 'Theta Iota Kappa',
+          avatar: '🏛️',
+          isOrganization: true,
+          university: university
+        },
+      content: {
+        caption: 'Winter Formal was absolutely magical! ❄️✨ Thank you to all 180+ brothers and guests who made it such a special night. The venue was stunning, the music was perfect, and the memories we made will last forever. Our next social event is coming up soon! #WinterFormal #TIK #GreekLife #UCBerkeley',
+        image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&h=400&fit=crop&crop=center&q=80',
+        eventDetails: {
+          date: 'February 24, 2024',
+          time: '8:00 PM',
+          location: 'Grand Ballroom',
+          attendees: 182,
+          maxAttendees: 200,
+          isPaid: true,
+          price: 30,
+          category: 'Social',
+          isPast: true,
+          nextEvent: 'March 20, 2024'
+        }
+      },
+      likes: 198,
+      comments: [
+        {
+          id: 1,
+          author: 'David Rodriguez',
+          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+          text: 'Best formal ever! The decorations were incredible!',
+          timestamp: '1 day ago'
+        },
+        {
+          id: 2,
+          author: 'Mike Johnson',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+          text: 'Can\'t believe how amazing it was! Already excited for next time!',
+          timestamp: '2 days ago'
+        }
+      ],
+      shares: 67,
+      timestamp: '3 days ago',
+      isLiked: false,
+      isSaved: true
+    },
     {
-      id: 3,
+      id: 5,
       type: 'announcement',
       author: {
         name: 'Theta Iota Kappa',
@@ -94,7 +225,17 @@ const HomeScreen = ({ user, onNavigate }) => {
       },
       content: {
         caption: 'Congratulations to our brothers who made Dean\'s List this semester! 🎓 Your hard work and dedication inspire us all. Keep up the excellent work! #AcademicExcellence #DeanList #TIK #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop&crop=center&q=80'
+        image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop&crop=center&q=80',
+        eventDetails: {
+          date: 'March 20, 2024',
+          time: '6:00 PM',
+          location: 'TIK House',
+          attendees: 28,
+          maxAttendees: 35,
+          isPaid: false,
+          price: null,
+          category: 'Academic'
+        }
       },
       likes: 203,
       comments: [
@@ -112,61 +253,32 @@ const HomeScreen = ({ user, onNavigate }) => {
       isSaved: true
     },
     {
-      id: 4,
-      type: 'event',
+      id: 6,
+      type: 'past-event',
       author: {
-        name: 'Delta Epsilon Zeta',
+        name: 'Alpha Beta Gamma',
         avatar: '🏛️',
         isOrganization: true,
         university: 'UC Berkeley'
       },
       content: {
-        caption: 'Join us for our annual philanthropy fundraiser! 🎗️ Support breast cancer awareness with gourmet food, silent auctions, and inspiring speakers. Let\'s make a difference together! #Philanthropy #Charity #DEZ #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop&crop=center&q=80',
+        caption: 'Community Service Day was a huge success! 👥 We had 42 brothers show up to help clean up the local park and assist at the food bank. The community was so grateful and we made a real difference. Our next service event is scheduled for April 5th! #CommunityService #Volunteer #ABG #UCBerkeley',
+        image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop&crop=center&q=80',
         eventDetails: {
-          date: 'March 22, 2024',
-          time: '6:30 PM',
-          location: 'Delta Epsilon Zeta House',
-          attendees: 89
+          date: 'March 1, 2024',
+          time: '9:00 AM - 3:00 PM',
+          location: 'Local Community Center',
+          attendees: 42,
+          maxAttendees: 40,
+          isPaid: false,
+          price: null,
+          category: 'Service',
+          isPast: true,
+          hoursVolunteered: 6,
+          nextEvent: 'April 5, 2024'
         }
       },
-      likes: 134,
-      comments: [
-        {
-          id: 1,
-          author: 'Rachel Green',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
-          text: 'Such an important cause! Count me in! 💕',
-          timestamp: '45 minutes ago'
-        },
-        {
-          id: 2,
-          author: 'Alex Thompson',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-          text: 'Can\'t wait to support this amazing cause!',
-          timestamp: '1 hour ago'
-        }
-      ],
-      shares: 23,
-      timestamp: '3 hours ago',
-      isLiked: true,
-      isSaved: false
-    },
-    {
-      id: 5,
-      type: 'photo',
-      author: {
-        name: 'Michael Chen',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-        isOrganization: false,
-        university: 'UC Berkeley',
-        organization: 'Alpha Beta Gamma'
-      },
-      content: {
-        caption: 'Community service day with the brothers! 👥 Making a positive impact in our local community. Service above self! #CommunityService #Volunteer #ABG #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop&crop=center&q=80'
-      },
-      likes: 98,
+      likes: 145,
       comments: [
         {
           id: 1,
@@ -183,13 +295,13 @@ const HomeScreen = ({ user, onNavigate }) => {
           timestamp: '3 hours ago'
         }
       ],
-      shares: 15,
-      timestamp: '5 hours ago',
+      shares: 23,
+      timestamp: '1 week ago',
       isLiked: false,
       isSaved: true
     },
     {
-      id: 6,
+      id: 7,
       type: 'event',
       author: {
         name: 'Greek Life Council',
@@ -204,7 +316,11 @@ const HomeScreen = ({ user, onNavigate }) => {
           date: 'March 28, 2024',
           time: '2:00 PM',
           location: 'Business School Auditorium',
-          attendees: 67
+          attendees: 67,
+          maxAttendees: 100,
+          isPaid: true,
+          price: 20,
+          category: 'Leadership'
         }
       },
       likes: 76,
@@ -222,9 +338,33 @@ const HomeScreen = ({ user, onNavigate }) => {
       isLiked: false,
       isSaved: false
     }
-  ]);
+  ];
+  };
 
+  const [feedPosts, setFeedPosts] = useState(generateFeedPosts(user?.university));
 
+  // Update feed when user's university changes
+  useEffect(() => {
+    setFeedPosts(generateFeedPosts(user?.university));
+  }, [user?.university]);
+
+  // Mock data for share recipients
+  const shareRecipients = {
+    people: [
+      { id: 1, name: 'Sarah Johnson', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face', university: user?.university || 'University of California, Berkeley' },
+      { id: 2, name: 'Michael Chen', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', university: user?.university || 'University of California, Berkeley' },
+      { id: 3, name: 'Emma Wilson', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', university: user?.university || 'University of California, Berkeley' },
+      { id: 4, name: 'Jessica Lee', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', university: user?.university || 'University of California, Berkeley' },
+      { id: 5, name: 'David Rodriguez', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', university: user?.university || 'University of California, Berkeley' }
+    ],
+    organizations: [
+      { id: 1, name: 'Alpha Beta Gamma', avatar: '🏛️', type: 'Fraternity', university: user?.university || 'University of California, Berkeley' },
+      { id: 2, name: 'Delta Epsilon Zeta', avatar: '🏛️', type: 'Sorority', university: user?.university || 'University of California, Berkeley' },
+      { id: 3, name: 'Theta Iota Kappa', avatar: '🏛️', type: 'Fraternity', university: user?.university || 'University of California, Berkeley' },
+      { id: 4, name: 'Lambda Mu Nu', avatar: '🏛️', type: 'Sorority', university: user?.university || 'University of California, Berkeley' },
+      { id: 5, name: 'Sigma Tau Upsilon', avatar: '🏛️', type: 'Fraternity', university: user?.university || 'University of California, Berkeley' }
+    ]
+  };
 
   const handleLike = (postId) => {
     // In a real app, this would update the backend
@@ -243,8 +383,30 @@ const HomeScreen = ({ user, onNavigate }) => {
   };
 
   const handleShare = (postId) => {
-    // In a real app, this would open a share modal
-    console.log('Share post:', postId);
+    const post = feedPosts.find(p => p.id === postId);
+    setSharePost(post);
+    setShowShareModal(true);
+    setShareMessage('');
+    setSelectedRecipient('');
+    setRecipientType('person');
+  };
+
+  const closeShareModal = () => {
+    setShowShareModal(false);
+    setSharePost(null);
+    setShareMessage('');
+    setSelectedRecipient('');
+  };
+
+  const handleSendShare = () => {
+    if (selectedRecipient && sharePost) {
+      // In a real app, this would send the share to the backend
+      console.log('Sharing post:', sharePost.id, 'to:', selectedRecipient, 'type:', recipientType, 'message:', shareMessage);
+      alert(`Post shared successfully to ${selectedRecipient}!`);
+      closeShareModal();
+    } else {
+      alert('Please select a recipient to share with.');
+    }
   };
 
   const handleSave = (postId) => {
@@ -268,6 +430,29 @@ const HomeScreen = ({ user, onNavigate }) => {
 
   const handleEventClick = (eventId) => {
     onNavigate('events');
+  };
+
+  const handleLearnMore = (eventDetails, post) => {
+    setSelectedEvent({ ...eventDetails, post });
+    setShowEventModal(true);
+  };
+
+  const closeEventModal = () => {
+    setShowEventModal(false);
+    setSelectedEvent(null);
+  };
+
+  const handleEventRSVP = () => {
+    // Handle RSVP logic here
+    console.log('RSVP for event:', selectedEvent);
+    // You could add logic to update the event attendance count
+    closeEventModal();
+  };
+
+  const handleEventShare = () => {
+    setSharePost(selectedEvent.post);
+    setShowEventModal(false);
+    setShowShareModal(true);
   };
 
   const handleActionClick = (action) => {
@@ -335,16 +520,84 @@ const HomeScreen = ({ user, onNavigate }) => {
           <span className="caption-text">{post.content.caption}</span>
         </div>
 
-        {/* Event Card */}
+        {/* Enhanced Event Card */}
         {post.content.eventDetails && (
           <div className="event-card" onClick={() => handleEventClick(post.content.eventDetails)}>
-            <div className="event-info">
-              <h4>📅 {post.content.eventDetails.date}</h4>
-              <p>🕒 {post.content.eventDetails.time}</p>
-              <p>📍 {post.content.eventDetails.location}</p>
-              <p>👥 {post.content.eventDetails.attendees} attending</p>
+            <div className="event-header">
+              <div className="event-category-badge">
+                {post.content.eventDetails.category}
+              </div>
+              {post.content.eventDetails.isPast ? (
+                <div className="event-past-badge">
+                  Past Event
+                </div>
+              ) : post.content.eventDetails.isPaid && (
+                <div className="event-price-badge">
+                  ${post.content.eventDetails.price}
+                </div>
+              )}
             </div>
-            <button className="event-btn">View Event</button>
+            <div className="event-content">
+              <div className="event-details">
+                <div className="event-detail-item">
+                  <span className="event-icon">📅</span>
+                  <span className="event-text">{post.content.eventDetails.date}</span>
+                </div>
+                <div className="event-detail-item">
+                  <span className="event-icon">🕒</span>
+                  <span className="event-text">{post.content.eventDetails.time}</span>
+                </div>
+                <div className="event-detail-item">
+                  <span className="event-icon">📍</span>
+                  <span className="event-text">{post.content.eventDetails.location}</span>
+                </div>
+                <div className="event-detail-item">
+                  <span className="event-icon">👥</span>
+                  <span className="event-text">
+                    {post.content.eventDetails.isPast 
+                      ? `${post.content.eventDetails.attendees} attended`
+                      : `${post.content.eventDetails.attendees}/${post.content.eventDetails.maxAttendees} attending`
+                    }
+                  </span>
+                </div>
+                {post.content.eventDetails.isPast && post.content.eventDetails.fundsRaised && (
+                  <div className="event-detail-item">
+                    <span className="event-icon">💰</span>
+                    <span className="event-text">${post.content.eventDetails.fundsRaised} raised</span>
+                  </div>
+                )}
+                {post.content.eventDetails.isPast && post.content.eventDetails.hoursVolunteered && (
+                  <div className="event-detail-item">
+                    <span className="event-icon">⏱️</span>
+                    <span className="event-text">{post.content.eventDetails.hoursVolunteered} hours</span>
+                  </div>
+                )}
+                {post.content.eventDetails.isPast && post.content.eventDetails.nextEvent && (
+                  <div className="event-detail-item next-event">
+                    <span className="event-icon">🎉</span>
+                    <span className="event-text">Next: {post.content.eventDetails.nextEvent}</span>
+                  </div>
+                )}
+              </div>
+              <div className="event-actions">
+                {!post.content.eventDetails.isPast && (
+                  <>
+                    <button className="event-action-btn primary">
+                      {post.content.eventDetails.isPaid ? 'Get Tickets' : 'RSVP Now'}
+                    </button>
+                    <button 
+                      className="event-action-btn secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLearnMore(post.content.eventDetails, post);
+                      }}
+                    >
+                      Learn More
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -384,7 +637,7 @@ const HomeScreen = ({ user, onNavigate }) => {
           className={`save-btn ${post.isSaved ? 'saved' : ''}`}
           onClick={() => handleSave(post.id)}
         >
-          <span className="action-icon">{post.isSaved ? '🔖' : '📌'}</span>
+          <span className="action-icon">{post.isSaved ? '🔖' : ''}</span>
         </button>
       </div>
 
@@ -490,6 +743,232 @@ const HomeScreen = ({ user, onNavigate }) => {
                   >
                     Post
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && sharePost && (
+        <div className="share-modal-overlay" onClick={closeShareModal}>
+          <div className="share-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="share-modal-header">
+              <h3>Share Post</h3>
+              <button className="close-btn" onClick={closeShareModal}>×</button>
+            </div>
+            
+            <div className="share-modal-content">
+              {/* Post Preview */}
+              <div className="share-post-preview">
+                <div className="share-post-header">
+                  <div className="share-post-author">
+                    <div className="share-post-avatar">
+                      {sharePost.author.isOrganization ? (
+                        <span className="org-avatar">{sharePost.author.avatar}</span>
+                      ) : (
+                        <img src={sharePost.author.avatar} alt={sharePost.author.name} />
+                      )}
+                    </div>
+                    <div className="share-post-info">
+                      <h4>{sharePost.author.name}</h4>
+                      <p>{sharePost.content.caption.substring(0, 100)}...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recipient Type Selection */}
+              <div className="share-recipient-type">
+                <label>
+                  <input
+                    type="radio"
+                    name="recipientType"
+                    value="person"
+                    checked={recipientType === 'person'}
+                    onChange={(e) => setRecipientType(e.target.value)}
+                  />
+                  Share with Person
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="recipientType"
+                    value="organization"
+                    checked={recipientType === 'organization'}
+                    onChange={(e) => setRecipientType(e.target.value)}
+                  />
+                  Share with Organization
+                </label>
+              </div>
+
+              {/* Recipient Selection */}
+              <div className="share-recipient-selection">
+                <label>Select Recipient:</label>
+                <select 
+                  value={selectedRecipient} 
+                  onChange={(e) => setSelectedRecipient(e.target.value)}
+                  className="share-recipient-select"
+                >
+                  <option value="">Choose a {recipientType}...</option>
+                  {recipientType === 'person' 
+                    ? shareRecipients.people.map(person => (
+                        <option key={person.id} value={person.name}>
+                          {person.name} - {person.university}
+                        </option>
+                      ))
+                    : shareRecipients.organizations.map(org => (
+                        <option key={org.id} value={org.name}>
+                          {org.name} ({org.type}) - {org.university}
+                        </option>
+                      ))
+                  }
+                </select>
+              </div>
+
+              {/* Message Input */}
+              <div className="share-message-input">
+                <label>Add a message (optional):</label>
+                <textarea
+                  value={shareMessage}
+                  onChange={(e) => setShareMessage(e.target.value)}
+                  placeholder="Add a personal message..."
+                  className="share-message-textarea"
+                  rows="3"
+                />
+              </div>
+
+              {/* Share Button */}
+              <div className="share-actions">
+                <button 
+                  className="share-send-btn"
+                  onClick={handleSendShare}
+                  disabled={!selectedRecipient}
+                >
+                  Send Share
+                </button>
+                <button 
+                  className="share-cancel-btn"
+                  onClick={closeShareModal}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Event Details Modal */}
+      {showEventModal && selectedEvent && (
+        <div className="event-modal-overlay" onClick={closeEventModal}>
+          <div className="event-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="event-modal-header">
+              <h3>Event Details</h3>
+              <button className="close-btn" onClick={closeEventModal}>×</button>
+            </div>
+            
+            <div className="event-modal-content">
+              {/* Event Image */}
+              {selectedEvent.post.content.image && (
+                <div className="event-modal-image">
+                  <img src={selectedEvent.post.content.image} alt="Event" />
+                </div>
+              )}
+              
+              {/* Event Details */}
+              <div className="event-modal-details">
+                <div className="event-modal-org-info">
+                  <div className="event-modal-org-avatar">
+                    {selectedEvent.post.author.isOrganization ? (
+                      <span className="org-avatar">{selectedEvent.post.author.avatar}</span>
+                    ) : (
+                      <img src={selectedEvent.post.author.avatar} alt={selectedEvent.post.author.name} />
+                    )}
+                  </div>
+                  <div className="event-modal-org-details">
+                    <h4>{selectedEvent.post.author.name}</h4>
+                    <p>{selectedEvent.post.author.university}</p>
+                  </div>
+                </div>
+
+                <div className="event-modal-info">
+                  <h2 className="event-modal-title">{selectedEvent.post.content.caption.split('!')[0]}!</h2>
+                  
+                  <div className="event-modal-details-grid">
+                    <div className="event-modal-detail-item">
+                      <span className="event-modal-icon">📅</span>
+                      <div>
+                        <label>Date</label>
+                        <span>{selectedEvent.date}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="event-modal-detail-item">
+                      <span className="event-modal-icon">🕒</span>
+                      <div>
+                        <label>Time</label>
+                        <span>{selectedEvent.time}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="event-modal-detail-item">
+                      <span className="event-modal-icon">📍</span>
+                      <div>
+                        <label>Location</label>
+                        <span>{selectedEvent.location}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="event-modal-detail-item">
+                      <span className="event-modal-icon">👥</span>
+                      <div>
+                        <label>Attendance</label>
+                        <span>{selectedEvent.attendees}/{selectedEvent.maxAttendees} people</span>
+                      </div>
+                    </div>
+                    
+                    {selectedEvent.isPaid && (
+                      <div className="event-modal-detail-item">
+                        <span className="event-modal-icon">💰</span>
+                        <div>
+                          <label>Price</label>
+                          <span>${selectedEvent.price}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedEvent.category && (
+                      <div className="event-modal-detail-item">
+                        <span className="event-modal-icon">🏷️</span>
+                        <div>
+                          <label>Category</label>
+                          <span>{selectedEvent.category}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="event-modal-description">
+                    <h4>About This Event</h4>
+                    <p>{selectedEvent.post.content.caption}</p>
+                  </div>
+
+                  <div className="event-modal-actions">
+                    <button 
+                      className="event-modal-rsvp-btn"
+                      onClick={handleEventRSVP}
+                    >
+                      {selectedEvent.isPaid ? 'Get Tickets' : 'RSVP Now'}
+                    </button>
+                    <button 
+                      className="event-modal-share-btn"
+                      onClick={handleEventShare}
+                    >
+                      Share Event
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

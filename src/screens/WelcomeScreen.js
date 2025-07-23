@@ -28,7 +28,6 @@ const WelcomeScreen = ({ onNavigate }) => {
       <div className="welcome-container">
         <div className="welcome-content">
           <div className="welcome-header">
-            <div className="welcome-icon">🏛️</div>
             <h1 className="welcome-title">Greek Life</h1>
             <p className="welcome-subtitle">Connect, Engage, Thrive</p>
           </div>

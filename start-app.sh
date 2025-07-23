@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting Greek Life App..."
+echo "Starting The Greek Life App..."
 
 # Check if node_modules exists
 if [ ! -d "node_modules" ]; then

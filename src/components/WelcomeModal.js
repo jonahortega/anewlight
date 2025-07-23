@@ -24,12 +24,12 @@ const WelcomeModal = ({ isOpen, onClose, user }) => {
       icon: "📅",
       color: "#0ea5e9"
     },
-    // {
-    //   title: "Direct Messaging",
-    //   description: "Chat directly with organization members and leaders. Stay in the loop with private conversations.",
-    //   icon: "💬",
-    //   color: "#38bdf8"
-    // }, // REMOVED - MESSAGING FEATURE
+    {
+      title: "Direct Messaging",
+      description: "Chat directly with organization members and leaders. Stay in the loop with private conversations.",
+      icon: "💬",
+      color: "#38bdf8"
+    },
     {
       title: "Campus Map",
       description: "Navigate your campus with our interactive map showing Greek houses, event locations, and campus landmarks.",

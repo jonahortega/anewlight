@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import './MessagesScreen.css';
 
-const MessagesScreen = ({ user, onNavigate, conversations, setConversations, activeConversation, setActiveConversation }) => {
+const MessagesScreen = ({ user, onNavigate, conversations, setConversations, activeConversation, setActiveConversation, navigationData }) => {
   const [selectedConversationId, setSelectedConversationId] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -247,6 +247,16 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
       }
     }
   }, [activeConversation, allConversations, selectedConversationId]);
+
+  // Handle conversationId from navigation data
+  useEffect(() => {
+    if (navigationData?.conversationId && !selectedConversationId) {
+      const conversation = allConversations.find(conv => conv.id === navigationData.conversationId);
+      if (conversation) {
+        setSelectedConversationId(conversation.id);
+      }
+    }
+  }, [navigationData, allConversations, selectedConversationId]);
 
   // Close modals when entering a conversation
   useEffect(() => {
@@ -594,6 +604,18 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
     setShowGroupMembers(true);
   };
 
+  const handleProfileClick = (conversation) => {
+    if (!conversation) return;
+    
+    if (conversation.type === 'individual') {
+      // Navigate to user profile
+      onNavigate('profile', { userId: conversation.id, userName: conversation.name });
+    } else {
+      // Navigate to organization profile
+      onNavigate('organization-profile', { orgId: conversation.id, orgName: conversation.name });
+    }
+  };
+
   // Close modals when entering a conversation
   useEffect(() => {
     if (selectedConversation) {
@@ -735,7 +757,7 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
         >
           ← Back
         </button>
-        <div className="chat-info">
+        <div className="chat-info" onClick={() => selectedConversation && handleProfileClick(selectedConversation)}>
           <div className="chat-avatar">
             {selectedConversation.type === 'individual' ? (
               <img src={selectedConversation.avatar} alt={selectedConversation.name} />
@@ -1059,8 +1081,6 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
           <button className="back-button" onClick={() => onNavigate('home')}>
             ← Back to Home
           </button>
-          <h1>Messages</h1>
-          <p>Stay connected with your campus community</p>
         </header>
 
         <div className="messages-container">

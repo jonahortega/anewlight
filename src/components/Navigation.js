@@ -4,8 +4,7 @@ import './Navigation.css';
 const Navigation = ({ currentScreen, onNavigate }) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'events', label: 'Events', icon: '📅' },
-    // { id: 'messages', label: 'Messages', icon: '💬' }, // REMOVED - MESSAGING FEATURE
+    { id: 'events', label: 'Search', icon: '🔍' },
     { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
   ];

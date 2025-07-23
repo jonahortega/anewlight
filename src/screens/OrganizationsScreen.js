@@ -287,7 +287,7 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
         </button>
         <div className="header-content">
           <h1 className="organizations-title">Organizations</h1>
-          <p className="organizations-subtitle">Manage your memberships and discover new opportunities</p>
+          <p className="organizations-subtitle">Find and join fraternities, sororities, clubs, and organizations at your university</p>
         </div>
       </div>
 
@@ -305,7 +305,6 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
           onClick={() => setActiveTab('search-organizations')}
         >
           <span className="tab-icon">🔍</span>
-          Search Organizations
           <span className="tab-count">({allOrganizations.length - userOrganizations.length})</span>
         </button>
       </div>
@@ -313,17 +312,6 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
       {activeTab === 'my-organizations' && (
         <div className="tab-content">
           <div className="controls-section">
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder="Search your organizations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-              <span className="search-icon">🔍</span>
-            </div>
-
             <div className="sort-controls">
               <label htmlFor="sort-select">Sort by:</label>
               <select 
@@ -440,12 +428,6 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
 
       {activeTab === 'search-organizations' && (
         <div className="tab-content">
-          <div className="search-section">
-            <div className="search-header">
-              <h2>Discover Organizations</h2>
-              <p>Find and join fraternities, sororities, clubs, and organizations at your university</p>
-            </div>
-            
             <div className="search-controls">
               <div className="search-container">
                 <input
@@ -573,7 +555,6 @@ const OrganizationsScreen = ({ user, onNavigate }) => {
                 </div>
               </div>
             )}
-          </div>
         </div>
       )}
 
