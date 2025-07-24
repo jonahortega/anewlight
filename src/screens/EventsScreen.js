@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import './EventsScreen.css';
 
-const EventsScreen = ({ user, onNavigate, navigationData }) => {
+const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoinedEvents }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [userEvents, setUserEvents] = useState(new Set());
+
   const [viewMode, setViewMode] = useState('list'); // 'list', 'calendar', 'map'
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -346,7 +346,7 @@ const EventsScreen = ({ user, onNavigate, navigationData }) => {
   });
 
   const isUserAttending = (eventId) => {
-    return userEvents.has(eventId);
+    return joinedEvents.some(event => event.id === eventId);
   };
 
   // Function to get organization profile by name
@@ -388,16 +388,21 @@ const EventsScreen = ({ user, onNavigate, navigationData }) => {
           return newSet;
         });
       } else {
-        const newUserEvents = new Set(userEvents);
         const wasAttending = isUserAttending(event.id);
         
         if (wasAttending) {
-          newUserEvents.delete(event.id);
+          // Remove from joined events
+          setJoinedEvents(prev => prev.filter(e => e.id !== event.id));
         } else {
-          newUserEvents.add(event.id);
+          // Add to joined events
+          const eventWithId = {
+            ...event,
+            id: event.id || `event_${Date.now()}`,
+            joinedAt: new Date().toISOString()
+          };
+          setJoinedEvents(prev => [...prev, eventWithId]);
         }
         
-        setUserEvents(newUserEvents);
         setRsvpProcessing(prev => {
           const newSet = new Set(prev);
           newSet.delete(event.id);
@@ -408,9 +413,12 @@ const EventsScreen = ({ user, onNavigate, navigationData }) => {
   };
 
   const handlePayment = () => {
-    const newUserEvents = new Set(userEvents);
-    newUserEvents.add(selectedEvent.id);
-    setUserEvents(newUserEvents);
+    const eventWithId = {
+      ...selectedEvent,
+      id: selectedEvent.id || `event_${Date.now()}`,
+      joinedAt: new Date().toISOString()
+    };
+    setJoinedEvents(prev => [...prev, eventWithId]);
     
     setShowPaymentModal(false);
     setSelectedEvent(null);
@@ -818,8 +826,8 @@ const EventsScreen = ({ user, onNavigate, navigationData }) => {
                           }}
                     disabled={rsvpProcessing.has(event.id)}
                   >
-                    {rsvpProcessing.has(event.id) ? 'Processing...' : 
-                     isUserAttending(event.id) ? '✓ Attending' : 'RSVP'}
+                                      {rsvpProcessing.has(event.id) ? 'Processing...' : 
+                   isUserAttending(event.id) ? '✓ Attending' : 'Join'}
                   </button>
                         <button className="details-btn" onClick={(e) => {
                           e.stopPropagation();
@@ -1066,7 +1074,7 @@ const EventsScreen = ({ user, onNavigate, navigationData }) => {
                 disabled={rsvpProcessing.has(selectedEvent.id)}
               >
                 {rsvpProcessing.has(selectedEvent.id) ? 'Processing...' : 
-                 isUserAttending(selectedEvent.id) ? '✓ Attending' : 'RSVP Now'}
+                 isUserAttending(selectedEvent.id) ? '✓ Attending' : 'Join'}
               </button>
               <button className="close-btn" onClick={handleCloseModal}>
                 Close

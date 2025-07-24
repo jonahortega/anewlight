@@ -28,6 +28,7 @@ function App() {
   const [navigationData, setNavigationData] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [joinedEvents, setJoinedEvents] = useState([]);
   
   // Mock notifications with event invitations and messages
   const [notifications, setNotifications] = useState([
@@ -292,9 +293,20 @@ function App() {
       case 'clubs':
         return <ClubsScreen user={user} onSelect={handleClubSelect} onBack={() => setCurrentScreen('greek-question')} />;
       case 'home':
-        return <HomeScreen user={user} onNavigate={handleNavigate} />;
+        return <HomeScreen 
+          user={user} 
+          onNavigate={handleNavigate} 
+          joinedEvents={joinedEvents}
+          setJoinedEvents={setJoinedEvents}
+        />;
       case 'events':
-        return <EventsScreen user={user} onNavigate={handleNavigate} navigationData={navigationData} />;
+        return <EventsScreen 
+          user={user} 
+          onNavigate={handleNavigate} 
+          navigationData={navigationData}
+          joinedEvents={joinedEvents}
+          setJoinedEvents={setJoinedEvents}
+        />;
       case 'messages':
         return <MessagesScreen 
           user={user} 

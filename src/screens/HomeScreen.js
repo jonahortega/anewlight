@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './HomeScreen.css';
 
-const HomeScreen = ({ user, onNavigate }) => {
+const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -12,6 +12,8 @@ const HomeScreen = ({ user, onNavigate }) => {
   const [recipientType, setRecipientType] = useState('person'); // 'person' or 'organization'
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   // Function to generate feed posts based on user's university
   const generateFeedPosts = (userUniversity) => {
     const university = userUniversity || 'University of California, Berkeley';
@@ -27,31 +29,195 @@ const HomeScreen = ({ user, onNavigate }) => {
                            university.includes('Columbia') ? 'Columbia' :
                            university.split(',')[0]; // Use first part of university name
 
-    return [
+    // Use the same events data as EventsScreen
+    const eventsData = [
       {
         id: 1,
+        title: "Summer Formal 2025",
+        organization: "Alpha Beta Gamma Fraternity",
+        date: "July 5, 2025",
+        time: "8:00 PM",
+        location: "Grand Ballroom",
+        description: "Join us for our annual summer formal celebration with live music, dancing, and great food. Dress to impress and enjoy an unforgettable evening with your Greek family!",
+        attendees: 127,
+        maxAttendees: 200,
+        image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: true,
+        price: 25,
+        category: "Social",
+        tags: ["formal", "dancing", "music"]
+      },
+      {
+        id: 2,
+        title: "Charity Fundraiser Gala",
+        organization: "Delta Epsilon Zeta Sorority",
+        date: "July 12, 2025",
+        time: "6:30 PM",
+        location: "Delta Epsilon Zeta House",
+        description: "Support breast cancer awareness with our annual philanthropy fundraiser! Enjoy gourmet food, silent auctions, and inspiring speakers while making a difference.",
+        attendees: 89,
+        maxAttendees: 150,
+        image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: true,
+        price: 35,
+        category: "Philanthropy",
+        tags: ["charity", "fundraiser", "awareness"]
+      },
+      {
+        id: 3,
+        title: "Community Service Day",
+        organization: "Theta Iota Kappa Fraternity",
+        date: "July 15, 2025",
+        time: "9:00 AM",
+        location: "Local Community Center",
+        description: "Make a positive impact in our community! We'll be working on various projects including park cleanup, food bank assistance, and mentoring local youth.",
+        attendees: 28,
+        maxAttendees: 40,
+        image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: false,
+        price: null,
+        category: "Service",
+        tags: ["community", "volunteer", "impact"]
+      },
+      {
+        id: 4,
+        title: "Leadership Workshop Series",
+        organization: "Greek Life Council",
+        date: "July 18, 2025",
+        time: "2:00 PM",
+        location: "Business School Auditorium",
+        description: "Develop essential leadership skills with industry professionals and interactive workshops. Topics include public speaking, team management, and strategic planning.",
+        attendees: 67,
+        maxAttendees: 100,
+        image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: true,
+        price: 20,
+        category: "Leadership",
+        tags: ["workshop", "skills", "professional"]
+      },
+      {
+        id: 5,
+        title: "Beach Day Social",
+        organization: "Alpha Beta Gamma Fraternity",
+        date: "July 22, 2025",
+        time: "11:00 AM",
+        location: "Crystal Beach",
+        description: "Enjoy a perfect day at the beach with your Greek family! We'll have beach games, volleyball, and a BBQ. Don't forget your sunscreen and beach towel!",
+        attendees: 156,
+        maxAttendees: 200,
+        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: false,
+        price: null,
+        category: "Social",
+        tags: ["beach", "outdoor", "fun"]
+      },
+      {
+        id: 6,
+        title: "Study Session & Academic Support",
+        organization: "Theta Iota Kappa Fraternity",
+        date: "July 25, 2025",
+        time: "7:00 PM",
+        location: "Library Study Room 3",
+        description: "Join our weekly academic support session! Bring your books and questions. We'll have tutors available for various subjects and quiet study spaces.",
+        attendees: 45,
+        maxAttendees: 50,
+        image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: false,
+        price: null,
+        category: "Academic",
+        tags: ["study", "tutoring", "academic"]
+      },
+      {
+        id: 7,
+        title: "Greek Olympics",
+        organization: "Greek Life Council",
+        date: "July 28, 2025",
+        time: "10:00 AM",
+        location: "University Stadium",
+        description: "Compete in the annual Greek Olympics! Events include tug-of-war, relay races, and team challenges. Show your Greek pride and win bragging rights!",
+        attendees: 234,
+        maxAttendees: 300,
+        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: false,
+        price: null,
+        category: "Social",
+        tags: ["competition", "sports", "team"]
+      },
+      {
+        id: 8,
+        title: "Career Networking Mixer",
+        organization: "Professional Greek Association",
+        date: "July 30, 2025",
+        time: "6:00 PM",
+        location: "Alumni Center",
+        description: "Connect with Greek alumni and industry professionals! Perfect opportunity for internships, job opportunities, and professional development.",
+        attendees: 78,
+        maxAttendees: 120,
+        image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop&crop=center&q=80",
+        isPaid: true,
+        price: 15,
+        category: "Professional",
+        tags: ["networking", "career", "alumni"]
+      }
+    ];
+
+    // Convert events to feed posts
+    return eventsData.map((event, index) => {
+      const captions = [
+        `🎉 Exciting news! Our annual ${event.title} is just around the corner! Join us for an unforgettable experience. This is one event you won't want to miss! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `❤️ Join us for ${event.title}! ${event.description.split('.')[0]}. Let's make memories together! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🤝 ${event.title} is coming up! ${event.description.split('.')[0]}. Everyone is welcome! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `⭐ ${event.title} is back! ${event.description.split('.')[0]}. Don't miss this opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🏖️ ${event.title} is happening! ${event.description.split('.')[0]}. Can't wait to see you there! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `📚 ${event.title} is here! ${event.description.split('.')[0]}. Perfect for academic success! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🏆 ${event.title} is coming! ${event.description.split('.')[0]}. Show your Greek pride! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `💼 ${event.title} is approaching! ${event.description.split('.')[0]}. Great networking opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`
+      ];
+
+      const organizationAvatars = {
+        "Alpha Beta Gamma Fraternity": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=150&h=150&fit=crop&crop=center&q=80",
+        "Delta Epsilon Zeta Sorority": "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=150&h=150&fit=crop&crop=center&q=80",
+        "Theta Iota Kappa Fraternity": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=150&h=150&fit=crop&crop=center&q=80",
+        "Greek Life Council": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=150&h=150&fit=crop&crop=center&q=80",
+        "Professional Greek Association": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=150&h=150&fit=crop&crop=center&q=80"
+      };
+
+      const organizationTypes = {
+        "Alpha Beta Gamma Fraternity": "Fraternity",
+        "Delta Epsilon Zeta Sorority": "Sorority",
+        "Theta Iota Kappa Fraternity": "Fraternity",
+        "Greek Life Council": "Council",
+        "Professional Greek Association": "Professional Association"
+      };
+
+      return {
+        id: event.id,
         type: 'event',
         author: {
-          name: 'Alpha Beta Gamma',
-          avatar: '🏛️',
+          name: event.organization,
+          avatar: organizationAvatars[event.organization] || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=150&h=150&fit=crop&crop=center&q=80",
           isOrganization: true,
-          university: university
+          university: university,
+          organization: organizationTypes[event.organization] || "Organization"
         },
         content: {
-          caption: `Spring Formal 2024 is just around the corner! 🎉 Join us for an unforgettable night of dancing, great food, and amazing company. Early bird tickets are selling fast! #SpringFormal #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-          image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&h=400&fit=crop&crop=center&q=80',
+          caption: captions[index % captions.length],
+          image: event.image,
           eventDetails: {
-            date: 'March 15, 2024',
-            time: '8:00 PM',
-            location: 'Grand Ballroom',
-            attendees: 127,
-            maxAttendees: 200,
-            isPaid: true,
-            price: 25,
-            category: 'Social'
+            id: event.id,
+            title: event.title,
+            date: event.date,
+            time: event.time,
+            location: event.location,
+            description: event.description,
+            isPaid: event.isPaid,
+            price: event.price,
+            attendees: event.attendees,
+            maxAttendees: event.maxAttendees,
+            category: event.category
           }
         },
-        likes: 89,
+        likes: Math.floor(Math.random() * 200) + 50,
         comments: [
           {
             id: 1,
@@ -68,277 +234,12 @@ const HomeScreen = ({ user, onNavigate }) => {
             timestamp: '30 minutes ago'
           }
         ],
-        shares: 12,
-        timestamp: '2 hours ago',
+        shares: Math.floor(Math.random() * 50) + 10,
+        timestamp: `${Math.floor(Math.random() * 24) + 1} hours ago`,
         isLiked: false,
         isSaved: false
-      },
-      {
-        id: 2,
-        type: 'past-event',
-        author: {
-          name: 'Delta Epsilon Zeta',
-          avatar: '🏛️',
-          isOrganization: true,
-          university: university
-        },
-        content: {
-          caption: `What an incredible philanthropy fundraiser last night! 🎗️ Thank you to everyone who came out to support breast cancer awareness. We raised over $3,500! The silent auction was amazing and the guest speakers were truly inspiring. Can't wait for our next event! #Philanthropy #Charity #DEZ #${universityShort.replace(/\s+/g, '')}`,
-          image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop&crop=center&q=80',
-          eventDetails: {
-            date: 'March 8, 2024',
-            time: '6:30 PM',
-            location: 'Delta Epsilon Zeta House',
-            attendees: 156,
-            maxAttendees: 150,
-            isPaid: true,
-            price: 35,
-            category: 'Philanthropy',
-            isPast: true,
-            fundsRaised: 3500,
-            nextEvent: 'March 22, 2024'
-          }
-        },
-        likes: 234,
-        comments: [
-          {
-            id: 1,
-            author: 'Rachel Green',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
-            text: 'Such an amazing night! The energy was incredible! 💕',
-            timestamp: '2 hours ago'
-          },
-          {
-            id: 2,
-            author: 'Alex Thompson',
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-            text: 'Proud to be part of such an impactful event!',
-            timestamp: '3 hours ago'
-          }
-        ],
-        shares: 45,
-        timestamp: '1 day ago',
-        isLiked: true,
-        isSaved: false
-      },
-      {
-        id: 3,
-        type: 'photo',
-        author: {
-          name: 'Sarah Johnson',
-          avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-          isOrganization: false,
-          university: university,
-          organization: 'Delta Epsilon Zeta'
-        },
-      content: {
-        caption: 'Amazing time at our sisterhood retreat this weekend! 💕 The bonds we create here are truly special. Can\'t wait for our next adventure together! #Sisterhood #GreekLife #Retreat #DEZ',
-        image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&h=400&fit=crop&crop=center&q=80',
-        eventDetails: {
-          date: 'March 10-12, 2024',
-          time: 'All Day Event',
-          location: 'Lake Tahoe Resort',
-          attendees: 45,
-          maxAttendees: 50,
-          isPaid: false,
-          price: null,
-          category: 'Retreat'
-        }
-      },
-      likes: 156,
-      comments: [
-        {
-          id: 1,
-          author: 'Emma Wilson',
-          avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-          text: 'Looks like you had an amazing time! 💕',
-          timestamp: '2 hours ago'
-        },
-        {
-          id: 2,
-          author: 'Jessica Lee',
-          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
-          text: 'Miss you all already! Can\'t wait for next time!',
-          timestamp: '1 hour ago'
-        }
-      ],
-      shares: 8,
-      timestamp: '4 hours ago',
-      isLiked: true,
-      isSaved: false
-    },
-      {
-        id: 4,
-        type: 'past-event',
-        author: {
-          name: 'Theta Iota Kappa',
-          avatar: '🏛️',
-          isOrganization: true,
-          university: university
-        },
-      content: {
-        caption: 'Winter Formal was absolutely magical! ❄️✨ Thank you to all 180+ brothers and guests who made it such a special night. The venue was stunning, the music was perfect, and the memories we made will last forever. Our next social event is coming up soon! #WinterFormal #TIK #GreekLife #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&h=400&fit=crop&crop=center&q=80',
-        eventDetails: {
-          date: 'February 24, 2024',
-          time: '8:00 PM',
-          location: 'Grand Ballroom',
-          attendees: 182,
-          maxAttendees: 200,
-          isPaid: true,
-          price: 30,
-          category: 'Social',
-          isPast: true,
-          nextEvent: 'March 20, 2024'
-        }
-      },
-      likes: 198,
-      comments: [
-        {
-          id: 1,
-          author: 'David Rodriguez',
-          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-          text: 'Best formal ever! The decorations were incredible!',
-          timestamp: '1 day ago'
-        },
-        {
-          id: 2,
-          author: 'Mike Johnson',
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-          text: 'Can\'t believe how amazing it was! Already excited for next time!',
-          timestamp: '2 days ago'
-        }
-      ],
-      shares: 67,
-      timestamp: '3 days ago',
-      isLiked: false,
-      isSaved: true
-    },
-    {
-      id: 5,
-      type: 'announcement',
-      author: {
-        name: 'Theta Iota Kappa',
-        avatar: '🏛️',
-        isOrganization: true,
-        university: 'UC Berkeley'
-      },
-      content: {
-        caption: 'Congratulations to our brothers who made Dean\'s List this semester! 🎓 Your hard work and dedication inspire us all. Keep up the excellent work! #AcademicExcellence #DeanList #TIK #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop&crop=center&q=80',
-        eventDetails: {
-          date: 'March 20, 2024',
-          time: '6:00 PM',
-          location: 'TIK House',
-          attendees: 28,
-          maxAttendees: 35,
-          isPaid: false,
-          price: null,
-          category: 'Academic'
-        }
-      },
-      likes: 203,
-      comments: [
-        {
-          id: 1,
-          author: 'David Rodriguez',
-          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-          text: 'Proud to be part of such an amazing brotherhood!',
-          timestamp: '3 hours ago'
-        }
-      ],
-      shares: 67,
-      timestamp: '6 hours ago',
-      isLiked: false,
-      isSaved: true
-    },
-    {
-      id: 6,
-      type: 'past-event',
-      author: {
-        name: 'Alpha Beta Gamma',
-        avatar: '🏛️',
-        isOrganization: true,
-        university: 'UC Berkeley'
-      },
-      content: {
-        caption: 'Community Service Day was a huge success! 👥 We had 42 brothers show up to help clean up the local park and assist at the food bank. The community was so grateful and we made a real difference. Our next service event is scheduled for April 5th! #CommunityService #Volunteer #ABG #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop&crop=center&q=80',
-        eventDetails: {
-          date: 'March 1, 2024',
-          time: '9:00 AM - 3:00 PM',
-          location: 'Local Community Center',
-          attendees: 42,
-          maxAttendees: 40,
-          isPaid: false,
-          price: null,
-          category: 'Service',
-          isPast: true,
-          hoursVolunteered: 6,
-          nextEvent: 'April 5, 2024'
-        }
-      },
-      likes: 145,
-      comments: [
-        {
-          id: 1,
-          author: 'David Rodriguez',
-          avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-          text: 'Great work everyone! Proud to be part of this!',
-          timestamp: '2 hours ago'
-        },
-        {
-          id: 2,
-          author: 'Emma Wilson',
-          avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-          text: 'This is what Greek life is all about! 💪',
-          timestamp: '3 hours ago'
-        }
-      ],
-      shares: 23,
-      timestamp: '1 week ago',
-      isLiked: false,
-      isSaved: true
-    },
-    {
-      id: 7,
-      type: 'event',
-      author: {
-        name: 'Greek Life Council',
-        avatar: '🏛️',
-        isOrganization: true,
-        university: 'UC Berkeley'
-      },
-      content: {
-        caption: 'Leadership Workshop Series starts next week! 🎯 Develop essential skills with industry professionals. Topics include public speaking, team management, and strategic planning. #Leadership #Workshop #GreekLife #UCBerkeley',
-        image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&h=400&fit=crop&crop=center&q=80',
-        eventDetails: {
-          date: 'March 28, 2024',
-          time: '2:00 PM',
-          location: 'Business School Auditorium',
-          attendees: 67,
-          maxAttendees: 100,
-          isPaid: true,
-          price: 20,
-          category: 'Leadership'
-        }
-      },
-      likes: 76,
-      comments: [
-        {
-          id: 1,
-          author: 'Jessica Lee',
-          avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
-          text: 'Perfect timing! I need to improve my leadership skills!',
-          timestamp: '1 hour ago'
-        }
-      ],
-      shares: 8,
-      timestamp: '7 hours ago',
-      isLiked: false,
-      isSaved: false
-    }
-  ];
+      };
+    });
   };
 
   const [feedPosts, setFeedPosts] = useState(generateFeedPosts(user?.university));
@@ -444,9 +345,41 @@ const HomeScreen = ({ user, onNavigate }) => {
 
   const handleEventRSVP = () => {
     // Handle RSVP logic here
-    console.log('RSVP for event:', selectedEvent);
-    // You could add logic to update the event attendance count
-    closeEventModal();
+    console.log('Join for event:', selectedEvent);
+    console.log('isPaid:', selectedEvent.isPaid);
+    console.log('price:', selectedEvent.price);
+    
+    // If it's a paid event, show payment modal
+    if (selectedEvent.isPaid || selectedEvent.price) {
+      console.log('Showing payment modal');
+      setShowPaymentModal(true);
+      setShowEventModal(false);
+    } else {
+      console.log('Closing modal - free event');
+      // For free events, add to joined events and close modal
+      addToJoinedEvents(selectedEvent);
+      closeEventModal();
+    }
+  };
+
+  const addToJoinedEvents = (event) => {
+    const eventWithId = {
+      ...event,
+      id: event.id || `event_${Date.now()}`,
+      joinedAt: new Date().toISOString()
+    };
+    
+    setJoinedEvents(prev => {
+      // Check if event is already joined
+      const isAlreadyJoined = prev.some(e => e.id === eventWithId.id);
+      if (isAlreadyJoined) {
+        return prev;
+      }
+      return [...prev, eventWithId];
+    });
+    
+    console.log('Added to joined events:', eventWithId);
+    alert('Successfully joined the event!');
   };
 
   const handleEventShare = () => {
@@ -582,9 +515,34 @@ const HomeScreen = ({ user, onNavigate }) => {
               <div className="event-actions">
                 {!post.content.eventDetails.isPast && (
                   <>
-                    <button className="event-action-btn primary">
-                      {post.content.eventDetails.isPaid ? 'Get Tickets' : 'RSVP Now'}
-                    </button>
+                                          {joinedEvents.some(event => event.id === post.content.eventDetails.id) ? (
+                        <button className="event-action-btn joined" disabled>
+                          ✓ Joined
+                        </button>
+                      ) : (
+                        <button 
+                          className="event-action-btn primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Join button clicked for event:', post.content.eventDetails);
+                            console.log('isPaid:', post.content.eventDetails.isPaid);
+                            console.log('price:', post.content.eventDetails.price);
+                            
+                            // Check if it's a paid event
+                            if (post.content.eventDetails.isPaid || post.content.eventDetails.price) {
+                              console.log('Setting up payment modal');
+                              setSelectedEvent({ ...post.content.eventDetails, post });
+                              setShowPaymentModal(true);
+                            } else {
+                              console.log('Free event - adding to joined events');
+                              // For free events, add to joined events
+                              addToJoinedEvents(post.content.eventDetails);
+                            }
+                          }}
+                        >
+                          Join
+                        </button>
+                      )}
                     <button 
                       className="event-action-btn secondary"
                       onClick={(e) => {
@@ -952,7 +910,7 @@ const HomeScreen = ({ user, onNavigate }) => {
 
                   <div className="event-modal-description">
                     <h4>About This Event</h4>
-                    <p>{selectedEvent.post.content.caption}</p>
+                    <p>Join us for this exciting event!</p>
                   </div>
 
                   <div className="event-modal-actions">
@@ -960,7 +918,7 @@ const HomeScreen = ({ user, onNavigate }) => {
                       className="event-modal-rsvp-btn"
                       onClick={handleEventRSVP}
                     >
-                      {selectedEvent.isPaid ? 'Get Tickets' : 'RSVP Now'}
+                      Join
                     </button>
                     <button 
                       className="event-modal-share-btn"
@@ -970,6 +928,78 @@ const HomeScreen = ({ user, onNavigate }) => {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+            {/* Payment Modal */}
+      {console.log('Payment modal state:', { showPaymentModal, selectedEvent: !!selectedEvent })}
+      
+      {showPaymentModal && selectedEvent && (
+        <div className="payment-modal-overlay" onClick={() => setShowPaymentModal(false)}>
+          <div className="payment-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="payment-modal-header">
+              <h3>Select Payment Method</h3>
+              <button className="close-btn" onClick={() => setShowPaymentModal(false)}>×</button>
+            </div>
+            
+            <div className="payment-modal-content">
+              <div className="payment-event-info">
+                <h4>Event Details</h4>
+                <p><strong>Date:</strong> {selectedEvent.date}</p>
+                <p><strong>Time:</strong> {selectedEvent.time}</p>
+                <p><strong>Location:</strong> {selectedEvent.location}</p>
+              </div>
+              
+              <div className="payment-amount">
+                <div className="amount-label">Total Amount:</div>
+                <div className="amount-value">${selectedEvent.price}</div>
+              </div>
+              
+              <div className="payment-methods">
+                <div 
+                  className={`payment-method-option ${selectedPaymentMethod === 'card' ? 'selected' : ''}`}
+                  onClick={() => setSelectedPaymentMethod('card')}
+                >
+                  <div className="payment-method-icon">💳</div>
+                  <div className="payment-method-text">Credit/Debit Card</div>
+                </div>
+                <div 
+                  className={`payment-method-option ${selectedPaymentMethod === 'paypal' ? 'selected' : ''}`}
+                  onClick={() => setSelectedPaymentMethod('paypal')}
+                >
+                  <div className="payment-method-icon">📱</div>
+                  <div className="payment-method-text">PayPal</div>
+                </div>
+
+              </div>
+              
+              <div className="payment-actions">
+                <button 
+                  className={`pay-btn ${!selectedPaymentMethod ? 'disabled' : ''}`} 
+                  onClick={() => {
+                    if (selectedPaymentMethod) {
+                      alert(`Payment processed successfully using ${selectedPaymentMethod === 'card' ? 'Credit/Debit Card' : 'PayPal'}!`);
+                      addToJoinedEvents(selectedEvent);
+                      setShowPaymentModal(false);
+                      setSelectedEvent(null);
+                      setSelectedPaymentMethod(null);
+                    } else {
+                      alert('Please select a payment method first!');
+                    }
+                  }}
+                  disabled={!selectedPaymentMethod}
+                >
+                  Pay ${selectedEvent.price}
+                </button>
+                <button className="cancel-btn" onClick={() => {
+                  setShowPaymentModal(false);
+                  setSelectedPaymentMethod(null);
+                }}>
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
