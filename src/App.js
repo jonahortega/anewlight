@@ -12,6 +12,7 @@ import ClubsScreen from './screens/ClubsScreen';
 import HomeScreen from './screens/HomeScreen';
 import EventsScreen from './screens/EventsScreen';
 import MessagesScreen from './screens/MessagesScreen';
+import TicketsScreen from './screens/TicketsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import HelpScreen from './screens/HelpScreen';
@@ -29,6 +30,46 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [joinedEvents, setJoinedEvents] = useState([]);
+  
+  // Search functionality for header
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchCategory, setSearchCategory] = useState('all');
+  const [searchSortBy, setSearchSortBy] = useState('date');
+  const [showMyEvents, setShowMyEvents] = useState(false);
+  const [activeTab, setActiveTab] = useState('events');
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+  
+  // View mode state for home screen
+  const [homeViewMode, setHomeViewMode] = useState('list');
+  const [homeCurrentMonth, setHomeCurrentMonth] = useState(new Date(2025, 6, 1));
+  
+  // Search categories - dynamic based on activeTab
+  const eventCategories = [
+    { id: 'all', name: 'All Events', icon: '🎉' },
+    { id: 'social', name: 'Social', icon: '🎊' },
+    { id: 'philanthropy', name: 'Philanthropy', icon: '❤️' },
+    { id: 'academic', name: 'Academic', icon: '📚' },
+    { id: 'leadership', name: 'Leadership', icon: '👑' },
+    { id: 'sports', name: 'Sports', icon: '⚽' },
+    { id: 'cultural', name: 'Cultural', icon: '🌍' }
+  ];
+
+  const organizationCategories = [
+    { id: 'all', name: 'All Organizations', icon: '🏛️' },
+    { id: 'fraternity', name: 'Fraternities', icon: '🤝' },
+    { id: 'sorority', name: 'Sororities', icon: '👭' },
+    { id: 'professional', name: 'Professional', icon: '💼' },
+    { id: 'academic', name: 'Academic', icon: '📚' },
+    { id: 'cultural', name: 'Cultural', icon: '🌍' },
+    { id: 'service', name: 'Service', icon: '🤲' }
+  ];
+
+  const searchCategories = activeTab === 'events' ? eventCategories : organizationCategories;
+  
+  // Reset search category when switching between events and organizations
+  useEffect(() => {
+    setSearchCategory('all');
+  }, [activeTab]);
   
   // Mock notifications with event invitations and messages
   const [notifications, setNotifications] = useState([
@@ -232,6 +273,46 @@ function App() {
   };
 
   const handleStartConversation = (organization) => {
+    // Check if user is part of this organization
+    const isUserInOrganization = () => {
+      if (!user) return false;
+      
+      const userOrgNames = [];
+      
+      // Check user's organizations
+      if (user.organization) {
+        if (typeof user.organization === 'string') {
+          userOrgNames.push(user.organization.toLowerCase());
+        } else if (user.organization.name) {
+          userOrgNames.push(user.organization.name.toLowerCase());
+        }
+      }
+      
+      if (user.organizations && Array.isArray(user.organizations)) {
+        user.organizations.forEach(org => {
+          if (org.name) userOrgNames.push(org.name.toLowerCase());
+        });
+      }
+      
+      if (user.greekOrganization && user.greekOrganization.name) {
+        userOrgNames.push(user.greekOrganization.name.toLowerCase());
+      }
+      
+      if (user.club && user.club.name) {
+        userOrgNames.push(user.club.name.toLowerCase());
+      }
+      
+      const orgName = organization.name.toLowerCase();
+      return userOrgNames.some(userOrg => 
+        userOrg.includes(orgName) || orgName.includes(userOrg)
+      );
+    };
+    
+    if (!isUserInOrganization()) {
+      alert('You can only message organizations you are part of.');
+      return;
+    }
+    
     // Check if conversation already exists
     const existingConversation = conversations.find(conv => conv.id === `org-${organization.id}`);
     
@@ -252,7 +333,7 @@ function App() {
           {
             id: 1,
             sender: 'system',
-            content: `You started a conversation with ${organization.name}`,
+            content: `You joined the ${organization.name} group chat`,
             timestamp: new Date().toISOString(),
             type: 'system'
           }
@@ -289,6 +370,8 @@ function App() {
           user={user}
           onNavigate={handleNavigate} 
           onStartConversation={handleStartConversation}
+          joinedEvents={joinedEvents}
+          setJoinedEvents={setJoinedEvents}
         />;
       case 'clubs':
         return <ClubsScreen user={user} onSelect={handleClubSelect} onBack={() => setCurrentScreen('greek-question')} />;
@@ -298,6 +381,10 @@ function App() {
           onNavigate={handleNavigate} 
           joinedEvents={joinedEvents}
           setJoinedEvents={setJoinedEvents}
+          viewMode={homeViewMode}
+          setViewMode={setHomeViewMode}
+          currentMonth={homeCurrentMonth}
+          setCurrentMonth={setHomeCurrentMonth}
         />;
       case 'events':
         return <EventsScreen 
@@ -306,6 +393,16 @@ function App() {
           navigationData={navigationData}
           joinedEvents={joinedEvents}
           setJoinedEvents={setJoinedEvents}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          searchCategory={searchCategory}
+          setSearchCategory={setSearchCategory}
+          searchSortBy={searchSortBy}
+          setSearchSortBy={setSearchSortBy}
+          showMyEvents={showMyEvents}
+          setShowMyEvents={setShowMyEvents}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
         />;
       case 'messages':
         return <MessagesScreen 
@@ -316,6 +413,12 @@ function App() {
           activeConversation={activeConversation} 
           setActiveConversation={setActiveConversation}
           navigationData={navigationData}
+        />;
+      case 'tickets':
+        return <TicketsScreen 
+          user={user} 
+          onNavigate={handleNavigate} 
+          joinedEvents={joinedEvents}
         />;
       case 'profile':
         return <ProfileScreen user={user} onNavigate={handleNavigate} />;
@@ -328,15 +431,15 @@ function App() {
     }
   };
 
-  // Show navigation for all authenticated screens except onboarding screens and organization profile
+  // Show navigation for all authenticated screens except onboarding screens
   const showNavigation = isAuthenticated && 
-    !['welcome', 'user-info', 'login', 'university', 'greek-question', 'organization-profile', 'clubs'].includes(currentScreen);
+    !['welcome', 'user-info', 'login', 'university', 'greek-question', 'clubs'].includes(currentScreen);
 
   console.log('Navigation visibility:', {
     isAuthenticated,
     currentScreen,
     showNavigation,
-    excludedScreens: ['welcome', 'user-info', 'login', 'university', 'greek-question', 'organization-profile', 'clubs']
+    excludedScreens: ['welcome', 'user-info', 'login', 'university', 'greek-question', 'clubs']
   });
 
   return (
@@ -346,20 +449,219 @@ function App() {
           <div className="top-bar">
             <div className="top-bar-content">
               <div className="top-bar-left">
-                <h2 className="app-title">Greek Life</h2>
+                {currentScreen === 'home' ? (
+                  <div className="header-actions">
+                    <button 
+                      className={`university-btn ${homeViewMode === 'list' ? 'active' : ''}`}
+                      onClick={() => setHomeViewMode('list')}
+                      title={user?.university || 'University of California, Berkeley'}
+                    >
+                      <span className="university-name">
+                        {user?.university || 'UC Berkeley'}
+                      </span>
+                    </button>
+                    <button 
+                      className={`view-toggle-btn ${homeViewMode === 'calendar' ? 'active' : ''}`}
+                      onClick={() => {
+                        setHomeViewMode('calendar');
+                        setHomeCurrentMonth(new Date(2025, 6, 1));
+                      }}
+                    >
+                      <span className="view-icon">📅</span>
+                    </button>
+                    <button 
+                      className={`view-toggle-btn ${homeViewMode === 'map' ? 'active' : ''}`}
+                      onClick={() => setHomeViewMode('map')}
+                    >
+                      <span className="view-icon">🗺️</span>
+                    </button>
+                  </div>
+                ) : currentScreen !== 'events' && currentScreen !== 'profile' && currentScreen !== 'messages' && currentScreen !== 'organization-profile' && currentScreen !== 'tickets' && (
+                  <h2 className="app-title">@{user?.username || 'jonahortega'}</h2>
+                )}
+              </div>
+              <div className="top-bar-center">
+                {currentScreen === 'events' && (
+                  <div className="header-search-container">
+                    <div className="header-search-input">
+                      <span className="search-icon"></span>
+                      <input
+                        type="text"
+                        placeholder="Search events, organizations, or keywords..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="header-search-field"
+                      />
+                    </div>
+                    <div className="header-search-filters">
+                      <div className="search-type-selector">
+                        <button 
+                          className={`search-type-btn ${activeTab === 'events' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('events')}
+                        >
+                          📅
+                        </button>
+                        <button 
+                          className={`search-type-btn ${activeTab === 'organizations' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('organizations')}
+                        >
+                          🏛️
+                        </button>
+                      </div>
+                      <button 
+                        className="filter-btn"
+                        onClick={() => setShowFilterPopup(!showFilterPopup)}
+                      >
+                        Filters
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Filter Popup - Fixed */}
+                {showFilterPopup && currentScreen === 'events' && (
+                  <div 
+                    className="filter-popup-overlay" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowFilterPopup(false);
+                    }}
+                  >
+                    <div 
+                      className="filter-popup" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                    >
+                      <div className="filter-popup-header">
+                        <h3>Filter {activeTab === 'events' ? 'Events' : 'Organizations'}</h3>
+                        <button 
+                          className="filter-close-btn" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowFilterPopup(false);
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                      
+                      <div className="filter-popup-content">
+                        <div className="current-search-type">
+                          <div className="search-type-display">
+                            <span className="search-type-icon">
+                              {activeTab === 'events' ? '📅' : '🏛️'}
+                            </span>
+                            <span className="search-type-text">
+                              Searching: {activeTab === 'events' ? 'Events' : 'Organizations'}
+                            </span>
+                            <button 
+                              className="change-type-btn"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setActiveTab(activeTab === 'events' ? 'organizations' : 'events');
+                              }}
+                            >
+                              Switch to {activeTab === 'events' ? 'Organizations' : 'Events'}
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="filter-section">
+                          <h4>
+                            {activeTab === 'events' ? 'Event Categories' : 'Organization Types'}
+                          </h4>
+                          <div className="filter-options">
+                            {searchCategories.map(category => (
+                              <button 
+                                key={category.id}
+                                className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSearchCategory(category.id);
+                                }}
+                              >
+                                {category.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {activeTab === 'events' && (
+                          <div className="filter-section">
+                            <h4>My Events</h4>
+                            <div className="filter-options">
+                              <button 
+                                className={`filter-option ${showMyEvents ? 'active' : ''}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setShowMyEvents(!showMyEvents);
+                                }}
+                              >
+                                My Events ({joinedEvents.length})
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="filter-popup-footer">
+                        <button 
+                          className="filter-clear-btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSearchCategory('all');
+                            setShowMyEvents(false);
+                          }}
+                        >
+                          Clear Filters
+                        </button>
+                        <button 
+                          className="filter-apply-btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowFilterPopup(false);
+                          }}
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="top-bar-right">
-                <MessagesDropdown 
-                  conversations={conversations}
-                  onNavigate={handleNavigate}
-                  onStartConversation={handleStartConversation}
-                />
-                <Notifications 
-                  notifications={notifications}
-                  onDismiss={handleNotificationDismiss}
-                  onMarkAsRead={handleNotificationMarkAsRead}
-          onNavigate={handleNavigate}
-                />
+                {currentScreen !== 'events' && (
+                  <>
+                    <MessagesDropdown 
+                      conversations={conversations}
+                      onNavigate={handleNavigate}
+                      onStartConversation={handleStartConversation}
+                    />
+                    <Notifications 
+                      notifications={notifications}
+                      onDismiss={handleNotificationDismiss}
+                      onMarkAsRead={handleNotificationMarkAsRead}
+                      onNavigate={handleNavigate}
+                    />
+                    {currentScreen === 'profile' && (
+                      <button 
+                        className="settings-btn"
+                        onClick={() => handleNavigate('settings')}
+                      >
+                        <span className="settings-icon">⚙️</span>
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>

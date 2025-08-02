@@ -1,12 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './OrganizationProfileScreen.css';
 
-const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConversation }) => {
+const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConversation, joinedEvents, setJoinedEvents }) => {
   const [activeTab, setActiveTab] = useState('events');
   const [rsvpStatus, setRsvpStatus] = useState({});
   const [showRequestPopup, setShowRequestPopup] = useState(false);
+  const [likedPosts, setLikedPosts] = useState(new Set());
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [selectedPostForComments, setSelectedPostForComments] = useState(null);
+  const [showEventFromPostModal, setShowEventFromPostModal] = useState(false);
+  const [selectedEventFromPost, setSelectedEventFromPost] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareEvent, setShareEvent] = useState(null);
+  const [shareMessage, setShareMessage] = useState('');
+  const [selectedRecipient, setSelectedRecipient] = useState('');
+  const [recipientType, setRecipientType] = useState('organization');
   const [requestMessage, setRequestMessage] = useState('');
+  const [organizationPosts, setOrganizationPosts] = useState([]);
   const [showMembersPopup, setShowMembersPopup] = useState(false);
+
+  // Initialize organization posts
+  useEffect(() => {
+    const posts = getOrganizationPosts(organization);
+    setOrganizationPosts(posts);
+  }, [organization]);
+
+  // Share recipients data
+  const shareRecipients = {
+    organizations: [
+      { id: 1, name: 'Alpha Beta Gamma Fraternity', type: 'Fraternity', university: 'UC Berkeley' },
+      { id: 2, name: 'Delta Epsilon Zeta Sorority', type: 'Sorority', university: 'UC Berkeley' },
+      { id: 3, name: 'Theta Iota Kappa Fraternity', type: 'Fraternity', university: 'UC Berkeley' },
+      { id: 4, name: 'Greek Life Council', type: 'Council', university: 'UC Berkeley' },
+      { id: 5, name: 'Professional Greek Association', type: 'Professional Association', university: 'UC Berkeley' }
+    ]
+  };
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -35,6 +63,28 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
   const getOrganizationEvents = (org) => {
     const baseEvents = {
       'Fraternity': [
+        {
+          id: 'past-1',
+          title: "Fall Rush Week",
+          date: "2023-09-15",
+          time: "6:00 PM",
+          location: "Greek Row",
+          description: "Our annual Fall Rush Week event where potential new members got to meet the brothers and learn about our fraternity.",
+          attendees: 75,
+          maxAttendees: 100,
+          image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400&h=200&fit=crop"
+        },
+        {
+          id: 'past-2',
+          title: "Holiday Charity Drive",
+          date: "2023-12-10",
+          time: "2:00 PM",
+          location: "Student Union",
+          description: "Annual holiday charity drive where we collected donations for local families in need.",
+          attendees: 120,
+          maxAttendees: 150,
+          image: "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=400&h=200&fit=crop"
+        },
         {
           id: 1,
           title: "Brotherhood Retreat",
@@ -571,7 +621,6 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
 
   const organizationEvents = getOrganizationEvents(organization);
   const organizationMembers = getOrganizationMembers(organization);
-  const organizationPosts = getOrganizationPosts(organization);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -582,11 +631,28 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
     });
   };
 
+  const isUserAttending = (eventId) => {
+    return joinedEvents.some(event => event.id === eventId);
+  };
+
   const handleRSVP = (eventId) => {
-    setRsvpStatus(prev => ({
-      ...prev,
-      [eventId]: !prev[eventId]
-    }));
+    const event = organizationEvents.find(e => e.id === eventId);
+    if (!event) return;
+    
+    const wasAttending = isUserAttending(eventId);
+    
+    if (wasAttending) {
+      // Remove from joined events
+      setJoinedEvents(prev => prev.filter(e => e.id !== eventId));
+    } else {
+      // Add to joined events
+      const eventWithId = {
+        ...event,
+        id: eventId,
+        joinedAt: new Date().toISOString()
+      };
+      setJoinedEvents(prev => [...prev, eventWithId]);
+    }
   };
 
   const handleRequestClick = () => {
@@ -639,20 +705,103 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
   };
 
   const handleShare = (event) => {
-    const shareText = `Check out this event: ${event.title} on ${event.date}!`;
-    const shareUrl = window.location.href;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: event.title,
-        text: shareText,
-        url: shareUrl
-      });
+    setShareEvent(event);
+    setShowShareModal(true);
+    setShareMessage('');
+    setSelectedRecipient('');
+    setRecipientType('organization');
+  };
+
+  const closeShareModal = () => {
+    setShowShareModal(false);
+    setShareEvent(null);
+    setShareMessage('');
+    setSelectedRecipient('');
+  };
+
+  const handleSendShare = () => {
+    if (selectedRecipient && shareEvent) {
+      // In a real app, this would send the share to the backend
+      console.log('Sharing event:', shareEvent.id, 'to:', selectedRecipient, 'type:', recipientType, 'message:', shareMessage);
+      alert(`Event shared successfully to ${selectedRecipient}!`);
+      closeShareModal();
     } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-      alert('Event link copied to clipboard!');
+      alert('Please select a recipient to share with.');
     }
+  };
+
+  const handleLikePost = (postId, event) => {
+    event.stopPropagation(); // Prevent opening the post modal
+    
+    setLikedPosts(prevLiked => {
+      const newLiked = new Set(prevLiked);
+      if (newLiked.has(postId)) {
+        newLiked.delete(postId);
+        // Unlike - decrease count
+        setOrganizationPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.id === postId 
+              ? { ...post, likes: Math.max(0, post.likes - 1) }
+              : post
+          )
+        );
+      } else {
+        newLiked.add(postId);
+        // Like - increase count
+        setOrganizationPosts(prevPosts => 
+          prevPosts.map(post => 
+            post.id === postId 
+              ? { ...post, likes: post.likes + 1 }
+              : post
+          )
+        );
+      }
+      return newLiked;
+    });
+  };
+
+  const handleCommentClick = (post) => {
+    setSelectedPostForComments(post);
+    setShowCommentModal(true);
+  };
+
+  const handleCloseCommentModal = () => {
+    setShowCommentModal(false);
+    setSelectedPostForComments(null);
+  };
+
+  const handleEventFromPostClick = (post) => {
+    // Find the associated event for this post
+    const associatedEvent = organizationEvents.find(event => 
+      event.title.toLowerCase().includes(post.content.toLowerCase()) ||
+      post.content.toLowerCase().includes(event.title.toLowerCase())
+    );
+    
+    if (associatedEvent) {
+      setSelectedEventFromPost(associatedEvent);
+      setShowEventFromPostModal(true);
+      } else {
+      // If no specific event found, create a generic one based on the post
+      const genericEvent = {
+        id: `post-${post.id}`,
+        title: post.content.split(' ').slice(0, 4).join(' ') + '...',
+        date: 'Upcoming',
+        time: 'TBD',
+        location: 'Campus',
+        description: post.content,
+        attendees: post.likes || 0,
+        maxAttendees: 50,
+        image: post.image || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=200&fit=crop',
+        category: 'Event'
+      };
+      setSelectedEventFromPost(genericEvent);
+      setShowEventFromPostModal(true);
+    }
+  };
+
+  const handleCloseEventFromPostModal = () => {
+    setShowEventFromPostModal(false);
+    setSelectedEventFromPost(null);
   };
 
   const handleNewEventClick = () => {
@@ -936,13 +1085,16 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
   };
 
   return (
-    <div className="organization-profile-screen">
-      {/* Profile Container */}
+    <div className="profile-screen">
       <div className="profile-container">
-        {/* Back Button */}
-        <button className="back-button" onClick={() => onNavigate('events')}>
-          ← Back
+
+        
+        {/* Request Button - Top Right */}
+        {!isUserMember() && (
+          <button className="modern-request-btn" onClick={handleRequestClick}>
+            Request
         </button>
+        )}
         
         {/* New Event/Post Button - Top Right */}
         {isUserLeader() && (
@@ -969,12 +1121,7 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
           </div>
         )}
 
-        {/* Request Button - Top Right */}
-        {!isUserMember() && (
-          <button className="request-top-btn" onClick={handleRequestClick}>
-            Request
-          </button>
-        )}
+
 
         {/* Profile Header Section with Avatar at Top */}
         <div className="profile-header-section">
@@ -993,30 +1140,28 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         <div className="profile-info-section">
           <div className="profile-details">
             <div className="profile-name-section">
-              <h1 className="profile-name">{organization.name}</h1>
+              <h2 className="profile-name">{organization.name}</h2>
             <span className="profile-username">@{organization.name.toLowerCase().replace(/\s+/g, '').replace('club', '')}</span>
             </div>
             
             <div className="profile-stats">
               <div className="stat-item clickable" onClick={handleMembersClick}>
                 <span className="stat-number">{organization.members}</span>
-                <span className="stat-label">Members</span>
+                <span className="stat-label">members</span>
               </div>
               <div className="stat-item">
                 <span className="stat-number">{organizationEvents.length}</span>
-                <span className="stat-label">Events</span>
+                <span className="stat-label">events</span>
               </div>
               <div className="stat-item">
               <span className="stat-number">{organization.type.replace(' Club', '')}</span>
-              <span className="stat-label">Club</span>
+                <span className="stat-label">club</span>
               </div>
             </div>
             
             <div className="profile-bio-section">
               <p className="profile-bio">{organization.description}</p>
             </div>
-            
-
         </div>
       </div>
 
@@ -1040,66 +1185,75 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
       {/* Tab Content */}
       <div className="profile-content">
         {activeTab === 'events' && (
-          <div className="events-section">
-            <div className="events-grid">
+          <div className="shotgun-events-feed">
               {organizationEvents.map(event => (
-                <div key={event.id} className="event-card" onClick={() => handleEventClick(event)}>
-                  <div className="event-image-container">
-                    <img src={event.image} alt={event.title} className="event-image" />
-                    <div className="event-overlay">
-                      <div className="event-badges">
-                        {event.isPaid && (
-                          <div className="paid-badge">💰 ${event.price}</div>
-                        )}
-                  </div>
-                      <div className="event-actions-overlay">
-                        <button className="share-btn" onClick={(e) => {
+              <div key={event.id} className="shotgun-event-card">
+                <div className="shotgun-event-image">
+                  <img src={event.image} alt={event.title} />
+                  <div className="shotgun-event-overlay">
+                    <div className="shotgun-event-badges">
+                      {event.isPaid && (
+                        <div className="shotgun-price-badge">${event.price}</div>
+                      )}
+                      {isUserAttending(event.id) && (
+                        <div className="shotgun-attending-badge">✓</div>
+                      )}
+                    </div>
+                    <div className="shotgun-event-actions">
+                      <button 
+                        className="shotgun-share-btn"
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleShare(event);
-                        }}>
-                          📤
-                        </button>
-                      </div>
-                      </div>
-                      </div>
-                  
-                  <div className="event-content">
-                    <div className="event-category">
-                      {event.category || 'Event'}
+                        }}
+                      >
+                        📤
+                      </button>
                     </div>
-                    
-                    <h3 className="event-title">{event.title}</h3>
-                    
-                    <p className="event-description">{event.description}</p>
-                    
-                    <div className="event-info">
-                      <span>📅 {formatDate(event.date)}</span>
-                      <span>🕒 {event.time}</span>
-                      <span>📍 {event.location}</span>
-                      <span>👥 {event.attendees}/{event.maxAttendees || 'Unlimited'}</span>
+                  </div>
+                  </div>
+                  
+                <div className="shotgun-event-content">
+                  <div className="shotgun-event-header">
+                    <div className="shotgun-event-org">{organization.name}</div>
+                    <div className="shotgun-event-category">{event.category || 'Event'}</div>
+                  </div>
+                  
+                  <h3 className="shotgun-event-title">{event.title}</h3>
+                  
+                  <div className="shotgun-event-meta">
+                    <div className="shotgun-event-details">
+                      <span className="shotgun-event-date">{formatDate(event.date)}, {event.time}</span>
+                      <span className="shotgun-event-location">{event.location}</span>
+                    </div>
+                    <div className="shotgun-event-attendance">
+                      <span className="shotgun-attendance-count">{event.attendees}/{event.maxAttendees || 'Unlimited'}</span>
+                    </div>
                       </div>
                       
-                    <div className="event-actions">
+                  <div className="shotgun-event-actions-bottom">
                       <button 
-                        className="rsvp-btn"
+                      className={`shotgun-rsvp-btn ${isUserAttending(event.id) ? 'attending' : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleRSVP(event.id);
                         }}
                       >
-                        RSVP
+                      {isUserAttending(event.id) ? '✓ Attending' : 'Join Event'}
                       </button>
-                      <button className="details-btn" onClick={(e) => {
+                    <button 
+                      className="shotgun-details-btn"
+                      onClick={(e) => {
                         e.stopPropagation();
                         handleEventClick(event);
-                      }}>
+                      }}
+                    >
                         Details
                       </button>
                     </div>
                   </div>
                 </div>
               ))}
-            </div>
           </div>
         )}
 
@@ -1112,20 +1266,34 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
                 <div key={post.id} className="post-item" onClick={() => handlePostClick(post)}>
                   <img 
                     src={post.image || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop'} 
-                    alt={post.content} 
+                    alt="Post" 
                     className="post-image" 
                   />
                   <div className="post-overlay">
-                    <div className="post-stats">
-                      <span className="post-stat">❤️ {post.likes}</span>
-                  </div>
-                      </div>
+                    <div className="post-actions">
+                      <button 
+                        className={`like-btn ${likedPosts.has(post.id) ? 'liked' : ''}`}
+                        onClick={(e) => handleLikePost(post.id, e)}
+                      >
+                        {likedPosts.has(post.id) ? '❤️' : '🤍'} {post.likes}
+                      </button>
+                      <button 
+                        className="comment-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCommentClick(post);
+                        }}
+                      >
+                        💬 {(post.comments || []).length}
+                      </button>
                     </div>
-              ))}
                   </div>
-                      </div>
-                    )}
-                      </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
       </div>
 
       {/* Join Request Popup Modal */}
@@ -1225,205 +1393,305 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         <div className="event-modal-overlay" onClick={handleCloseEventModal}>
           <div className="event-modal" onClick={(e) => e.stopPropagation()}>
             <div className="event-modal-header">
-              <button className="event-modal-close-btn" onClick={handleCloseEventModal}>×</button>
+              <h3>Event Details</h3>
+              <button className="modal-close-btn" onClick={handleCloseEventModal}>×</button>
             </div>
             
             <div className="event-modal-content">
-              <div className="event-modal-image">
-                <img src={selectedEvent.image} alt={selectedEvent.title} />
+              <div className="event-modal-header-info">
+                <div className="event-title-section">
+                  <h2 className="event-modal-title">{selectedEvent.title}</h2>
+                  <span className="event-modal-type-badge">{selectedEvent.category || 'Event'}</span>
+                </div>
               </div>
               
-              <div className="event-modal-details">
-                <div className="event-modal-header-info">
-                  <div className="event-user-info">
-                    <div className="event-user-avatar">
-                      <img src={organization.image} alt={organization.name} />
-                    </div>
-                    <div className="event-user-details">
-                      <div className="event-username">{organization.name}</div>
-                      <div className="event-location">{selectedEvent.location}</div>
-                    </div>
-                  </div>
-                  <button className="event-options-btn">⋯</button>
-                </div>
-                
-                <div className="event-modal-actions">
-                  <div className="event-action-buttons">
-                    <button className="event-action-btn">❤️</button>
-                    <button className="event-action-btn">💬</button>
-                    <button className="event-action-btn">📤</button>
+              <div className="event-modal-grid">
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Date & Time</span>
+                    <span className="event-modal-value">{formatDate(selectedEvent.date)}, {selectedEvent.time}</span>
                   </div>
                 </div>
                 
-                <div className="event-likes">
-                  <div className="likes-count">{selectedEvent.attendees} people attending</div>
-                </div>
-                
-                <div className="event-caption">
-                  <div className="caption-content">
-                    <span className="caption-username">{organization.name}</span>
-                    <span className="caption-text">{selectedEvent.description}</span>
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Location</span>
+                    <span className="event-modal-value">{selectedEvent.location}</span>
                   </div>
                 </div>
                 
-                <div className="event-details-section">
-                  <div className="event-header">
-                    <div className="event-title">{selectedEvent.title}</div>
-                    <div className="event-type-badge">Event</div>
-                  </div>
-                  
-                  <div className="event-info-grid">
-                    <div className="event-info-item">
-                      <span className="event-info-icon">📅</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Date</div>
-                        <div className="event-info-value">{formatDate(selectedEvent.date)}</div>
-                      </div>
-                    </div>
-                    <div className="event-info-item">
-                      <span className="event-info-icon">🕒</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Time</div>
-                        <div className="event-info-value">{selectedEvent.time}</div>
-                      </div>
-                    </div>
-                    <div className="event-info-item">
-                      <span className="event-info-icon">📍</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Location</div>
-                        <div className="event-info-value">{selectedEvent.location}</div>
-                      </div>
-                    </div>
-                    <div className="event-info-item">
-                      <span className="event-info-icon">👥</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Attending</div>
-                        <div className="event-info-value">{selectedEvent.attendees}/{selectedEvent.maxAttendees}</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="event-description">
-                    <h5>Description</h5>
-                    <p>{selectedEvent.description}</p>
-                  </div>
-                  
-                  <div className="event-organization">
-                    <span className="event-org-icon">🏛️</span>
-                    <div>
-                      <div className="event-org-name">{organization.name}</div>
-                      <div className="event-category">{organization.category}</div>
-                    </div>
-                    <button 
-                      className="view-org-profile-btn"
-                      onClick={() => {
-                        handleCloseEventModal();
-                        onNavigate('organization-profile', { organization: organization });
-                      }}
-                    >
-                      View Profile
-                    </button>
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Attendees</span>
+                    <span className="event-modal-value">{selectedEvent.attendees}/{selectedEvent.maxAttendees || 'Unlimited'} people</span>
                   </div>
                 </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Organization</span>
+                    <span className="event-modal-value">{organization.name}</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Category</span>
+                    <span className="event-modal-value">{selectedEvent.category || 'Event'}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="event-modal-description">
+                <h4>Event Description</h4>
+                <p>{selectedEvent.description}</p>
+              </div>
+              
+              <div className="event-modal-actions">
+                <button 
+                  className={`event-modal-rsvp-btn ${isUserAttending(selectedEvent.id) ? 'attending' : ''}`}
+                  onClick={() => handleRSVP(selectedEvent.id)}
+                >
+                  {isUserAttending(selectedEvent.id) ? '✓ Attending' : 'Join Event'}
+                </button>
+                <button 
+                  className="event-modal-share-btn"
+                  onClick={() => handleShare(selectedEvent)}
+                >
+                  Share Event
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Post Modal */}
+      {/* Instagram-style Post Modal */}
       {showPostModal && selectedPost && (
-        <div className="event-modal-overlay" onClick={handleClosePostModal}>
-          <div className="event-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="event-modal-header">
-              <button className="event-modal-close-btn" onClick={handleClosePostModal}>×</button>
+        <div className="post-modal-overlay" onClick={handleClosePostModal}>
+          <div className="post-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="post-modal-header">
+              <button className="modal-close-btn" onClick={handleClosePostModal}>×</button>
             </div>
             
-            <div className="event-modal-content">
-              <div className="event-modal-image">
-                <img src={selectedPost.image || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop'} alt={selectedPost.content} />
-              </div>
-              
-              <div className="event-modal-details">
-                <div className="event-modal-header-info">
-                  <div className="event-user-info">
-                    <div className="event-user-avatar">
-                      <img src={selectedPost.authorAvatar} alt={selectedPost.author} />
-                    </div>
-                    <div className="event-user-details">
-                      <div className="event-username">{selectedPost.author}</div>
-                      <div className="event-location">{selectedPost.authorRole}</div>
+            <div className="post-modal-content">
+                <div className="post-modal-header-info">
+                  <div className="post-user-info">
+                    <img src={organization.image} alt={organization.name} className="post-user-avatar" />
+                    <div className="post-user-details">
+                      <span className="post-username">{organization.name}</span>
+                      <span className="post-location">{user?.university || 'University of California, Berkeley'}</span>
                     </div>
                   </div>
-                  <button className="event-options-btn">⋯</button>
+                <button className="post-options-btn" onClick={() => handleEventFromPostClick(selectedPost)}>Event</button>
                 </div>
                 
-
+              <div className="post-modal-image">
+                <img src={selectedPost.image || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop'} alt="Post" />
+              </div>
                 
-                <div className="event-caption">
+              <div className="post-modal-details">
+                <div className="post-caption">
                   <div className="caption-content">
-                    <span className="caption-username">{selectedPost.author}</span>
+                    <span className="caption-username">{organization.name}</span>
                     <span className="caption-text">{selectedPost.content}</span>
                   </div>
                 </div>
                 
-                <div className="event-modal-actions">
-                  <div className="event-action-buttons">
-                    <button className="event-action-btn">💬</button>
-                    <button className="event-action-btn">📤</button>
+                <div className="post-modal-actions">
+                  <div className="post-action-buttons">
+                    <button 
+                      className={`action-btn ${likedPosts.has(selectedPost.id) ? 'liked' : ''}`}
+                      onClick={() => handleLikePost(selectedPost.id, { stopPropagation: () => {} })}
+                    >
+                      {likedPosts.has(selectedPost.id) ? '❤️' : '🤍'}
+                    </button>
+                    <button className="action-btn" onClick={() => handleCommentClick(selectedPost)}>💬</button>
+                    <button className="action-btn">📤</button>
+                </div>
+                </div>
+                
+                <div className="post-likes">
+                  <span className="likes-count">{selectedPost.likes} likes</span>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Event Details Modal from Post */}
+      {showEventFromPostModal && selectedEventFromPost && (
+        <div className="event-modal-overlay" onClick={handleCloseEventFromPostModal}>
+          <div className="event-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="event-modal-header">
+              <h3>Event Details</h3>
+              <button className="modal-close-btn" onClick={handleCloseEventFromPostModal}>×</button>
+            </div>
+            
+            <div className="event-modal-content">
+              <div className="event-modal-header-info">
+                <div className="event-title-section">
+                  <h2 className="event-modal-title">{selectedEventFromPost.title}</h2>
+                  <span className="event-modal-type-badge">{selectedEventFromPost.category || 'Event'}</span>
+                </div>
+              </div>
+              
+              <div className="event-modal-grid">
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Date & Time</span>
+                    <span className="event-modal-value">{selectedEventFromPost.date}, {selectedEventFromPost.time}</span>
                   </div>
                 </div>
                 
-                <div className="event-details-section">
-                  <div className="event-header">
-                    <div className="event-title">{selectedPost.type.charAt(0).toUpperCase() + selectedPost.type.slice(1)} Event</div>
-                    <div className="event-type-badge">{selectedPost.type}</div>
-                  </div>
-                  
-                  <div className="event-info-grid">
-                    <div className="event-info-item">
-                      <span className="event-info-icon">📅</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Event Date</div>
-                        <div className="event-info-value">Upcoming</div>
-                      </div>
-                    </div>
-                    <div className="event-info-item">
-                      <span className="event-info-icon">🕒</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Time</div>
-                        <div className="event-info-value">TBD</div>
-                      </div>
-                    </div>
-                    <div className="event-info-item">
-                      <span className="event-info-icon">📍</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Location</div>
-                        <div className="event-info-value">Campus</div>
-                      </div>
-                    </div>
-                    <div className="event-info-item">
-                      <span className="event-info-icon">👥</span>
-                      <div className="event-info-content">
-                        <div className="event-info-label">Expected Attendance</div>
-                        <div className="event-info-value">20-30 people</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="event-description">
-                    <h5>Event Description</h5>
-                    <p>{selectedPost.content}</p>
-                  </div>
-                  
-                  <div className="event-organization">
-                    <span className="event-org-icon">🏛️</span>
-                    <div>
-                      <div className="event-org-name">{organization.name}</div>
-                      <div className="event-category">{organization.type}</div>
-                    </div>
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Location</span>
+                    <span className="event-modal-value">{selectedEventFromPost.location}</span>
                   </div>
                 </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Attendees</span>
+                    <span className="event-modal-value">{selectedEventFromPost.attendees}/{selectedEventFromPost.maxAttendees || 'Unlimited'} people</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Organization</span>
+                    <span className="event-modal-value">{organization.name}</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Category</span>
+                    <span className="event-modal-value">{selectedEventFromPost.category || 'Event'}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="event-modal-description">
+                <h4>Event Description</h4>
+                <p>{selectedEventFromPost.description}</p>
+              </div>
+              
+              <div className="event-modal-actions">
+                    <button 
+                  className={`event-modal-rsvp-btn ${isUserAttending(selectedEventFromPost.id) ? 'attending' : ''}`}
+                  onClick={() => handleRSVP(selectedEventFromPost.id)}
+                    >
+                  {isUserAttending(selectedEventFromPost.id) ? '✓ Attending' : 'Join Event'}
+                    </button>
+                    <button 
+                  className="event-modal-share-btn"
+                  onClick={() => handleShare(selectedEventFromPost)}
+                    >
+                  Share Event
+                    </button>
+                  </div>
+                </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && shareEvent && (
+        <div className="share-modal-overlay" onClick={closeShareModal}>
+          <div className="share-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="share-modal-header">
+              <h3>Share Post</h3>
+              <button className="close-btn" onClick={closeShareModal}>×</button>
+                </div>
+                
+            <div className="share-modal-content">
+              {/* Post Preview */}
+              <div className="share-post-preview">
+                <div className="share-post-header">
+                  <div className="share-post-author">
+                    <div className="share-post-avatar">
+                      <img src={shareEvent.image} alt={shareEvent.title} />
+              </div>
+                    <div className="share-post-info">
+                      <h4>{organization.name}</h4>
+                      <p>{shareEvent.description.substring(0, 100)}...</p>
+            </div>
+          </div>
+        </div>
+            </div>
+            
+              {/* Recipient Type Selection */}
+              <div className="share-recipient-type">
+                <label>
+                  <input
+                    type="radio"
+                    name="recipientType"
+                    value="person"
+                    checked={recipientType === 'person'}
+                    onChange={(e) => setRecipientType(e.target.value)}
+                  />
+                  Share with Person
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="recipientType"
+                    value="organization"
+                    checked={recipientType === 'organization'}
+                    onChange={(e) => setRecipientType(e.target.value)}
+                  />
+                  Share with Organization
+                </label>
+                    </div>
+
+              {/* Recipient Selection */}
+              <div className="share-recipient-selection">
+                <label>Select Recipient:</label>
+                <select 
+                  value={selectedRecipient} 
+                  onChange={(e) => setSelectedRecipient(e.target.value)}
+                  className="share-recipient-select"
+                >
+                  <option value="">Choose a {recipientType}...</option>
+                  {recipientType === 'organization' && shareRecipients.organizations.map(org => (
+                    <option key={org.id} value={org.name}>
+                      {org.name} ({org.type}) - {org.university}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Message Input */}
+              <div className="share-message-input">
+                <label>Add a message (optional):</label>
+                <textarea 
+                  value={shareMessage}
+                  onChange={(e) => setShareMessage(e.target.value)}
+                  placeholder="Add a personal message..."
+                  className="share-message-textarea"
+                  rows="3"
+                />
+              </div>
+
+              {/* Share Button */}
+              <div className="share-actions">
+                <button 
+                  className="share-send-btn"
+                  onClick={handleSendShare}
+                  disabled={!selectedRecipient}
+                >
+                  Send Share
+                </button>
+                <button 
+                  className="share-cancel-btn"
+                  onClick={closeShareModal}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>

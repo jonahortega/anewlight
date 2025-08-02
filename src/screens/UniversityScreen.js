@@ -41,15 +41,15 @@ const UniversityScreen = ({ onUniversitySelect }) => {
           <div className="continue-section">
             <div className="selected-preview">
               <div className="selected-university">
-                              <div className="university-logo">
-                <div className="logo-initials">
-                  {selectedUniversity.logo}
+                <div className="university-logo">
+                  <div className="logo-initials">
+                    {selectedUniversity.logo}
+                  </div>
                 </div>
-              </div>
-              <div className="university-info">
-                <h4>Selected: {selectedUniversity.name}</h4>
-                <p>{selectedUniversity.type} • {selectedUniversity.state}</p>
-              </div>
+                <div className="university-info">
+                  <h4>Selected: {selectedUniversity.name}</h4>
+                  <p>{selectedUniversity.type} • {selectedUniversity.state}</p>
+                </div>
               </div>
             </div>
             <button onClick={handleConfirm} className="confirm-button">

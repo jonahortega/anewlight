@@ -200,30 +200,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
     }
   ] : []);
 
-  // Mock join requests data
-  const joinRequests = [
-    {
-      id: 1,
-      organization: "Delta Epsilon Zeta",
-      status: "pending",
-      date: "2024-03-10",
-      message: "Your application is under review"
-    },
-    {
-      id: 2,
-      organization: "Computer Science Club",
-      status: "approved",
-      date: "2024-03-05",
-      message: "Welcome to the club!"
-    },
-    {
-      id: 3,
-      organization: "Environmental Club",
-      status: "denied",
-      date: "2024-03-01",
-      message: "Unfortunately, we cannot accept your application at this time"
-    }
-  ];
+
 
   // Mock data for attended events
   const attendedEvents = [
@@ -491,23 +468,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
     setSelectedOrgToLeave(null);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'approved': return 'green';
-      case 'denied': return 'red';
-      case 'pending': return 'orange';
-      default: return 'gray';
-    }
-  };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'approved': return '✅';
-      case 'denied': return '❌';
-      case 'pending': return '⏳';
-      default: return '❓';
-    }
-  };
 
   const handlePostClick = (post) => {
     setSelectedPost(post);
@@ -523,14 +484,27 @@ const ProfileScreen = ({ user, onNavigate }) => {
 
   const handleAddComment = (postId, commentText) => {
     // In a real app, this would add to the backend
-    // eslint-disable-next-line no-unused-vars
     const newComment = {
       id: Date.now(),
       user: profile.username,
       text: commentText,
       timestamp: 'Just now'
     };
-    // Add comment to the post (you'd need to update the posts state)
+    
+    // Update the post with the new comment (mock implementation)
+    setSelectedPostForComments(prev => ({
+      ...prev,
+      comments: [...(prev.comments || []), newComment]
+    }));
+    
+    // Also update the posts array to persist the comment
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === postId 
+          ? { ...post, comments: [...(post.comments || []), newComment] }
+          : post
+      )
+    );
   };
 
   const handleOrganizationsClick = () => {
@@ -590,6 +564,13 @@ const ProfileScreen = ({ user, onNavigate }) => {
         setNewPostImage(e.target.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageClick = () => {
+    const imageInput = document.getElementById('image-input');
+    if (imageInput) {
+      imageInput.click();
     }
   };
 
@@ -734,20 +715,15 @@ const ProfileScreen = ({ user, onNavigate }) => {
             className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
             onClick={() => setActiveTab('posts')}
           >
-            📷 Posts
+            Posts
           </button>
           <button 
             className={`tab-button ${activeTab === 'organization' ? 'active' : ''}`}
             onClick={() => setActiveTab('organization')}
           >
-            🏛️ Organization
+            Organization
           </button>
-          <button 
-            className={`tab-button ${activeTab === 'requests' ? 'active' : ''}`}
-            onClick={() => setActiveTab('requests')}
-          >
-            📋 Requests
-          </button>
+
         </div>
 
         {/* Tab Content */}
@@ -772,7 +748,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
                           handleCommentClick(post);
                         }}
                       >
-                        💬 {post.comments.length}
+                        💬 {(post.comments || []).length}
                       </button>
                     </div>
                   </div>
@@ -784,9 +760,6 @@ const ProfileScreen = ({ user, onNavigate }) => {
 
         {activeTab === 'organization' && (
           <div className="organization-section">
-            <div className="organizations-header">
-              <h3>My Organizations</h3>
-            </div>
             <div className="organizations-grid">
               {/* Alpha Sigma Phi Fraternity */}
               <div className="organization-card">
@@ -889,45 +862,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
           </div>
         )}
 
-        {activeTab === 'requests' && (
-          <div className="requests-section">
-            <div className="requests-header">
-              <h3>Join Requests</h3>
-              <button className="btn btn-primary" onClick={() => onNavigate('events', { defaultTab: 'organizations' })}>
-                Discover New Organizations
-              </button>
-            </div>
 
-            <div className="requests-list">
-              {joinRequests.length > 0 ? (
-                joinRequests.map(request => (
-                  <div key={request.id} className={`request-card ${request.status}`}>
-                    <div className="request-header">
-                      <h4>{request.organization}</h4>
-                      <span className={`status-badge ${getStatusColor(request.status)}`}>
-                        {getStatusIcon(request.status)} {request.status}
-                      </span>
-                    </div>
-                    <div className="request-details">
-                      <p className="request-date">Submitted: {request.date}</p>
-                      <p className="request-message">{request.message}</p>
-                    </div>
-                    {request.status === 'denied' && (
-                      <button className="btn btn-secondary">
-                        Reapply
-                      </button>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="no-requests">
-                  <p>No join requests found.</p>
-                  <p>Start exploring organizations to submit join requests!</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Instagram-style Post Modal */}
@@ -964,9 +899,19 @@ const ProfileScreen = ({ user, onNavigate }) => {
                 
                 <div className="post-modal-actions">
                   <div className="post-action-buttons">
+                    <button 
+                      className={`action-btn ${likedPosts.has(selectedPost.id) ? 'liked' : ''}`}
+                      onClick={() => handleLikePost(selectedPost.id, { stopPropagation: () => {} })}
+                    >
+                      {likedPosts.has(selectedPost.id) ? '❤️' : '🤍'}
+                    </button>
                     <button className="action-btn" onClick={() => handleCommentClick(selectedPost)}>💬</button>
                     <button className="action-btn">📤</button>
                 </div>
+                </div>
+                
+                <div className="post-likes">
+                  <span className="likes-count">{selectedPost.likes} likes</span>
                 </div>
                 
               </div>
@@ -1040,23 +985,13 @@ const ProfileScreen = ({ user, onNavigate }) => {
               
               <div className="event-modal-grid">
                 <div className="event-modal-info-item">
-                  <span className="event-modal-icon">📅</span>
                   <div className="event-modal-info-content">
-                    <span className="event-modal-label">Date</span>
-                    <span className="event-modal-value">{selectedEvent.date}</span>
+                    <span className="event-modal-label">Date & Time</span>
+                    <span className="event-modal-value">{selectedEvent.date}, {selectedEvent.time}</span>
                   </div>
                 </div>
                 
                 <div className="event-modal-info-item">
-                  <span className="event-modal-icon">🕒</span>
-                  <div className="event-modal-info-content">
-                    <span className="event-modal-label">Time</span>
-                    <span className="event-modal-value">{selectedEvent.time}</span>
-                  </div>
-                </div>
-                
-                <div className="event-modal-info-item">
-                  <span className="event-modal-icon">📍</span>
                   <div className="event-modal-info-content">
                     <span className="event-modal-label">Location</span>
                     <span className="event-modal-value">{selectedEvent.location}</span>
@@ -1064,7 +999,6 @@ const ProfileScreen = ({ user, onNavigate }) => {
                 </div>
                 
                 <div className="event-modal-info-item">
-                  <span className="event-modal-icon">👥</span>
                   <div className="event-modal-info-content">
                     <span className="event-modal-label">Attendees</span>
                     <span className="event-modal-value">{selectedEvent.attendees} people</span>
@@ -1072,7 +1006,6 @@ const ProfileScreen = ({ user, onNavigate }) => {
                 </div>
                 
                 <div className="event-modal-info-item">
-                  <span className="event-modal-icon">🏛️</span>
                   <div className="event-modal-info-content">
                     <span className="event-modal-label">Organization</span>
                     <span className="event-modal-value">{selectedEvent.organization}</span>
@@ -1080,7 +1013,6 @@ const ProfileScreen = ({ user, onNavigate }) => {
                 </div>
                 
                 <div className="event-modal-info-item">
-                  <span className="event-modal-icon">📋</span>
                   <div className="event-modal-info-content">
                     <span className="event-modal-label">Category</span>
                     <span className="event-modal-value">{selectedEvent.category}</span>
@@ -1108,7 +1040,7 @@ const ProfileScreen = ({ user, onNavigate }) => {
             
             <div className="comment-modal-content">
               <div className="comment-modal-comments">
-                {selectedPostForComments.comments.map(comment => (
+                {(selectedPostForComments.comments || []).map(comment => (
                   <div key={comment.id} className="comment-modal-item">
                     <div className="comment-modal-user">
                       <span className="comment-modal-username">{comment.user}</span>
@@ -1117,6 +1049,11 @@ const ProfileScreen = ({ user, onNavigate }) => {
                     <div className="comment-modal-text">{comment.text}</div>
                   </div>
                 ))}
+                {(!selectedPostForComments.comments || selectedPostForComments.comments.length === 0) && (
+                  <div className="no-comments">
+                    <p>No comments yet. Be the first to comment!</p>
+                  </div>
+                )}
               </div>
               
               <div className="comment-modal-add">
@@ -1173,11 +1110,11 @@ const ProfileScreen = ({ user, onNavigate }) => {
                   </div>
                   <div className="event-popup-info">
                     <h4>{event.name}</h4>
-                    <p className="event-popup-date">📅 {event.date} • {event.time}</p>
-                    <p className="event-popup-location">📍 {event.location}</p>
-                    <p className="event-popup-organization">🏛️ {event.organization}</p>
-                    <p className="event-popup-category">📋 {event.category}</p>
-                    <p className="event-popup-attendees">👥 {event.attendees} attendees</p>
+                                  <p className="event-popup-date">{event.date}, {event.time}</p>
+              <p className="event-popup-location">{event.location}</p>
+              <p className="event-popup-organization">{event.organization}</p>
+              <p className="event-popup-category">{event.category}</p>
+              <p className="event-popup-attendees">{event.attendees} attendees</p>
                     <p className="event-popup-description">{event.description}</p>
                   </div>
                 </div>
@@ -1291,14 +1228,6 @@ const ProfileScreen = ({ user, onNavigate }) => {
               <button className="cancel-btn" onClick={handleCloseNewPostModal}>
                 Cancel
               </button>
-              <h3>Create Post</h3>
-              <button 
-                className="share-btn"
-                onClick={handleSubmitPost}
-                disabled={!newPostImage || !newPostCaption.trim()}
-              >
-                Share
-              </button>
             </div>
             
             <div className="new-post-content">
@@ -1310,13 +1239,13 @@ const ProfileScreen = ({ user, onNavigate }) => {
                       <img src={newPostImage} alt="Preview" className="image-preview" />
                       <button 
                         className="change-image-btn"
-                        onClick={() => document.getElementById('image-input').click()}
+                        onClick={handleImageClick}
                       >
                         Change Photo
                       </button>
                     </div>
                   ) : (
-                    <div className="upload-area" onClick={() => document.getElementById('image-input').click()}>
+                    <div className="upload-area" onClick={handleImageClick}>
                       <div className="upload-icon">📷</div>
                       <p>Add photos</p>
                       <input 
@@ -1353,46 +1282,54 @@ const ProfileScreen = ({ user, onNavigate }) => {
                 </div>
                 
                 {/* Event Attachment */}
-                                  <div className="event-attachment-container">
-                    {selectedEventForPost ? (
-                      <div className="attached-event">
-                        <div className="attached-event-header">
-                          <span className="event-icon">📅</span>
-                          <span className="event-label">Attached Event</span>
-                          <button 
-                            className="remove-event-btn"
-                            onClick={handleRemoveEvent}
-                          >
-                            ×
-                          </button>
+                <div className="event-attachment-container">
+                  {selectedEventForPost ? (
+                    <div className="attached-event">
+                      <div className="attached-event-header">
+                        <span className="event-icon">📅</span>
+                        <span className="event-label">Attached Event</span>
+                        <button 
+                          className="remove-event-btn"
+                          onClick={handleRemoveEvent}
+                        >
+                          ×
+                        </button>
+                      </div>
+                      <div className="attached-event-content">
+                        <div className="attached-event-image">
+                          <img src={selectedEventForPost.image} alt={selectedEventForPost.name} />
+                          <div className="attached-event-badge">{selectedEventForPost.category}</div>
                         </div>
-                        <div className="attached-event-content">
-                          <div className="attached-event-image">
-                            <img src={selectedEventForPost.image} alt={selectedEventForPost.name} />
-                            <div className="attached-event-badge">{selectedEventForPost.category}</div>
+                        <div className="attached-event-details">
+                          <h5>{selectedEventForPost.name}</h5>
+                          <div className="attached-event-info">
+                            <span>{selectedEventForPost.date}, {selectedEventForPost.time}</span>
+                            <span>{selectedEventForPost.location}</span>
+                            <span>{selectedEventForPost.attendees} attending</span>
                           </div>
-                          <div className="attached-event-details">
-                            <h5>{selectedEventForPost.name}</h5>
-                            <div className="attached-event-info">
-                              <span>📅 {selectedEventForPost.date}</span>
-                              <span>🕒 {selectedEventForPost.time}</span>
-                              <span>📍 {selectedEventForPost.location}</span>
-                              <span>👥 {selectedEventForPost.attendees} attending</span>
-                            </div>
-                            <p className="attached-event-description">{selectedEventForPost.description}</p>
-                          </div>
+                          <p className="attached-event-description">{selectedEventForPost.description}</p>
                         </div>
                       </div>
-                    ) : (
-                      <button 
-                        className="attach-event-btn"
-                        onClick={handleAttachEvent}
-                      >
-                        <span className="event-icon">📅</span>
-                        <span>Attach Event</span>
-                      </button>
-                    )}
+                    </div>
+                  ) : null}
+                  
+                  <div className="post-action-buttons">
+                    <button 
+                      className="attach-event-btn"
+                      onClick={handleAttachEvent}
+                    >
+                      <span className="event-icon">📅</span>
+                      <span>Attach Event</span>
+                    </button>
+                    <button 
+                      className="share-btn"
+                      onClick={handleSubmitPost}
+                      disabled={!newPostImage || !newPostCaption.trim()}
+                    >
+                      Share
+                    </button>
                   </div>
+                </div>
               </div>
             </div>
           </div>

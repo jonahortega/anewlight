@@ -48,8 +48,8 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from the React build
+app.use(express.static(path.join(__dirname, 'build')));
 
 // API Routes
 app.use('/api/data', dataRoutes);
@@ -79,14 +79,9 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve the main website
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Dashboard route
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+// Serve the React app for all routes (SPA)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 // Error handling middleware

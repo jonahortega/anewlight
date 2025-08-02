@@ -12,6 +12,7 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   const [showNewConversation, setShowNewConversation] = useState(false);
   const [newConversationSearch, setNewConversationSearch] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [updatedConversations, setUpdatedConversations] = useState({});
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -23,149 +24,241 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
     scrollToBottom();
   }, [selectedConversationId]);
 
-  // Enhanced organization group chats with detailed messages
-  const generateOrganizationChats = useCallback(() => {
-    const chats = [];
-    
-    // Greek Organization Chats
-    const greekOrganizations = [
+  // Organization data
+  const organizationData = {
+    greekOrganizations: [
       {
-        id: 'theta-ki',
-        name: 'Theta Kappa Iota',
-        shortName: 'Theta KI',
+        id: 'alpha-sigma-phi',
+        name: 'Alpha Sigma Phi Fraternity',
+        shortName: 'Alpha Sigma Phi',
         type: 'Fraternity',
         avatar: '🏛️',
-        members: 68,
+        members: 45,
         isOnline: true,
-        lastMessage: 'Hey guys! Hope you\'re having a great Fall Semester, we\'re holding our first Greek interest event for any newcomers looking to rush and meet the brothers',
+        lastMessage: 'Hey brothers! Hope you\'re having a great Fall Semester, we\'re holding our first Greek interest event for any newcomers looking to rush and meet the brothers',
         time: '2:15 PM',
         unread: 5,
         color: '#667eea'
-      },
-      {
-        id: 'alpha-beta-gamma',
-        name: 'Alpha Beta Gamma',
-        shortName: 'ABG',
-        type: 'Fraternity',
-        avatar: '🏛️',
-        members: 72,
-        isOnline: true,
-        lastMessage: 'Brotherhood retreat this weekend! Don\'t forget to bring your gear and positive energy! 🔥',
-        time: '1:30 PM',
-        unread: 2,
-        color: '#764ba2'
-      },
-      {
-        id: 'sigma-phi',
-        name: 'Sigma Phi Sorority',
-        shortName: 'Sigma Phi',
-        type: 'Sorority',
-        avatar: '👑',
-        members: 85,
-        isOnline: true,
-        lastMessage: 'Sisterhood social tonight at 8PM! We\'ll be doing crafts and bonding activities 💕',
-        time: '12:45 PM',
-        unread: 8,
-        color: '#f093fb'
       }
-    ];
-
-    // Club Organizations
-    const clubOrganizations = [
+    ],
+    academicClubs: [
       {
-        id: 'soccer-club',
-        name: 'University Soccer Club',
-        shortName: 'Soccer Club',
-        type: 'Sports Club',
-        avatar: '⚽',
-        members: 45,
-        isOnline: true,
-        lastMessage: 'Hey players, look forward to the semester kicking off again! We\'ll be having our first practice Monday at 8PM on Field K',
-        time: '3:20 PM',
-        unread: 3,
-        color: '#4facfe'
-      },
-      {
-        id: 'debate-club',
-        name: 'Debate & Speech Club',
-        shortName: 'Debate Club',
+        id: 'computer-science-club',
+        name: 'Computer Science Club',
+        shortName: 'CS Club',
         type: 'Academic Club',
-        avatar: '🎭',
-        members: 32,
+        avatar: '💻',
+        members: 28,
         isOnline: true,
-        lastMessage: 'Great job at the tournament everyone! We\'re hosting a workshop next week for new members',
+        lastMessage: 'Great job at the hackathon everyone! We\'re hosting a workshop next week for new members',
         time: '11:15 AM',
         unread: 0,
         color: '#43e97b'
+      }
+    ]
+  };
+
+  // Enhanced organization group chats with detailed messages - Only for user's organizations
+  const generateOrganizationChats = useCallback(() => {
+    const chats = [];
+    
+    // Pre-populated conversations for demonstration
+    const sampleConversations = [
+      {
+        id: 'alpha-sigma-phi',
+        name: 'Alpha Sigma Phi Fraternity',
+        shortName: 'Alpha Sigma Phi',
+        type: 'Fraternity',
+        avatar: '🏛️',
+        members: 45,
+        isOnline: true,
+        lastMessage: 'Great job at the philanthropy event everyone! 🎉',
+        time: '2:15 PM',
+        unread: 3,
+        color: '#667eea',
+        messages: [
+          {
+            id: 1,
+            sender: 'system',
+            content: 'You joined the Alpha Sigma Phi Fraternity group chat',
+            timestamp: '2024-01-15T10:00:00Z',
+            type: 'system',
+            avatar: 'https://i.pravatar.cc/150?img=1'
+          },
+          {
+            id: 2,
+            sender: 'Brother Mike',
+            content: 'Hey brothers! Hope everyone had a great weekend',
+            timestamp: '2024-01-15T10:05:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=2'
+          },
+          {
+            id: 3,
+            sender: 'Brother Alex',
+            content: 'Weekend was awesome! Ready for the week ahead 💪',
+            timestamp: '2024-01-15T10:07:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=3'
+          },
+          {
+            id: 4,
+            sender: 'Brother Chris',
+            content: 'Don\'t forget about the philanthropy event this Friday!',
+            timestamp: '2024-01-15T10:10:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=4'
+          },
+          {
+            id: 5,
+            sender: 'Brother David',
+            content: 'I\'ll bring the supplies for the event',
+            timestamp: '2024-01-15T10:12:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=5'
+          },
+          {
+            id: 6,
+            sender: 'Brother Mike',
+            content: 'Perfect! Great job at the philanthropy event everyone! 🎉',
+            timestamp: '2024-01-15T14:15:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=2'
+          }
+        ]
       },
       {
-        id: 'photography-club',
-        name: 'Photography Society',
-        shortName: 'Photo Club',
-        type: 'Creative Club',
-        avatar: '📸',
+        id: 'computer-science-club',
+        name: 'Computer Science Club',
+        shortName: 'CS Club',
+        type: 'Academic Club',
+        avatar: '💻',
         members: 28,
-        isOnline: false,
-        lastMessage: 'Photo walk this Saturday! Meet at the campus fountain at 10AM. Don\'t forget your cameras!',
-        time: 'Yesterday',
-        unread: 1,
-        color: '#fa709a'
-      }
-    ];
-
-    // Service Organizations
-    const serviceOrganizations = [
-      {
-        id: 'volunteer-corps',
-        name: 'Volunteer Corps',
-        shortName: 'Volunteer Corps',
-        type: 'Service Club',
-        avatar: '🤝',
-        members: 55,
         isOnline: true,
-        lastMessage: 'Community cleanup day this Sunday! We\'ll be meeting at the local park at 9AM. Bring friends!',
-        time: '4:30 PM',
-        unread: 4,
-        color: '#ffecd2'
+        lastMessage: 'Hackathon planning meeting tomorrow at 3 PM!',
+        time: '11:30 AM',
+        unread: 0,
+        color: '#43e97b',
+        messages: [
+          {
+            id: 1,
+            sender: 'system',
+            content: 'You joined the Computer Science Club group chat',
+            timestamp: '2024-01-10T09:00:00Z',
+            type: 'system',
+            avatar: 'https://i.pravatar.cc/150?img=6'
+          },
+          {
+            id: 2,
+            sender: 'Sarah (President)',
+            content: 'Welcome everyone to the CS Club! 👋',
+            timestamp: '2024-01-10T09:05:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=7'
+          },
+          {
+            id: 3,
+            sender: 'John',
+            content: 'Excited to be here! What projects are we working on?',
+            timestamp: '2024-01-10T09:08:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=8'
+          },
+          {
+            id: 4,
+            sender: 'Sarah (President)',
+            content: 'We\'re planning a hackathon next month!',
+            timestamp: '2024-01-10T09:10:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=7'
+          },
+          {
+            id: 5,
+            sender: 'Emily',
+            content: 'That sounds amazing! I\'m in! 🚀',
+            timestamp: '2024-01-10T09:12:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=9'
+          },
+          {
+            id: 6,
+            sender: 'Sarah (President)',
+            content: 'Hackathon planning meeting tomorrow at 3 PM!',
+            timestamp: '2024-01-15T11:30:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=7'
+          }
+        ]
       },
       {
-        id: 'environmental-club',
-        name: 'Environmental Awareness Club',
-        shortName: 'Eco Club',
-        type: 'Service Club',
-        avatar: '🌱',
-        members: 38,
-        isOnline: true,
-        lastMessage: 'Tree planting event next week! We\'re partnering with the city to plant 100 new trees',
-        time: '2:45 PM',
-        unread: 6,
-        color: '#a8edea'
+        id: 'delta-epsilon-zeta',
+        name: 'Delta Epsilon Zeta Sorority',
+        shortName: 'DEZ',
+        type: 'Sorority',
+        avatar: '🌸',
+        members: 52,
+        isOnline: false,
+        lastMessage: 'Sisterhood retreat this weekend! Pack your bags! 🎒',
+        time: '9:45 AM',
+        unread: 7,
+        color: '#ff6b9d',
+        messages: [
+          {
+            id: 1,
+            sender: 'system',
+            content: 'You joined the Delta Epsilon Zeta Sorority group chat',
+            timestamp: '2024-01-12T14:00:00Z',
+            type: 'system',
+            avatar: 'https://i.pravatar.cc/150?img=10'
+          },
+          {
+            id: 2,
+            sender: 'Sister Jessica',
+            content: 'Hi sisters! 💕',
+            timestamp: '2024-01-12T14:05:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=11'
+          },
+          {
+            id: 3,
+            sender: 'Sister Amanda',
+            content: 'Hey everyone! How was your weekend?',
+            timestamp: '2024-01-12T14:07:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=12'
+          },
+          {
+            id: 4,
+            sender: 'Sister Rachel',
+            content: 'Weekend was perfect! Ready for the week! ✨',
+            timestamp: '2024-01-12T14:10:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=13'
+          },
+          {
+            id: 5,
+            sender: 'Sister Jessica',
+            content: 'Don\'t forget about the sisterhood retreat!',
+            timestamp: '2024-01-12T14:15:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=11'
+          },
+          {
+            id: 6,
+            sender: 'Sister Amanda',
+            content: 'Sisterhood retreat this weekend! Pack your bags! 🎒',
+            timestamp: '2024-01-15T09:45:00Z',
+            type: 'message',
+            avatar: 'https://i.pravatar.cc/150?img=12'
+          }
+        ]
       }
     ];
-
-    // Add user's organizations if they exist
-    if (user?.greekOrganization) {
-      chats.push({
-        ...greekOrganizations[0],
-        id: `user-greek-${user.greekOrganization.id}`,
-        name: user.greekOrganization.name,
-        shortName: user.greekOrganization.name,
-        members: user.greekOrganization.members || 45
-      });
-    }
-
-    if (user?.club) {
-      chats.push({
-        ...clubOrganizations[0],
-        id: `user-club-${user.club.id}`,
-        name: user.club.name,
-        shortName: user.club.name,
-        members: user.club.members || 25
-      });
-    }
-
-    // Add all other organizations
-    return [...chats, ...greekOrganizations, ...clubOrganizations, ...serviceOrganizations];
+    
+    // Add sample conversations to the chats array
+    chats.push(...sampleConversations);
+    
+    return chats;
   }, [user]);
 
   // Enhanced individual conversations
@@ -222,21 +315,35 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
 
   // Combine organization chats with individual conversations
   const allConversations = useMemo(() => {
-    return [
+    const baseConversations = [
       ...generateOrganizationChats(),
       ...individualConversations
     ];
-  }, [generateOrganizationChats, individualConversations]);
+    
+    // Apply any updates from updatedConversations
+    return baseConversations.map(conv => {
+      if (updatedConversations[conv.id]) {
+        return { ...conv, ...updatedConversations[conv.id] };
+      }
+      return conv;
+    });
+  }, [generateOrganizationChats, individualConversations, updatedConversations]);
 
   // Helper to get the selected conversation object
   const selectedConversation = allConversations.find(c => c.id === selectedConversationId) || null;
 
-  // Filter conversations based on search term
-  const filteredConversations = allConversations.filter(conversation =>
-    conversation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conversation.shortName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conversation.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter conversations to only show organization group chats and filter by search term
+  const filteredConversations = allConversations.filter(conversation => {
+    // Only show organization group chats (not individual conversations)
+    const isOrganizationChat = conversation.type !== 'individual';
+    
+    // Filter by search term
+    const matchesSearch = conversation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         conversation.shortName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         conversation.lastMessage.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return isOrganizationChat && matchesSearch;
+  });
 
   // Set active conversation if provided from props
   useEffect(() => {
@@ -267,21 +374,42 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
     }
   }, [selectedConversationId]);
 
-
-
   // Enhanced messages for different conversations
   const getConversationMessages = (conversation) => {
-    // If conversation has a messages array, use it (for dynamic messages)
+    // Check if this conversation has updated messages
+    const updatedConv = updatedConversations[conversation.id];
+    
+    console.log('Getting messages for conversation:', conversation.id);
+    console.log('Updated conv:', updatedConv);
+    
+    // If conversation has updated messages, use those
+    if (updatedConv && updatedConv.messages && updatedConv.messages.length > 0) {
+      console.log('Using updated messages:', updatedConv.messages);
+      return updatedConv.messages.map(msg => ({
+        id: msg.id,
+        sender: msg.sender,
+        senderRole: msg.sender === 'You' ? 'You' : 'Member',
+        message: msg.content || msg.message, // Handle both content and message fields
+        time: msg.time,
+        isOwn: msg.isOwn,
+        type: msg.type || 'message',
+        reactions: msg.reactions || [],
+        avatar: msg.avatar
+      }));
+    }
+    
+    // If conversation has a messages array, use it (for pre-populated messages)
     if (conversation.messages && conversation.messages.length > 0) {
       return conversation.messages.map(msg => ({
         id: msg.id,
-        sender: msg.sender,
-        senderRole: msg.senderRole || (msg.isOwn ? 'You' : 'Member'),
-        message: msg.message,
-        time: msg.time,
-        isOwn: msg.isOwn || false,
+        sender: msg.sender === 'system' ? 'System' : msg.sender,
+        senderRole: msg.sender === 'system' ? 'System' : (msg.sender.includes('Brother') ? 'Member' : msg.sender.includes('Sister') ? 'Member' : 'Member'),
+        message: msg.content,
+        time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isOwn: false,
         type: msg.type || 'message',
-        reactions: msg.reactions
+        reactions: msg.reactions || [],
+        avatar: msg.avatar
       }));
     }
     
@@ -294,236 +422,25 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
         message: msg.content,
         time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isOwn: false,
-        type: msg.type || 'message'
+        type: msg.type || 'message',
+        avatar: msg.avatar
       }));
     }
     
-    if (conversation.id === 'theta-ki' || conversation.id === 'user-greek-1') {
-      return [
-        { 
-          id: 1, 
-          sender: 'Theta KI', 
-          senderRole: 'Organization',
-          message: 'Hey guys! Hope you\'re having a great Fall Semester, we\'re holding our first Greek interest event for any newcomers looking to rush and meet the brothers', 
-          time: '2:15 PM', 
-          isOwn: false,
-          type: 'announcement',
-          reactions: { '👍': 12, '❤️': 8, '🔥': 5 }
-        },
-        { 
-          id: 2, 
-          sender: 'Alex Johnson', 
-          senderRole: 'President',
-          message: 'This is going to be amazing! We\'ll have food, games, and lots of brotherhood bonding', 
-          time: '2:17 PM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 3, 
-          sender: 'You', 
-          senderRole: 'Member',
-          message: 'I\'ll definitely be there! Can\'t wait to meet the new potential brothers', 
-          time: '2:18 PM', 
-          isOwn: true,
-          type: 'message'
-        },
-        { 
-          id: 4, 
-          sender: 'Mike Chen', 
-          senderRole: 'Rush Chair',
-          message: 'Perfect! I\'ll set up the registration form and send out the details', 
-          time: '2:20 PM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 5, 
-          sender: 'Sarah Wilson', 
-          senderRole: 'Social Chair',
-          message: 'I\'ll handle the decorations and make sure everything looks great! 🎉', 
-          time: '2:22 PM', 
-          isOwn: false,
-          type: 'message'
-        }
-      ];
-    } else if (conversation.id === 'soccer-club' || conversation.id === 'user-club-1') {
-      return [
-        { 
-          id: 1, 
-          sender: 'Soccer Club', 
-          senderRole: 'Organization',
-          message: 'Hey players, look forward to the semester kicking off again! We\'ll be having our first practice Monday at 8PM on Field K', 
-          time: '3:20 PM', 
-          isOwn: false,
-          type: 'announcement',
-          reactions: { '⚽': 15, '👍': 10, '🔥': 7 }
-        },
-        { 
-          id: 2, 
-          sender: 'David Kim', 
-          senderRole: 'Captain',
-          message: 'Make sure to bring your cleats and water bottles! We\'ll be doing fitness tests', 
-          time: '3:22 PM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 3, 
-          sender: 'You', 
-          senderRole: 'Player',
-          message: 'Can\'t wait to get back on the field! Will we have new jerseys this season?', 
-          time: '3:23 PM', 
-          isOwn: true,
-          type: 'message'
-        },
-        { 
-          id: 4, 
-          sender: 'Coach Martinez', 
-          senderRole: 'Coach',
-          message: 'Yes! New jerseys are being ordered this week. We\'ll have them by the first game', 
-          time: '3:25 PM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 5, 
-          sender: 'Emma Rodriguez', 
-          senderRole: 'Vice Captain',
-          message: 'I\'ll bring the cones and training equipment. Let\'s make this our best season yet! 💪', 
-          time: '3:27 PM', 
-          isOwn: false,
-          type: 'message'
-        }
-      ];
-    } else if (conversation.id === 'debate-club') {
-      return [
-        { 
-          id: 1, 
-          sender: 'Debate Club', 
-          senderRole: 'Organization',
-          message: 'Great job at the tournament everyone! We\'re hosting a workshop next week for new members', 
-          time: '11:15 AM', 
-          isOwn: false,
-          type: 'announcement',
-          reactions: { '🎭': 8, '👏': 12, '🏆': 6 }
-        },
-        { 
-          id: 2, 
-          sender: 'Jessica Lee', 
-          senderRole: 'VP',
-          message: 'We won first place! Everyone\'s hard work really paid off', 
-          time: '11:17 AM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 3, 
-          sender: 'You', 
-          senderRole: 'Member',
-          message: 'The workshop sounds great! I\'ll help organize the materials', 
-          time: '11:18 AM', 
-          isOwn: true,
-          type: 'message'
-        }
-      ];
-    } else if (conversation.id === 'volunteer-corps') {
-      return [
-        { 
-          id: 1, 
-          sender: 'Volunteer Corps', 
-          senderRole: 'Organization',
-          message: 'Community cleanup day this Sunday! We\'ll be meeting at the local park at 9AM. Bring friends!', 
-          time: '4:30 PM', 
-          isOwn: false,
-          type: 'announcement',
-          reactions: { '🤝': 20, '🌍': 15, '❤️': 12 }
-        },
-        { 
-          id: 2, 
-          sender: 'Maria Garcia', 
-          senderRole: 'Coordinator',
-          message: 'We\'ll provide gloves and trash bags. Let\'s make our community beautiful!', 
-          time: '4:32 PM', 
-          isOwn: false,
-          type: 'message'
-        }
-      ];
-    } else if (conversation.type === 'individual') {
-      return [
-        { 
-          id: 1, 
-          sender: conversation.name, 
-          senderRole: conversation.role,
-          message: 'Hey! How are you doing?', 
-          time: '2:30 PM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 2, 
-          sender: 'You', 
-          senderRole: 'You',
-          message: 'I\'m doing great! How about you?', 
-          time: '2:32 PM', 
-          isOwn: true,
-          type: 'message'
-        },
-        { 
-          id: 3, 
-          sender: conversation.name, 
-          senderRole: conversation.role,
-          message: 'Pretty good! Are you coming to the social this weekend?', 
-          time: '2:35 PM', 
-          isOwn: false,
-          type: 'message'
-        },
-        { 
-          id: 4, 
-          sender: 'You', 
-          senderRole: 'You',
-          message: 'Yes, I\'ll be there! Looking forward to it.', 
-          time: '2:36 PM', 
-          isOwn: true,
-          type: 'message'
-        },
-        { 
-          id: 5, 
-          sender: conversation.name, 
-          senderRole: conversation.role,
-          message: 'Great! It\'s going to be so much fun! 🎉', 
-          time: '2:38 PM', 
-          isOwn: false,
-          type: 'message'
-        }
-      ];
-    } else {
-      // Default organization messages
-      return [
-        { 
-          id: 1, 
-          sender: conversation.name, 
-          senderRole: 'Organization',
-          message: 'Welcome to the group! We\'re excited to have you here.', 
-          time: '2:30 PM', 
-          isOwn: false,
-          type: 'announcement',
-          reactions: { '👋': 5, '🎉': 3 }
-        },
-        { 
-          id: 2, 
-          sender: 'You', 
-          senderRole: 'Member',
-          message: 'Thanks! Happy to be part of the community!', 
-          time: '2:32 PM', 
-          isOwn: true,
-          type: 'message'
-        }
-      ];
-    }
+    // Default messages for demo purposes
+    return [
+      { 
+        id: 1, 
+        sender: conversation.name, 
+        senderRole: conversation.type,
+        message: conversation.lastMessage, 
+        time: conversation.time, 
+        isOwn: false,
+        type: 'message',
+        avatar: conversation.avatar
+      }
+    ];
   };
-
-
 
   const handleSendMessage = () => {
     if (newMessage.trim() && selectedConversation && !isSending) {
@@ -536,32 +453,31 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
       const newMessageObj = {
         id: messageId,
         sender: user?.name || 'You',
-        message: newMessage,
+        content: newMessage,
         timestamp,
         time: currentTime,
         isOwn: true,
-        type: 'message'
+        type: 'message',
+        avatar: 'https://i.pravatar.cc/150?img=1' // Default avatar for user
       };
       
-      // Update the selected conversation with the new message
-      const updatedSelectedConversation = {
-        ...selectedConversation,
-        messages: [...(selectedConversation.messages || []), newMessageObj],
-        lastMessage: newMessage,
-        time: currentTime
-      };
+      // Get existing messages for this conversation
+      const existingMessages = selectedConversation.messages || [];
       
-      // Update the conversations list
-      const updatedConversations = allConversations.map(conv => {
-        if (conv.id === selectedConversation.id) {
-          return updatedSelectedConversation;
-        }
-        return conv;
+      // Update the updatedConversations state with existing + new message
+      setUpdatedConversations(prev => {
+        const currentMessages = prev[selectedConversation.id]?.messages || existingMessages;
+        const newState = {
+          ...prev,
+          [selectedConversation.id]: {
+            messages: [...currentMessages, newMessageObj],
+            lastMessage: newMessage,
+            time: currentTime
+          }
+        };
+        console.log('Updated conversations:', newState);
+        return newState;
       });
-      
-      // Update state
-      setSelectedConversationId(updatedSelectedConversation.id); // Update selectedConversationId
-      setConversations(updatedConversations.filter(conv => conv.type === 'individual'));
       
       // Clear input and typing state
       setNewMessage('');
@@ -593,201 +509,149 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Handle file upload
       console.log('File selected:', file.name);
-      // In a real app, this would upload the file
     }
   };
 
   const handleGroupMembersClick = (conversation, e) => {
-    e.stopPropagation(); // Prevent conversation selection
+    e.stopPropagation();
     setSelectedGroup(conversation);
     setShowGroupMembers(true);
   };
 
   const handleProfileClick = (conversation) => {
-    if (!conversation) return;
-    
     if (conversation.type === 'individual') {
       // Navigate to user profile
-      onNavigate('profile', { userId: conversation.id, userName: conversation.name });
+      onNavigate('profile', { userId: conversation.id });
     } else {
       // Navigate to organization profile
-      onNavigate('organization-profile', { orgId: conversation.id, orgName: conversation.name });
+      onNavigate('organization-profile', { organizationId: conversation.id });
     }
   };
 
-  // Close modals when entering a conversation
-  useEffect(() => {
-    if (selectedConversation) {
-      setShowGroupMembers(false);
-      setShowNewConversation(false);
-      setNewConversationSearch('');
-    }
-  }, [selectedConversation]);
-
   const generateGroupMembers = (group) => {
-    const memberCount = group.members || 50;
     const members = [];
+    const roles = ['President', 'Vice President', 'Secretary', 'Treasurer', 'Member'];
+    const years = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
+    const majors = ['Computer Science', 'Business', 'Engineering', 'Psychology', 'Biology'];
     
-    const names = [
-      'Alex Johnson', 'Sarah Chen', 'Michael Rodriguez', 'Emily Davis', 'David Kim',
-      'Jessica Lee', 'Ryan Thompson', 'Amanda Wilson', 'Chris Martinez', 'Rachel Green',
-      'Kevin Brown', 'Lisa Anderson', 'Daniel Taylor', 'Maria Garcia', 'James White',
-      'Nicole Clark', 'Andrew Lewis', 'Stephanie Hall', 'Robert Young', 'Ashley King',
-      'Matthew Scott', 'Jennifer Adams', 'Joshua Baker', 'Melissa Nelson', 'Christopher Carter',
-      'Amber Mitchell', 'Brandon Perez', 'Danielle Roberts', 'Tyler Turner', 'Brittany Phillips',
-      'Jonathan Campbell', 'Samantha Parker', 'Steven Evans', 'Lauren Edwards', 'Nathan Collins',
-      'Megan Stewart', 'Aaron Morris', 'Katherine Rogers', 'Sean Reed', 'Victoria Cook',
-      'Patrick Morgan', 'Hannah Bell', 'Adam Murphy', 'Olivia Bailey', 'Timothy Rivera',
-      'Sophia Cooper', 'Zachary Richardson', 'Isabella Cox', 'Dylan Ward', 'Ava Torres'
-    ];
-
-    const roles = ['President', 'Vice President', 'Secretary', 'Treasurer', 'Social Chair', 'Philanthropy Chair', 'Member'];
-    const statuses = ['Online', 'Last seen 5 min ago', 'Last seen 1 hour ago', 'Last seen 2 hours ago', 'Last seen 1 day ago'];
-
-    for (let i = 0; i < Math.min(memberCount, names.length); i++) {
+    for (let i = 0; i < (group.members || 10); i++) {
       members.push({
-        id: i + 1,
-        name: names[i],
-        role: i < 6 ? roles[i] : 'Member',
-        avatar: `https://images.unsplash.com/photo-${1500000000000 + i}?w=150&h=150&fit=crop&crop=face`,
-        isOnline: Math.random() > 0.7,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        joinedDate: new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28)).toLocaleDateString()
+        id: `member-${i}`,
+        name: `Member ${i + 1}`,
+        role: roles[i % roles.length],
+        year: years[i % years.length],
+        major: majors[i % majors.length],
+        avatar: `https://i.pravatar.cc/150?img=${i + 1}`,
+        isOnline: Math.random() > 0.5
       });
     }
-
+    
     return members;
   };
 
   const renderConversationsList = () => (
-    <div className="conversations-list">
-      <div className="conversations-header">
-        <h2>Messages</h2>
-        <button className="new-conversation-btn" onClick={startNewConversation}>
-          <span>+</span>
-        </button>
-      </div>
-
-      <div className="search-section">
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search conversations..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <span className="search-icon">🔍</span>
+    <div className="clean-messages-container">
+      {/* Clean Header with Search and New Message */}
+      <div className="clean-header">
+        <div className="search-new-row">
+          <div className="search-container">
+            <div className="search-icon">🔍</div>
+            <input
+              type="text"
+              placeholder="Search your organization chats..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="clean-search-input"
+            />
+          </div>
+          <button className="new-message-btn" onClick={startNewConversation}>
+            <span className="plus-icon">+</span>
+          </button>
         </div>
       </div>
 
-      <div className="conversations">
-        {filteredConversations.map(conversation => (
-          <div 
-            key={conversation.id} 
-            className={`conversation-item ${selectedConversationId === conversation.id ? 'active' : ''}`}
-            onClick={() => {
-              setSelectedConversationId(conversation.id);
-              setShowGroupMembers(false);
-              setSelectedGroup(null);
-              setShowNewConversation(false);
-              setNewMessage('');
-            }}
-          >
-            <div className="conversation-avatar">
-              {conversation.type === 'individual' ? (
-                <img src={conversation.avatar} alt={conversation.name} />
-              ) : (
-                <div className="group-avatar" style={{ backgroundColor: conversation.color }}>
+      {/* Clean Conversations List */}
+      <div className="clean-conversations">
+        {filteredConversations.length > 0 ? (
+          filteredConversations.map(conversation => (
+            <div 
+              key={conversation.id} 
+              className={`clean-conversation-item ${selectedConversationId === conversation.id ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedConversationId(conversation.id);
+                setShowGroupMembers(false);
+                setSelectedGroup(null);
+                setShowNewConversation(false);
+                setNewMessage('');
+              }}
+            >
+              <div className="conversation-avatar">
+                <div className="avatar-circle" style={{ backgroundColor: conversation.color }}>
                   {conversation.avatar}
                 </div>
+                {conversation.isOnline && <div className="online-dot"></div>}
+              </div>
+              
+              <div className="conversation-content">
+                <div className="conversation-header">
+                  <h3 className="conversation-name">{conversation.shortName || conversation.name}</h3>
+                  <span className="conversation-time">{conversation.time}</span>
+                </div>
+                <p className="conversation-preview">{conversation.lastMessage}</p>
+                <div className="conversation-meta">
+                  <span className="member-count">{conversation.members} members</span>
+                  <span className="organization-type">{conversation.type}</span>
+                </div>
+              </div>
+              
+              {conversation.unread > 0 && (
+                <div className="unread-badge">
+                  <span>{conversation.unread}</span>
+                </div>
               )}
-              <span className={`status-dot ${conversation.isOnline ? 'online' : 'offline'}`}></span>
             </div>
-            
-            <div className="conversation-content">
-              <div className="conversation-header">
-                <h4>{conversation.shortName || conversation.name}</h4>
-                <span className="conversation-time">{conversation.time}</span>
-              </div>
-              <p className="conversation-preview">{conversation.lastMessage}</p>
-              <div className="conversation-meta">
-                {(conversation.type === 'group' || conversation.type === 'Fraternity' || conversation.type === 'Sorority' || conversation.type === 'Sports Club' || conversation.type === 'Academic Club' || conversation.type === 'Creative Club' || conversation.type === 'Service Club') && (
-                  <span 
-                    className="group-members clickable" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGroupMembersClick(conversation, e);
-                    }}
-                    title="Click to view members"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {conversation.members} members 👥
-                  </span>
-                )}
-                {conversation.organizationType && (
-                  <span className={`organization-badge ${conversation.organizationType.toLowerCase()}`}>
-                    {conversation.organizationType}
-                  </span>
-                )}
-                {conversation.role && (
-                  <span className="role-badge">{conversation.role}</span>
-                )}
-              </div>
-            </div>
-            
-            {conversation.unread > 0 && (
-              <div className="unread-badge">
-                {conversation.unread}
-              </div>
-            )}
+          ))
+        ) : (
+          <div className="empty-state">
+            <div className="empty-icon">💬</div>
+            <h3>No conversations yet</h3>
+            <p>Start chatting with your organizations to see them here</p>
+            <button className="start-chat-btn" onClick={startNewConversation}>
+              Start Your First Chat
+            </button>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
 
   const renderChatView = () => (
-    <div className="chat-view">
-      <div className="chat-header">
+    <div className="clean-chat-view">
+      <div className="clean-chat-header">
         <button 
-          className="back-to-conversations"
+          className="back-btn"
           onClick={() => setSelectedConversationId(null)}
         >
-          ← Back
+          ←
         </button>
         <div className="chat-info" onClick={() => selectedConversation && handleProfileClick(selectedConversation)}>
           <div className="chat-avatar">
-            {selectedConversation.type === 'individual' ? (
-              <img src={selectedConversation.avatar} alt={selectedConversation.name} />
-            ) : (
-              <div className="group-avatar" style={{ backgroundColor: selectedConversation.color }}>
-                {selectedConversation.avatar}
-              </div>
-            )}
-            <span className={`status-dot ${selectedConversation.isOnline ? 'online' : 'offline'}`}></span>
+            <div className="avatar-circle" style={{ backgroundColor: selectedConversation.color }}>
+              {selectedConversation.avatar}
+            </div>
+            {selectedConversation.isOnline && <div className="online-dot"></div>}
           </div>
           <div className="chat-details">
-            <h3>{selectedConversation.shortName || selectedConversation.name}</h3>
-            <p>
-              {(selectedConversation.type === 'group' || selectedConversation.type === 'Fraternity' || selectedConversation.type === 'Sorority' || selectedConversation.type === 'Sports Club' || selectedConversation.type === 'Academic Club' || selectedConversation.type === 'Creative Club' || selectedConversation.type === 'Service Club') 
-                ? (
-                  <span 
-                    className="group-members clickable" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGroupMembersClick(selectedConversation, e);
-                    }}
-                    title="Click to view members"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {selectedConversation.members} members 👥
-                  </span>
-                )
-                : selectedConversation.status || 'Online'
-              }
-            </p>
+            <h3>{selectedConversation.name}</h3>
+            <span className="chat-status">
+              {selectedConversation.type === 'individual' ? (
+                selectedConversation.status
+              ) : (
+                `${selectedConversation.members} members`
+              )}
+            </span>
           </div>
         </div>
         <div className="chat-actions">
@@ -797,10 +661,15 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
         </div>
       </div>
 
-      <div className="chat-messages">
+      <div className="clean-chat-messages">
         {getConversationMessages(selectedConversation).map(message => (
-          <div key={message.id} className={`message ${message.isOwn ? 'own' : ''} ${message.type}`}>
-            <div className="message-content">
+          <div key={message.id} className={`clean-message ${message.isOwn ? 'own' : ''} ${message.type}`}>
+            {!message.isOwn && message.avatar && (
+              <div className="message-avatar">
+                <img src={message.avatar} alt={message.sender} />
+              </div>
+            )}
+            <div className="clean-message-content">
               {!message.isOwn && (
                 <div className="message-sender">
                   <span className="sender-name">{message.sender}</span>
@@ -824,8 +693,8 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
           </div>
         ))}
         {isTyping && (
-          <div className="message typing">
-            <div className="message-content">
+          <div className="clean-message typing">
+            <div className="clean-message-content">
               <div className="typing-indicator">
                 <span></span>
                 <span></span>
@@ -837,46 +706,45 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input">
-        <div className="input-actions">
-          <button className="input-action-btn" onClick={handleFileUpload} title="Attach File">
-            📎
-          </button>
-          <button 
-            className="input-action-btn" 
+      <div className="clean-chat-input">
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileSelect}
+        />
+        <button className="clean-input-btn attachment-btn" onClick={handleFileUpload} title="Attach file">
+          📎
+        </button>
+        <div className="clean-input-container">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={newMessage}
+            onChange={handleTyping}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            className="clean-message-input"
+          />
+          <button
+            className="clean-input-btn emoji-btn"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            title="Emoji"
+            title="Add emoji"
           >
             😊
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            style={{ display: 'none' }}
-            onChange={handleFileSelect}
-            accept="image/*,video/*,.pdf,.doc,.docx"
-          />
         </div>
-        <input
-          type="text"
-          placeholder="Type your message..."
-          value={newMessage}
-          onChange={handleTyping}
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          className="message-input"
-          style={{
-            position: 'relative',
-            zIndex: 25,
-            pointerEvents: 'auto'
-          }}
-          autoFocus={false}
-        />
-        <button 
-          className="send-btn"
+        <button
+          className="clean-input-btn send-btn"
           onClick={handleSendMessage}
           disabled={!newMessage.trim() || isSending}
+          title="Send message"
         >
-          {isSending ? 'Sending...' : 'Send'}
+          📤
         </button>
       </div>
     </div>
@@ -888,38 +756,21 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
     const members = generateGroupMembers(selectedGroup);
     
     return (
-      <div className="group-members-modal-overlay" onClick={() => { setShowGroupMembers(false); setSelectedGroup(null); }}>
+      <div className="group-members-modal-overlay" onClick={() => setShowGroupMembers(false)}>
         <div className="group-members-modal" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
             <h3>{selectedGroup.name} Members</h3>
             <button 
               className="close-modal-btn"
-              onClick={() => { setShowGroupMembers(false); setSelectedGroup(null); }}
+              onClick={() => setShowGroupMembers(false)}
             >
               ✕
             </button>
           </div>
           
-          <div className="group-info">
-            <div className="group-avatar" style={{ backgroundColor: selectedGroup.color }}>
-              {selectedGroup.avatar}
-            </div>
-            <div className="group-details">
-              <h4>{selectedGroup.name}</h4>
-              <p>{selectedGroup.type} • {selectedGroup.members} members</p>
-            </div>
-          </div>
-          
           <div className="members-list">
             <div className="members-header">
-              <h4>Members ({members.length})</h4>
-              <div className="members-filter">
-                <input 
-                  type="text" 
-                  placeholder="Search members..." 
-                  className="member-search"
-                />
-              </div>
+              <h4>Members ({selectedGroup.members})</h4>
             </div>
             
             <div className="members-grid">
@@ -932,9 +783,28 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
                   <div className="member-info">
                     <h5>{member.name}</h5>
                     <span className="member-role">{member.role}</span>
-                    <span className="member-status">{member.status}</span>
+                    <span className="member-status">{member.year} • {member.major}</span>
                   </div>
-                  <button className="message-member-btn" title="Message this member">
+                  <button 
+                    className="message-member-btn" 
+                    title="Send message"
+                    onClick={() => {
+                      // Create a new individual conversation
+                      const newConversation = {
+                        id: `member-${member.id}`,
+                        type: 'individual',
+                        name: member.name,
+                        avatar: member.avatar,
+                        isOnline: member.isOnline,
+                        lastMessage: '',
+                        time: 'Now',
+                        unread: 0
+                      };
+                      setConversations(prev => [newConversation, ...prev]);
+                      setSelectedConversationId(newConversation.id);
+                      setShowGroupMembers(false);
+                    }}
+                  >
                     💬
                   </button>
                 </div>
@@ -949,18 +819,12 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   const renderNewConversationModal = () => {
     if (!showNewConversation) return null;
     
-    const allMembers = generateGroupMembers({ members: 100 });
     const allOrganizations = generateOrganizationChats();
     
-    // Filter organizations and members based on search
+    // Filter organizations based on search
     const filteredOrganizations = allOrganizations.filter(org => 
       org.name.toLowerCase().includes(newConversationSearch.toLowerCase()) ||
       org.type.toLowerCase().includes(newConversationSearch.toLowerCase())
-    );
-    
-    const filteredMembers = allMembers.filter(member => 
-      member.name.toLowerCase().includes(newConversationSearch.toLowerCase()) ||
-      member.role.toLowerCase().includes(newConversationSearch.toLowerCase())
     );
     
     return (
@@ -978,11 +842,12 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
           
           <div className="members-list">
             <div className="members-header">
-              <h4>Organizations & Clubs</h4>
+              <h4>Your Organization Group Chats</h4>
+              <p className="members-subtitle">Join group chats for organizations you're part of</p>
               <div className="members-filter">
                 <input 
                   type="text" 
-                  placeholder="Search organizations..." 
+                  placeholder="Search your organizations..." 
                   className="member-search"
                   value={newConversationSearch}
                   onChange={(e) => setNewConversationSearch(e.target.value)}
@@ -1016,50 +881,7 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
                         unread: 0
                       };
                       setConversations(prev => [newConversation, ...prev]);
-                      setSelectedConversationId(newConversation.id); // Update selectedConversationId
-                      setShowNewConversation(false);
-                    }}
-                  >
-                    💬
-                  </button>
-                </div>
-              ))}
-            </div>
-            
-            <div className="members-header" style={{ marginTop: '30px' }}>
-              <h4>Individual People</h4>
-            </div>
-            
-            <div className="members-grid">
-              {filteredMembers.slice(0, 15).map(member => (
-                <div key={member.id} className="member-item">
-                  <div className="member-avatar">
-                    <img src={member.avatar} alt={member.name} />
-                    <span className={`status-dot ${member.isOnline ? 'online' : 'offline'}`}></span>
-                  </div>
-                  <div className="member-info">
-                    <h5>{member.name}</h5>
-                    <span className="member-role">{member.role}</span>
-                    <span className="member-status">{member.status}</span>
-                  </div>
-                  <button 
-                    className="message-member-btn" 
-                    title="Start conversation"
-                    onClick={() => {
-                      // Create a new individual conversation
-                      const newConversation = {
-                        id: `new-${member.id}`,
-                        type: 'individual',
-                        name: member.name,
-                        avatar: member.avatar,
-                        isOnline: member.isOnline,
-                        status: member.status,
-                        lastMessage: '',
-                        time: 'Now',
-                        unread: 0
-                      };
-                      setConversations(prev => [newConversation, ...prev]);
-                      setSelectedConversationId(newConversation.id); // Update selectedConversationId
+                      setSelectedConversationId(newConversation.id);
                       setShowNewConversation(false);
                     }}
                   >
@@ -1077,12 +899,6 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   return (
     <>
       <div className="messages-screen">
-        <header className="messages-header">
-          <button className="back-button" onClick={() => onNavigate('home')}>
-            ← Back to Home
-          </button>
-        </header>
-
         <div className="messages-container">
           <div className="messages-content">
             {!selectedConversationId ? renderConversationsList() : renderChatView()}
@@ -1097,4 +913,4 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   );
 };
 
-export default MessagesScreen; 
+export default MessagesScreen;

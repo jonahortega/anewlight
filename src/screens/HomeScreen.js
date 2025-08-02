@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './HomeScreen.css';
 
-const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
+const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode, setViewMode, currentMonth, setCurrentMonth }) => {
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedMapLocation, setSelectedMapLocation] = useState(null);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
@@ -14,6 +15,413 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+
+  // Events data for calendar and map views
+  const events = [
+    {
+      id: 1,
+      title: "Summer Formal 2025",
+      organization: "Alpha Beta Gamma Fraternity",
+      date: "July 5, 2025",
+      time: "8:00 PM",
+      location: "Grand Ballroom",
+      description: "Join us for our annual summer formal celebration with live music, dancing, and great food.",
+      attendees: 127,
+      maxAttendees: 200,
+      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: true,
+      price: 25,
+      category: "Social",
+      tags: ["formal", "dancing", "music"]
+    },
+    {
+      id: 2,
+      title: "Charity Fundraiser Gala",
+      organization: "Delta Epsilon Zeta Sorority",
+      date: "July 12, 2025",
+      time: "6:30 PM",
+      location: "Delta Epsilon Zeta House",
+      description: "Support breast cancer awareness with our annual philanthropy fundraiser!",
+      attendees: 89,
+      maxAttendees: 150,
+      image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: true,
+      price: 35,
+      category: "Philanthropy",
+      tags: ["charity", "fundraiser", "awareness"]
+    },
+    {
+      id: 3,
+      title: "Community Service Day",
+      organization: "Theta Iota Kappa Fraternity",
+      date: "July 15, 2025",
+      time: "9:00 AM",
+      location: "Local Community Center",
+      description: "Make a positive impact in our community!",
+      attendees: 28,
+      maxAttendees: 40,
+      image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: false,
+      price: null,
+      category: "Service",
+      tags: ["community", "volunteer", "impact"]
+    },
+    {
+      id: 4,
+      title: "Leadership Workshop Series",
+      organization: "Greek Life Council",
+      date: "July 18, 2025",
+      time: "2:00 PM",
+      location: "Business School Auditorium",
+      description: "Develop essential leadership skills with industry professionals.",
+      attendees: 67,
+      maxAttendees: 100,
+      image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: true,
+      price: 20,
+      category: "Leadership",
+      tags: ["workshop", "skills", "professional"]
+    },
+    {
+      id: 5,
+      title: "Beach Day Social",
+      organization: "Alpha Beta Gamma Fraternity",
+      date: "July 22, 2025",
+      time: "11:00 AM",
+      location: "Crystal Beach",
+      description: "Fun beach day with games, food, and relaxation!",
+      attendees: 45,
+      maxAttendees: 60,
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: false,
+      price: null,
+      category: "Social",
+      tags: ["beach", "games", "social"]
+    },
+    {
+      id: 6,
+      title: "Study Group - Finals Prep",
+      organization: "Academic Excellence Committee",
+      date: "July 25, 2025",
+      time: "7:00 PM",
+      location: "Library Study Room 3",
+      description: "Group study session for upcoming finals with tutoring support.",
+      attendees: 15,
+      maxAttendees: 20,
+      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: false,
+      price: null,
+      category: "Academic",
+      tags: ["study", "finals", "tutoring"]
+    },
+    {
+      id: 7,
+      title: "Greek Games Championship",
+      organization: "Intramural Sports Committee",
+      date: "July 28, 2025",
+      time: "1:00 PM",
+      location: "University Stadium",
+      description: "Annual inter-fraternity and inter-sorority sports competition.",
+      attendees: 180,
+      maxAttendees: 250,
+      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: false,
+      price: null,
+      category: "Sports",
+      tags: ["competition", "sports", "greek"]
+    },
+    {
+      id: 8,
+      title: "Alumni Networking Night",
+      organization: "Professional Greek Association",
+      date: "July 30, 2025",
+      time: "6:00 PM",
+      location: "Alumni Center",
+      description: "Connect with Greek alumni for professional development and networking.",
+      attendees: 95,
+      maxAttendees: 120,
+      image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop&crop=center&q=80",
+      isPaid: true,
+      price: 15,
+      category: "Professional",
+      tags: ["networking", "career", "alumni"]
+    }
+  ];
+
+  // Enhanced campus map data with real university maps and coordinates
+  const getUniversityMap = (universityName) => {
+    const universityMaps = {
+      'University of California, Berkeley': {
+        image: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "UC Berkeley Campus",
+        center: { lat: 37.8716, lng: -122.2727 }
+      },
+      'Stanford University': {
+        image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "Stanford Campus",
+        center: { lat: 37.4275, lng: -122.1697 }
+      },
+      'UCLA': {
+        image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "UCLA Campus",
+        center: { lat: 34.0689, lng: -118.4452 }
+      },
+      'USC': {
+        image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "USC Campus",
+        center: { lat: 34.0224, lng: -118.2851 }
+      },
+      'NYU': {
+        image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "NYU Campus",
+        center: { lat: 40.7295, lng: -73.9965 }
+      },
+      'Harvard University': {
+        image: "https://images.unsplash.com/photo-1562774053-701939374585?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "Harvard Campus",
+        center: { lat: 42.3744, lng: -71.1169 }
+      },
+      'MIT': {
+        image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=1200&h=800&fit=crop&crop=center&q=80",
+        name: "MIT Campus",
+        center: { lat: 42.3601, lng: -71.0942 }
+      }
+    };
+    
+    return universityMaps[universityName] || universityMaps['University of California, Berkeley'];
+  };
+
+  const universityMap = getUniversityMap(user?.university);
+  
+  const campusMap = {
+    image: universityMap.image,
+    name: universityMap.name,
+    center: universityMap.center,
+    locations: [
+      {
+        id: 1,
+        name: "Student Union Grand Ballroom",
+        x: 65,
+        y: 35,
+        events: [1],
+        description: "Main event venue for large gatherings and formal events",
+        coordinates: { lat: universityMap.center.lat + 0.001, lng: universityMap.center.lng - 0.001 },
+        address: "Student Union Building, University Ave"
+      },
+      {
+        id: 2,
+        name: "Greek Row - Delta Epsilon Zeta House",
+        x: 25,
+        y: 60,
+        events: [2],
+        description: "Sorority house and event space for sisterhood events",
+        coordinates: { lat: universityMap.center.lat - 0.002, lng: universityMap.center.lng + 0.002 },
+        address: "123 Greek Row, Fraternity Way"
+      },
+      {
+        id: 3,
+        name: "Community Service Center",
+        x: 80,
+        y: 70,
+        events: [3],
+        description: "Off-campus community service and volunteer location",
+        coordinates: { lat: universityMap.center.lat + 0.003, lng: universityMap.center.lng + 0.003 },
+        address: "456 Community St, Downtown"
+      },
+      {
+        id: 4,
+        name: "Business School Auditorium",
+        x: 45,
+        y: 25,
+        events: [4],
+        description: "Academic and professional networking events",
+        coordinates: { lat: universityMap.center.lat - 0.001, lng: universityMap.center.lng - 0.002 },
+        address: "Business School Building, Campus Dr"
+      },
+      {
+        id: 5,
+        name: "University Beach & Recreation Area",
+        x: 90,
+        y: 85,
+        events: [5],
+        description: "Beach location for outdoor events and recreation",
+        coordinates: { lat: universityMap.center.lat + 0.004, lng: universityMap.center.lng + 0.001 },
+        address: "Beach Access Rd, Coastal Blvd"
+      },
+      {
+        id: 6,
+        name: "Main Library Study Rooms",
+        x: 35,
+        y: 45,
+        events: [6],
+        description: "Academic study and tutoring space for students",
+        coordinates: { lat: universityMap.center.lat + 0.0005, lng: universityMap.center.lng + 0.0005 },
+        address: "Main Library, Academic Quad"
+      },
+      {
+        id: 7,
+        name: "University Stadium & Athletic Complex",
+        x: 55,
+        y: 75,
+        events: [7],
+        description: "Sports and large outdoor events venue",
+        coordinates: { lat: universityMap.center.lat + 0.002, lng: universityMap.center.lng - 0.003 },
+        address: "Athletic Complex, Stadium Way"
+      },
+      {
+        id: 8,
+        name: "Alumni Center & Conference Hall",
+        x: 70,
+        y: 20,
+        events: [8],
+        description: "Professional networking and alumni events",
+        coordinates: { lat: universityMap.center.lat - 0.003, lng: universityMap.center.lng + 0.001 },
+        address: "Alumni Center, University Blvd"
+      }
+    ]
+  };
+
+  // Helper functions for calendar and map
+  const isUserAttending = (eventId) => {
+    return joinedEvents.some(event => event.id === eventId);
+  };
+
+  const getDaysInMonth = (date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  const getEventsForDate = (day) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate.getDate() === day && 
+             eventDate.getMonth() === currentMonth.getMonth() &&
+             eventDate.getFullYear() === currentMonth.getFullYear();
+    });
+  };
+
+  const getMyEventsForDate = (day) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate.getDate() === day && 
+             eventDate.getMonth() === currentMonth.getMonth() &&
+             eventDate.getFullYear() === currentMonth.getFullYear() &&
+             isUserAttending(event.id);
+    });
+  };
+
+  const getEventsForLocation = (locationId) => {
+    return events.filter(event => {
+      const location = campusMap.locations.find(loc => loc.id === locationId);
+      return location && location.events.includes(event.id);
+    });
+  };
+
+  // Enhanced map functions
+  const handleLocationClick = (location) => {
+    setSelectedMapLocation(location);
+  };
+
+  const handleCloseLocationModal = () => {
+    setSelectedMapLocation(null);
+  };
+
+  const openInMaps = (destination) => {
+    const { lat, lng } = destination.coordinates;
+    const address = destination.address;
+    
+    // Create the Google Maps directions URL
+    const mapsUrl = `https://maps.google.com/maps?daddr=${lat},${lng}&dirflg=w`;
+    
+    // Try to open in native maps app first (mobile)
+    if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      navigator.share({
+        title: `Directions to ${destination.name}`,
+        text: `Get directions to ${destination.name} at ${address}`,
+        url: mapsUrl
+      }).catch(() => {
+        // If share fails, open directly
+        window.open(mapsUrl, '_blank');
+      });
+    } else {
+      // Desktop or fallback - open directly in new tab
+      window.open(mapsUrl, '_blank');
+    }
+  };
+
+  const renderCalendar = () => {
+    const daysInMonth = getDaysInMonth(currentMonth);
+    const firstDay = getFirstDayOfMonth(currentMonth);
+    const days = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+    }
+
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayEvents = getEventsForDate(day);
+      const myEvents = getMyEventsForDate(day);
+      const isToday = new Date().getDate() === day && 
+                     new Date().getMonth() === currentMonth.getMonth() &&
+                     new Date().getFullYear() === currentMonth.getFullYear();
+
+      days.push(
+        <div key={day} className={`calendar-day ${isToday ? 'today' : ''}`}>
+          <div className="calendar-day-number">{day}</div>
+          
+          {/* Show user's RSVP'd events first with special styling */}
+          {myEvents.map(event => (
+            <div 
+              key={`my-${event.id}`} 
+              className="calendar-event my-event"
+              onClick={() => {
+                setSelectedEvent(event);
+                setShowEventModal(true);
+              }}
+            >
+              <div className="calendar-event-title">✓ {event.title}</div>
+              <div className="calendar-event-time">{event.time}</div>
+            </div>
+          ))}
+          
+          {/* Show other events */}
+          {dayEvents.filter(event => !isUserAttending(event.id)).map(event => (
+            <div 
+              key={event.id} 
+              className="calendar-event"
+              onClick={() => {
+                setSelectedEvent(event);
+                setShowEventModal(true);
+              }}
+            >
+              <div className="calendar-event-title">{event.title}</div>
+              <div className="calendar-event-time">{event.time}</div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return days;
+  };
+
+  const nextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
+
+  const prevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+
   // Function to generate feed posts based on user's university
   const generateFeedPosts = (userUniversity) => {
     const university = userUniversity || 'University of California, Berkeley';
@@ -164,22 +572,25 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
     // Convert events to feed posts
     return eventsData.map((event, index) => {
       const captions = [
-        `🎉 Exciting news! Our annual ${event.title} is just around the corner! Join us for an unforgettable experience. This is one event you won't want to miss! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `❤️ Join us for ${event.title}! ${event.description.split('.')[0]}. Let's make memories together! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `🤝 ${event.title} is coming up! ${event.description.split('.')[0]}. Everyone is welcome! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `⭐ ${event.title} is back! ${event.description.split('.')[0]}. Don't miss this opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `🏖️ ${event.title} is happening! ${event.description.split('.')[0]}. Can't wait to see you there! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `📚 ${event.title} is here! ${event.description.split('.')[0]}. Perfect for academic success! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `🏆 ${event.title} is coming! ${event.description.split('.')[0]}. Show your Greek pride! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `💼 ${event.title} is approaching! ${event.description.split('.')[0]}. Great networking opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`
+        `Exciting news! Our annual ${event.title} is just around the corner! Join us for an unforgettable experience. This is one event you won't want to miss! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `Join us for ${event.title}! ${event.description.split('.')[0]}. Let's make memories together! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `${event.title} is coming up! ${event.description.split('.')[0]}. Everyone is welcome! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `${event.title} is back! ${event.description.split('.')[0]}. Don't miss this opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `${event.title} is happening! ${event.description.split('.')[0]}. Can't wait to see you there! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `${event.title} is here! ${event.description.split('.')[0]}. Perfect for academic success! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `${event.title} is coming! ${event.description.split('.')[0]}. Show your Greek pride! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `${event.title} is approaching! ${event.description.split('.')[0]}. Great networking opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`
       ];
 
+      // Use the same organization profile images as shown in organization profiles
       const organizationAvatars = {
-        "Alpha Beta Gamma Fraternity": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=150&h=150&fit=crop&crop=center&q=80",
-        "Delta Epsilon Zeta Sorority": "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=150&h=150&fit=crop&crop=center&q=80",
-        "Theta Iota Kappa Fraternity": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=150&h=150&fit=crop&crop=center&q=80",
-        "Greek Life Council": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=150&h=150&fit=crop&crop=center&q=80",
-        "Professional Greek Association": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=150&h=150&fit=crop&crop=center&q=80"
+        "Alpha Beta Gamma Fraternity": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop",
+        "Delta Epsilon Zeta Sorority": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "Theta Iota Kappa Fraternity": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+        "Greek Life Council": "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&h=400&fit=crop",
+        "Professional Greek Association": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=150&h=150&fit=crop&crop=center&q=80",
+        "Computer Science Club": "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=400&h=400&fit=crop",
+        "Mathematics Club": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=400&fit=crop"
       };
 
       const organizationTypes = {
@@ -223,7 +634,7 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
             id: 1,
             author: 'Sarah Johnson',
             avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-            text: 'Can\'t wait for this! Already got my ticket! 🎉',
+            text: 'Can\'t wait for this! Already got my ticket!',
             timestamp: '1 hour ago'
           },
           {
@@ -235,18 +646,35 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
           }
         ],
         shares: Math.floor(Math.random() * 50) + 10,
-        timestamp: `${Math.floor(Math.random() * 24) + 1} hours ago`,
+        timestamp: index === 0 ? '2 hours ago' : 
+                   index === 1 ? '4 hours ago' :
+                   index === 2 ? '6 hours ago' :
+                   index === 3 ? '8 hours ago' :
+                   index === 4 ? '12 hours ago' :
+                   index === 5 ? '18 hours ago' :
+                   '24 hours ago',
+        timestampValue: index === 0 ? 2 : 
+                       index === 1 ? 4 :
+                       index === 2 ? 6 :
+                       index === 3 ? 8 :
+                       index === 4 ? 12 :
+                       index === 5 ? 18 :
+                       24,
         isLiked: false,
         isSaved: false
       };
     });
   };
 
-  const [feedPosts, setFeedPosts] = useState(generateFeedPosts(user?.university));
+  const [feedPosts, setFeedPosts] = useState(() => {
+    const posts = generateFeedPosts(user?.university);
+    return posts.sort((a, b) => a.timestampValue - b.timestampValue); // Sort chronologically (newest first)
+  });
 
   // Update feed when user's university changes
   useEffect(() => {
-    setFeedPosts(generateFeedPosts(user?.university));
+    const posts = generateFeedPosts(user?.university);
+    setFeedPosts(posts.sort((a, b) => a.timestampValue - b.timestampValue)); // Sort chronologically (newest first)
   }, [user?.university]);
 
   // Mock data for share recipients
@@ -383,7 +811,17 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
   };
 
   const handleEventShare = () => {
-    setSharePost(selectedEvent.post);
+    // Create a post object for sharing if it doesn't exist
+    const eventPost = selectedEvent.post || {
+      id: selectedEvent.id,
+      content: selectedEvent.image || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop',
+      caption: `${selectedEvent.title} - ${selectedEvent.description}`,
+      author: {
+        name: selectedEvent.organization || 'Unknown Organization',
+        avatar: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop'
+      }
+    };
+    setSharePost(eventPost);
     setShowEventModal(false);
     setShowShareModal(true);
   };
@@ -392,6 +830,8 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
     onNavigate(action);
   };
 
+
+
   const renderFeedPost = (post) => (
     <div key={post.id} className="feed-post">
       {/* Post Header */}
@@ -399,21 +839,34 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
         <div className="post-author">
           <div className="author-avatar">
             {post.author.isOrganization ? (
-              <span className="org-avatar">{post.author.avatar}</span>
+              <>
+                <img 
+                  src={post.author.avatar} 
+                  alt={post.author.name}
+                  className="org-avatar"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="avatar-fallback org-fallback" style={{ display: 'none' }}>
+                  {post.author.name.charAt(0).toUpperCase()}
+                </div>
+              </>
             ) : (
-              <img 
-                src={post.author.avatar} 
-                alt={post.author.name}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
-              />
-            )}
-            {!post.author.isOrganization && (
-              <div className="avatar-fallback" style={{ display: 'none' }}>
-                {post.author.name.charAt(0).toUpperCase()}
-              </div>
+              <>
+                <img 
+                  src={post.author.avatar} 
+                  alt={post.author.name}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="avatar-fallback" style={{ display: 'none' }}>
+                  {post.author.name.charAt(0).toUpperCase()}
+                </div>
+              </>
             )}
           </div>
           <div className="author-info">
@@ -427,7 +880,19 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
           </div>
         </div>
         <div className="post-actions">
-          <button className="post-action-btn">⋯</button>
+          {post.content.eventDetails ? (
+            <button 
+              className="event-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLearnMore(post.content.eventDetails, post);
+              }}
+            >
+              Event
+            </button>
+          ) : (
+            <button className="post-action-btn">⋯</button>
+          )}
         </div>
       </div>
 
@@ -456,123 +921,10 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
         {/* Enhanced Event Card */}
         {post.content.eventDetails && (
           <div className="event-card" onClick={() => handleEventClick(post.content.eventDetails)}>
-            <div className="event-header">
-              <div className="event-category-badge">
-                {post.content.eventDetails.category}
-              </div>
-              {post.content.eventDetails.isPast ? (
-                <div className="event-past-badge">
-                  Past Event
-                </div>
-              ) : post.content.eventDetails.isPaid && (
-                <div className="event-price-badge">
-                  ${post.content.eventDetails.price}
-                </div>
-              )}
-            </div>
-            <div className="event-content">
-              <div className="event-details">
-                <div className="event-detail-item">
-                  <span className="event-icon">📅</span>
-                  <span className="event-text">{post.content.eventDetails.date}</span>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-icon">🕒</span>
-                  <span className="event-text">{post.content.eventDetails.time}</span>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-icon">📍</span>
-                  <span className="event-text">{post.content.eventDetails.location}</span>
-                </div>
-                <div className="event-detail-item">
-                  <span className="event-icon">👥</span>
-                  <span className="event-text">
-                    {post.content.eventDetails.isPast 
-                      ? `${post.content.eventDetails.attendees} attended`
-                      : `${post.content.eventDetails.attendees}/${post.content.eventDetails.maxAttendees} attending`
-                    }
-                  </span>
-                </div>
-                {post.content.eventDetails.isPast && post.content.eventDetails.fundsRaised && (
-                  <div className="event-detail-item">
-                    <span className="event-icon">💰</span>
-                    <span className="event-text">${post.content.eventDetails.fundsRaised} raised</span>
-                  </div>
-                )}
-                {post.content.eventDetails.isPast && post.content.eventDetails.hoursVolunteered && (
-                  <div className="event-detail-item">
-                    <span className="event-icon">⏱️</span>
-                    <span className="event-text">{post.content.eventDetails.hoursVolunteered} hours</span>
-                  </div>
-                )}
-                {post.content.eventDetails.isPast && post.content.eventDetails.nextEvent && (
-                  <div className="event-detail-item next-event">
-                    <span className="event-icon">🎉</span>
-                    <span className="event-text">Next: {post.content.eventDetails.nextEvent}</span>
-                  </div>
-                )}
-              </div>
-              <div className="event-actions">
-                {!post.content.eventDetails.isPast && (
-                  <>
-                                          {joinedEvents.some(event => event.id === post.content.eventDetails.id) ? (
-                        <button className="event-action-btn joined" disabled>
-                          ✓ Joined
-                        </button>
-                      ) : (
-                        <button 
-                          className="event-action-btn primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            console.log('Join button clicked for event:', post.content.eventDetails);
-                            console.log('isPaid:', post.content.eventDetails.isPaid);
-                            console.log('price:', post.content.eventDetails.price);
-                            
-                            // Check if it's a paid event
-                            if (post.content.eventDetails.isPaid || post.content.eventDetails.price) {
-                              console.log('Setting up payment modal');
-                              setSelectedEvent({ ...post.content.eventDetails, post });
-                              setShowPaymentModal(true);
-                            } else {
-                              console.log('Free event - adding to joined events');
-                              // For free events, add to joined events
-                              addToJoinedEvents(post.content.eventDetails);
-                            }
-                          }}
-                        >
-                          Join
-                        </button>
-                      )}
-                    <button 
-                      className="event-action-btn secondary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleLearnMore(post.content.eventDetails, post);
-                      }}
-                    >
-                      Learn More
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         )}
 
-        {/* Comments Preview */}
-        {post.comments.length > 0 && (
-          <div className="comments-preview">
-            <div className="comment-preview">
-              <span className="comment-author">{post.comments[0].author}</span>
-              <span className="comment-text">{post.comments[0].text}</span>
-            </div>
-            {post.comments.length > 1 && (
-              <button className="view-comments-btn" onClick={() => handleComment(post.id)}>
-                View all {post.comments.length} comments
-              </button>
-            )}
-          </div>
-        )}
+
       </div>
 
       {/* Post Actions */}
@@ -591,12 +943,6 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
             <span className="action-icon">📤</span>
           </button>
         </div>
-        <button 
-          className={`save-btn ${post.isSaved ? 'saved' : ''}`}
-          onClick={() => handleSave(post.id)}
-        >
-          <span className="action-icon">{post.isSaved ? '🔖' : ''}</span>
-        </button>
       </div>
 
       {/* Post Stats */}
@@ -609,34 +955,88 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
 
   return (
     <div className="home-screen">
-      <div className="user-info-section">
-        <div className="user-info-card">
-          <div className="user-avatar">
-            <img src={user?.avatar || user?.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"} alt="User" />
-          </div>
-          <div className="user-details">
-            <h3>{user?.name || 'User Name'}</h3>
-            <p>{user?.university?.name || user?.university || 'University'}</p>
-            {user?.organization && (
-              <span className="organization-badge">
-                {typeof user.organization === 'string' ? user.organization : (user.organization?.name || 'Organization')}
-              </span>
-            )}
-            {user?.greekOrganization && (
-              <span className="organization-badge">
-                {user.greekOrganization.name || 'Greek Organization'} ({user.greekOrganization.type || 'Organization'})
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+
       
       <div className="home-content">
-        <div className="community-feed-full">
-          <div className="feed-list">
-            {feedPosts.map(renderFeedPost)}
+        {viewMode === 'list' && (
+          <div className="community-feed-full">
+            <div className="feed-list">
+              {feedPosts.map(renderFeedPost)}
+            </div>
           </div>
-        </div>
+        )}
+
+        {viewMode === 'calendar' && (
+          <div className="events-calendar">
+            <div className="calendar-header">
+              <button className="calendar-nav-btn" onClick={prevMonth}>‹</button>
+              <h2>{formatDate(currentMonth)}</h2>
+              <button className="calendar-nav-btn" onClick={nextMonth}>›</button>
+            </div>
+            <div className="calendar-weekdays">
+              <div className="weekday">Sun</div>
+              <div className="weekday">Mon</div>
+              <div className="weekday">Tue</div>
+              <div className="weekday">Wed</div>
+              <div className="weekday">Thu</div>
+              <div className="weekday">Fri</div>
+              <div className="weekday">Sat</div>
+            </div>
+            <div className="calendar-grid">
+              {renderCalendar()}
+            </div>
+          </div>
+        )}
+
+        {viewMode === 'map' && (
+          <div className="events-map">
+            <div className="map-header">
+              <h2>{campusMap.name} Map</h2>
+              <p>Click on locations to see events and get directions</p>
+            </div>
+            <div className="map-container">
+              <div className="campus-map-image">
+                <img src={campusMap.image} alt={campusMap.name} />
+                {campusMap.locations.map(location => {
+                  const locationEvents = getEventsForLocation(location.id);
+                  return (
+                    <div
+                      key={location.id}
+                      className={`map-marker ${locationEvents.length > 0 ? 'has-events' : 'no-events'}`}
+                      style={{
+                        left: `${location.x}%`,
+                        top: `${location.y}%`
+                      }}
+                      onClick={() => handleLocationClick(location)}
+                    >
+                      <div className="marker-pin">
+                        <span className="marker-icon">📍</span>
+                        {locationEvents.length > 0 && (
+                          <span className="event-count">{locationEvents.length}</span>
+                        )}
+                      </div>
+                      <div className="marker-tooltip">
+                        <h4>{location.name}</h4>
+                        <p>{locationEvents.length} event{locationEvents.length !== 1 ? 's' : ''}</p>
+                        <small>Click for details & directions</small>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="map-legend">
+                <div className="legend-item">
+                  <div className="legend-marker has-events"></div>
+                  <span>Has Events</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-marker no-events"></div>
+                  <span>No Events</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Comments Modal */}
@@ -668,7 +1068,7 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
               </div>
 
               <div className="comments-list">
-                {selectedPost.comments.map(comment => (
+                {(selectedPost.comments || []).map(comment => (
                   <div key={comment.id} className="comment-item">
                     <div className="comment-avatar">
                       <img src={comment.avatar} alt={comment.author} />
@@ -824,109 +1224,86 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
           <div className="event-modal" onClick={(e) => e.stopPropagation()}>
             <div className="event-modal-header">
               <h3>Event Details</h3>
-              <button className="close-btn" onClick={closeEventModal}>×</button>
+              <button className="modal-close-btn" onClick={closeEventModal}>×</button>
             </div>
             
             <div className="event-modal-content">
-              {/* Event Image */}
-              {selectedEvent.post.content.image && (
-                <div className="event-modal-image">
-                  <img src={selectedEvent.post.content.image} alt="Event" />
+              <div className="event-modal-top-section">
+                {/* Event Image */}
+                {selectedEvent.image && (
+                  <div className="event-modal-image">
+                    <img src={selectedEvent.image} alt={selectedEvent.title} />
+                  </div>
+                )}
+                
+                <div className="event-modal-title-section">
+                  <h2 className="event-modal-title">{selectedEvent.title}</h2>
+                  <div className="event-modal-description-top">
+                    <p>{selectedEvent.description || 'Join us for an unforgettable experience at this exciting event!'}</p>
+                  </div>
                 </div>
-              )}
+              </div>
               
-              {/* Event Details */}
               <div className="event-modal-details">
-                <div className="event-modal-org-info">
-                  <div className="event-modal-org-avatar">
-                    {selectedEvent.post.author.isOrganization ? (
-                      <span className="org-avatar">{selectedEvent.post.author.avatar}</span>
-                    ) : (
-                      <img src={selectedEvent.post.author.avatar} alt={selectedEvent.post.author.name} />
-                    )}
+                <div className="event-modal-details-grid">
+                  <div className="event-modal-detail-item">
+                    <div>
+                      <label>Date & Time</label>
+                      <span>{selectedEvent.date}, {selectedEvent.time}</span>
+                    </div>
                   </div>
-                  <div className="event-modal-org-details">
-                    <h4>{selectedEvent.post.author.name}</h4>
-                    <p>{selectedEvent.post.author.university}</p>
+                  
+                  <div className="event-modal-detail-item">
+                    <div>
+                      <label>Location</label>
+                      <span>{selectedEvent.location}</span>
+                    </div>
                   </div>
+                  
+                  <div className="event-modal-detail-item">
+                    <div>
+                      <label>Attendees</label>
+                      <span>{selectedEvent.attendees} people</span>
+                    </div>
+                  </div>
+                  
+                  <div className="event-modal-detail-item">
+                    <div>
+                      <label>Organization</label>
+                      <span>{selectedEvent.post?.author?.name || selectedEvent.organization || 'Unknown Organization'}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="event-modal-detail-item">
+                    <div>
+                      <label>Category</label>
+                      <span>{selectedEvent.category || 'Social Event'}</span>
+                    </div>
+                  </div>
+                  
+                  {selectedEvent.isPaid && (
+                    <div className="event-modal-detail-item">
+                      <div>
+                        <label>Price</label>
+                        <span>${selectedEvent.price}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="event-modal-info">
-                  <h2 className="event-modal-title">{selectedEvent.post.content.caption.split('!')[0]}!</h2>
-                  
-                  <div className="event-modal-details-grid">
-                    <div className="event-modal-detail-item">
-                      <span className="event-modal-icon">📅</span>
-                      <div>
-                        <label>Date</label>
-                        <span>{selectedEvent.date}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="event-modal-detail-item">
-                      <span className="event-modal-icon">🕒</span>
-                      <div>
-                        <label>Time</label>
-                        <span>{selectedEvent.time}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="event-modal-detail-item">
-                      <span className="event-modal-icon">📍</span>
-                      <div>
-                        <label>Location</label>
-                        <span>{selectedEvent.location}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="event-modal-detail-item">
-                      <span className="event-modal-icon">👥</span>
-                      <div>
-                        <label>Attendance</label>
-                        <span>{selectedEvent.attendees}/{selectedEvent.maxAttendees} people</span>
-                      </div>
-                    </div>
-                    
-                    {selectedEvent.isPaid && (
-                      <div className="event-modal-detail-item">
-                        <span className="event-modal-icon">💰</span>
-                        <div>
-                          <label>Price</label>
-                          <span>${selectedEvent.price}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {selectedEvent.category && (
-                      <div className="event-modal-detail-item">
-                        <span className="event-modal-icon">🏷️</span>
-                        <div>
-                          <label>Category</label>
-                          <span>{selectedEvent.category}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="event-modal-description">
-                    <h4>About This Event</h4>
-                    <p>Join us for this exciting event!</p>
-                  </div>
-
-                  <div className="event-modal-actions">
-                    <button 
-                      className="event-modal-rsvp-btn"
-                      onClick={handleEventRSVP}
-                    >
-                      Join
-                    </button>
-                    <button 
-                      className="event-modal-share-btn"
-                      onClick={handleEventShare}
-                    >
-                      Share Event
-                    </button>
-                  </div>
+                <div className="event-modal-actions">
+                  <button 
+                    className="event-modal-rsvp-btn"
+                    onClick={handleEventRSVP}
+                  >
+                    {isUserAttending(selectedEvent.id) ? '✓ Joined' : 'RSVP'}
+                  </button>
+                  <button 
+                    className="event-modal-share-btn"
+                    onClick={handleEventShare}
+                  >
+                    📤 Share Event
+                  </button>
                 </div>
               </div>
             </div>
@@ -948,8 +1325,7 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
             <div className="payment-modal-content">
               <div className="payment-event-info">
                 <h4>Event Details</h4>
-                <p><strong>Date:</strong> {selectedEvent.date}</p>
-                <p><strong>Time:</strong> {selectedEvent.time}</p>
+                              <p><strong>Date & Time:</strong> {selectedEvent.date}, {selectedEvent.time}</p>
                 <p><strong>Location:</strong> {selectedEvent.location}</p>
               </div>
               
@@ -1001,6 +1377,110 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents }) => {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Location Details Modal */}
+      {selectedMapLocation && (
+        <div className="event-modal-overlay" onClick={handleCloseLocationModal}>
+          <div className="event-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="event-modal-header">
+              <h3>Location Details</h3>
+              <button className="modal-close-btn" onClick={handleCloseLocationModal}>×</button>
+            </div>
+            
+            <div className="event-modal-content">
+              <div className="event-modal-header-info">
+                <div className="event-title-section">
+                  <h2 className="event-modal-title">{selectedMapLocation.name}</h2>
+                  <span className="event-modal-type-badge">📍 Location</span>
+                </div>
+              </div>
+              
+              <div className="event-modal-grid">
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Address</span>
+                    <span className="event-modal-value">{selectedMapLocation.address}</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Description</span>
+                    <span className="event-modal-value">{selectedMapLocation.description}</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Events</span>
+                    <span className="event-modal-value">
+                      {getEventsForLocation(selectedMapLocation.id).length} upcoming event{getEventsForLocation(selectedMapLocation.id).length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Coordinates</span>
+                    <span className="event-modal-value">
+                      {selectedMapLocation.coordinates.lat.toFixed(6)}, {selectedMapLocation.coordinates.lng.toFixed(6)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="event-modal-description">
+                <h4>Upcoming Events at this Location</h4>
+                {getEventsForLocation(selectedMapLocation.id).length > 0 ? (
+                  <div className="location-events-list">
+                    {getEventsForLocation(selectedMapLocation.id).map(event => (
+                      <div key={event.id} className="location-event-item">
+                        <div className="location-event-info">
+                          <h5>{event.title}</h5>
+                          <p>{event.date} at {event.time}</p>
+                          <p className="event-organization">by {event.organization}</p>
+                        </div>
+                        <button 
+                          className="event-details-btn"
+                          onClick={() => {
+                            // Create a proper event object that matches the expected structure
+                            const eventObject = {
+                              ...event,
+                              post: {
+                                author: {
+                                  name: event.organization
+                                }
+                              }
+                            };
+                            setSelectedEvent(eventObject);
+                            setShowEventModal(true);
+                            handleCloseLocationModal();
+                          }}
+                        >
+                          View Event
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No upcoming events scheduled at this location.</p>
+                )}
+              </div>
+
+              <div className="event-modal-actions">
+                <button 
+                  className="event-modal-share-btn"
+                  onClick={() => openInMaps(selectedMapLocation)}
+                >
+                  🗺️ Open in Maps
+                </button>
+              </div>
+
+
             </div>
           </div>
         </div>

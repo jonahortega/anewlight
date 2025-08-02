@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import './EventsScreen.css';
 
-const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoinedEvents }) => {
+const EventsScreen = ({ 
+  user, 
+  onNavigate, 
+  navigationData, 
+  joinedEvents, 
+  setJoinedEvents,
+  searchTerm,
+  setSearchTerm,
+  searchCategory,
+  setSearchCategory,
+  searchSortBy,
+  setSearchSortBy,
+  showMyEvents,
+  setShowMyEvents,
+  activeTab,
+  setActiveTab
+}) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const [viewMode, setViewMode] = useState('list'); // 'list', 'calendar', 'map'
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showMyEvents, setShowMyEvents] = useState(false);
-  const [sortBy, setSortBy] = useState('date');
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 6, 1)); // July 2025
   const [rsvpProcessing, setRsvpProcessing] = useState(new Set());
-  const [activeTab, setActiveTab] = useState(navigationData?.defaultTab || 'events'); // 'events' or 'organizations'
-  const [showMyOrganizations, setShowMyOrganizations] = useState(false);
   
   // Share modal state
   const [showShareModal, setShowShareModal] = useState(false);
@@ -22,10 +30,7 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
   const [selectedRecipient, setSelectedRecipient] = useState('');
   const [recipientType, setRecipientType] = useState('person');
   
-  // Join request modal state
-  const [showRequestPopup, setShowRequestPopup] = useState(false);
-  const [requestMessage, setRequestMessage] = useState('');
-  const [selectedOrgForRequest, setSelectedOrgForRequest] = useState(null);
+
 
   const events = [
     {
@@ -158,15 +163,7 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
     }
   ];
 
-  const categories = [
-    { id: 'all', name: 'All Events', icon: '🎉' },
-    { id: 'social', name: 'Social', icon: '🎊' },
-    { id: 'academic', name: 'Academic', icon: '📚' },
-    { id: 'service', name: 'Service', icon: '🤝' },
-    { id: 'leadership', name: 'Leadership', icon: '⭐' },
-    { id: 'philanthropy', name: 'Philanthropy', icon: '❤️' },
-    { id: 'professional', name: 'Professional', icon: '💼' }
-  ];
+
 
   // Campus map data with event locations
   const campusMap = {
@@ -239,77 +236,48 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
     ]
   };
 
+
+
   // Organizations Data
-  const userOrganizations = [
+  const organizations = [
     {
       id: 1,
-      name: 'Alpha Sigma Phi',
-      type: 'Fraternity',
-      description: 'Building better men through brotherhood, scholarship, and service.',
-      image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
-      members: 45,
-      events: 12
-    },
-    {
-      id: 2,
-      name: 'Computer Science Club',
-      type: 'Academic Club',
-      description: 'Exploring technology and programming together.',
-      image: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
-      members: 28,
-      events: 8
-    }
-  ];
-
-  const allOrganizations = [
-    ...userOrganizations,
-    {
-      id: 3,
       name: 'Alpha Beta Gamma Fraternity',
       type: 'Fraternity',
-      description: 'Building better men through brotherhood, scholarship, and service. We strive to develop well-rounded individuals through academic excellence, social responsibility, and lifelong friendships.',
+      description: 'Building better men through brotherhood, scholarship, and service.',
       image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop',
       members: 127,
       events: 15
     },
     {
-      id: 4,
+      id: 2,
       name: 'Delta Epsilon Zeta Sorority',
       type: 'Sorority',
-      description: 'Empowering women through sisterhood, leadership, and philanthropy. We focus on academic excellence, community service, and building lasting friendships.',
+      description: 'Empowering women through sisterhood, leadership, and philanthropy.',
       image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
       members: 89,
       events: 12
     },
     {
-      id: 5,
+      id: 3,
       name: 'Theta Iota Kappa Fraternity',
       type: 'Fraternity',
-      description: 'Developing leaders through brotherhood, academic achievement, and community service. We promote excellence in scholarship, leadership, and character.',
+      description: 'Developing leaders through brotherhood, academic achievement, and community service.',
       image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
       members: 73,
       events: 18
     },
     {
-      id: 6,
+      id: 4,
       name: 'Greek Life Council',
       type: 'Council',
-      description: 'The governing body for all Greek organizations on campus. We promote Greek unity, leadership development, and coordinate inter-fraternity and inter-sorority events.',
+      description: 'The governing body for all Greek organizations on campus.',
       image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&h=400&fit=crop',
       members: 301,
       events: 25
     },
     {
-      id: 7,
-      name: 'Professional Greek Association',
-      type: 'Professional Association',
-      description: 'Connecting Greek alumni and current members for professional development, networking opportunities, and career advancement.',
-      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop',
-      members: 78,
-      events: 8
-    },
-    {
-      id: 8,
+      id: 5,
       name: 'Delta Gamma',
       type: 'Sorority',
       description: 'Do Good. Building confidence in women through sisterhood.',
@@ -318,30 +286,28 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
       events: 15
     },
     {
-      id: 9,
+      id: 6,
       name: 'Beta Theta Pi',
       type: 'Fraternity',
       description: 'Developing men of principle for a principled life.',
       image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
       members: 38,
       events: 10
-    },
-    {
-      id: 10,
-      name: 'Environmental Club',
-      type: 'Service Club',
-      description: 'Promoting sustainability and environmental awareness.',
-      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80',
-      members: 35,
-      events: 6
     }
   ];
 
-  // Filter organizations based on search and category
-  const filteredOrganizations = allOrganizations.filter(org => {
+  // Filter organizations based on search
+  const filteredOrganizations = organizations.filter(org => {
     const matchesSearch = org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         org.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || org.type.toLowerCase().includes(selectedCategory.toLowerCase());
+                         org.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         org.type.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = searchCategory === 'all' || 
+                           (searchCategory === 'fraternity' && org.type === 'Fraternity') ||
+                           (searchCategory === 'sorority' && org.type === 'Sorority') ||
+                           (searchCategory === 'professional' && org.type === 'Professional') ||
+                           (searchCategory === 'academic' && org.type === 'Academic') ||
+                           (searchCategory === 'cultural' && org.type === 'Cultural') ||
+                           (searchCategory === 'service' && org.type === 'Service');
     return matchesSearch && matchesCategory;
   });
 
@@ -351,7 +317,7 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
 
   // Function to get organization profile by name
   const getOrganizationProfile = (orgName) => {
-    return allOrganizations.find(org => org.name === orgName) || {
+    return organizations.find(org => org.name === orgName) || {
       name: orgName,
       type: 'Organization',
       description: 'A campus organization dedicated to student life and community engagement.',
@@ -401,6 +367,9 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
             joinedAt: new Date().toISOString()
           };
           setJoinedEvents(prev => [...prev, eventWithId]);
+          
+          // Show ticket notification
+          alert(`🎫 Ticket generated for ${event.title}! Check your Tickets section to view your QR code.`);
         }
         
         setRsvpProcessing(prev => {
@@ -419,6 +388,9 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
       joinedAt: new Date().toISOString()
     };
     setJoinedEvents(prev => [...prev, eventWithId]);
+    
+    // Show ticket notification
+    alert(`🎫 Ticket generated for ${selectedEvent.title}! Check your Tickets section to view your QR code.`);
     
     setShowPaymentModal(false);
     setSelectedEvent(null);
@@ -468,46 +440,20 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
     }
   };
 
-  const handleJoinRequest = (org) => {
-    setSelectedOrgForRequest(org);
-    setShowRequestPopup(true);
-    setRequestMessage('');
-  };
 
-  const handleCloseRequestPopup = () => {
-    setShowRequestPopup(false);
-    setRequestMessage('');
-    setSelectedOrgForRequest(null);
-  };
-
-  const handleSubmitRequest = () => {
-    if (selectedOrgForRequest && requestMessage.trim()) {
-      // In a real app, this would send the request to the backend
-      console.log('Submitting join request:', {
-        organization: selectedOrgForRequest.name,
-        message: requestMessage
-      });
-      
-      // Show success message and close popup
-      alert(`Join request submitted successfully to ${selectedOrgForRequest.name}! You'll be notified when they respond.`);
-      handleCloseRequestPopup();
-    } else {
-      alert('Please provide a reason for wanting to join this organization.');
-    }
-  };
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || event.category.toLowerCase() === selectedCategory;
+    const matchesCategory = searchCategory === 'all' || event.category.toLowerCase() === searchCategory;
     const matchesMyEvents = !showMyEvents || isUserAttending(event.id);
     
     return matchesSearch && matchesCategory && matchesMyEvents;
   });
 
   const sortedEvents = [...filteredEvents].sort((a, b) => {
-    switch (sortBy) {
+    switch (searchSortBy) {
       case 'date':
         return new Date(a.date) - new Date(b.date);
       case 'name':
@@ -626,148 +572,7 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
       {/* Modern Header */}
       <div className="events-header">
         <div className="header-content">
-          <div className="header-top">
-            <button className="back-btn" onClick={() => onNavigate('home')}>
-              <span className="back-icon">←</span>
-              Back to Home
-            </button>
-            <div className="header-actions">
-              <button 
-                className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-              >
-                <span className="view-icon">☰</span>
-              </button>
-              <button 
-                className={`view-toggle-btn ${viewMode === 'calendar' ? 'active' : ''}`}
-                onClick={() => {
-                  setViewMode('calendar');
-                  // Set calendar to July 2025 when switching to calendar view
-                  setCurrentMonth(new Date(2025, 6, 1));
-                }}
-              >
-                <span className="view-icon">📅</span>
-              </button>
-              <button 
-                className={`view-toggle-btn ${viewMode === 'map' ? 'active' : ''}`}
-                onClick={() => setViewMode('map')}
-              >
-                <span className="view-icon">🗺️</span>
-              </button>
-            </div>
-          </div>
-          
-          <div className="discover-tabs">
-            <button 
-              className={`discover-tab ${activeTab === 'events' ? 'active' : ''}`}
-              onClick={() => setActiveTab('events')}
-            >
-              Events
-            </button>
-            <button 
-              className={`discover-tab ${activeTab === 'organizations' ? 'active' : ''}`}
-              onClick={() => setActiveTab('organizations')}
-            >
-              Organizations
-            </button>
-          </div>
-          
-          {activeTab === 'events' ? (
-            <>
-          <h1>Discover Events</h1>
-          
-          <div className="search-filter-bar">
-            <div className="search-container">
-              <span className="search-icon">🔍</span>
-              <input
-                type="text"
-                placeholder="Search events, organizations, or keywords..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-            </div>
-            
-            <div className="filter-controls">
-              <select 
-                value={selectedCategory} 
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="category-select"
-              >
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.icon} {category.name}
-                  </option>
-                ))}
-              </select>
-              
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-                className="sort-select"
-              >
-                <option value="date">📅 Sort by Date</option>
-                <option value="name">📝 Sort by Name</option>
-                <option value="popularity">🔥 Sort by Popularity</option>
-              </select>
-              
-              <button 
-                className={`my-events-btn ${showMyEvents ? 'active' : ''}`}
-                onClick={() => setShowMyEvents(!showMyEvents)}
-              >
-                {showMyEvents ? '✓' : '👤'} My Events ({myEvents.length})
-              </button>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <h1>Discover Organizations</h1>
-          
-                      <div className="search-filter-bar">
-              <div className="search-container">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="text"
-                  placeholder="Search organizations, fraternities, sororities..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-      </div>
 
-              <div className="filter-controls">
-                <select 
-                  value={selectedCategory} 
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="category-select"
-                >
-                  <option value="all">🏛️ All Organizations</option>
-                  <option value="fraternity">👔 Fraternities</option>
-                  <option value="sorority">👗 Sororities</option>
-                  <option value="club">🎯 Clubs</option>
-                </select>
-                
-                <select 
-                  value={sortBy} 
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
-                >
-                  <option value="name">📝 Sort by Name</option>
-                  <option value="popularity">🔥 Sort by Popularity</option>
-                  <option value="members">👥 Sort by Members</option>
-                </select>
-                
-                <button 
-                  className={`my-organizations-btn ${showMyOrganizations ? 'active' : ''}`}
-                  onClick={() => setShowMyOrganizations(!showMyOrganizations)}
-                >
-                  {showMyOrganizations ? '✓' : '👤'} My Organizations ({userOrganizations.length})
-                </button>
-              </div>
-            </div>
-        </>
-      )}
         </div>
       </div>
 
@@ -775,310 +580,186 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
       <div className="events-container">
         {activeTab === 'events' && (
           <>
-        {viewMode === 'list' && (
-              <div className="events-grid">
+          <div className="shotgun-events-feed">
             {sortedEvents.map(event => (
-                  <div key={event.id} className="event-card" onClick={() => handleEventClick(event)}>
-                    <div className="event-image-container">
-                      <img src={event.image} alt={event.title} className="event-image" />
-                      <div className="event-overlay">
-                        <div className="event-badges">
-                          {event.isPaid && (
-                            <div className="paid-badge">💰 ${event.price}</div>
-                          )}
-                          {isUserAttending(event.id) && (
-                            <div className="attending-badge">✓ Attending</div>
-                          )}
-                </div>
-                        <div className="event-actions-overlay">
-                          <button className="share-btn" onClick={(e) => {
-                            e.stopPropagation();
-                            handleShare(event);
-                          }}>
-                            📤
-                          </button>
-                  </div>
-                      </div>
+              <div key={event.id} className="shotgun-event-card">
+                <div className="shotgun-event-image">
+                  <img src={event.image} alt={event.title} />
+                  <div className="shotgun-event-overlay">
+                    <div className="shotgun-event-badges">
+                      {event.isPaid && (
+                        <div className="shotgun-price-badge">${event.price}</div>
+                      )}
+                      {isUserAttending(event.id) && (
+                        <div className="shotgun-attending-badge">✓</div>
+                      )}
                     </div>
-                    
-                    <div className="event-content">
-                      <div className="event-category">
-                        {event.organization}
-                      </div>
-                      
-                      <h3 className="event-title">{event.title}</h3>
-                      
-                      <p className="event-description">{event.description}</p>
-                      
-                      <div className="event-info">
-                        <span>📅 {event.date}</span>
-                        <span>🕒 {event.time}</span>
-                    <span>📍 {event.location}</span>
-                    <span>👥 {event.attendees}/{event.maxAttendees}</span>
-                  </div>
-                      
-                      <div className="event-actions">
-                  <button 
-                    className={`rsvp-btn ${isUserAttending(event.id) ? 'attending' : ''} ${rsvpProcessing.has(event.id) ? 'processing' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRSVP(event);
-                          }}
-                    disabled={rsvpProcessing.has(event.id)}
-                  >
-                                      {rsvpProcessing.has(event.id) ? 'Processing...' : 
-                   isUserAttending(event.id) ? '✓ Attending' : 'Join'}
-                  </button>
-                        <button className="details-btn" onClick={(e) => {
+                    <div className="shotgun-event-actions">
+                      <button 
+                        className="shotgun-share-btn"
+                        onClick={(e) => {
                           e.stopPropagation();
-                          handleEventClick(event);
-                        }}>
-                    Details
-                  </button>
-                      </div>
+                          handleShare(event);
+                        }}
+                      >
+                        📤
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="shotgun-event-content">
+                  <div className="shotgun-event-header">
+                    <div className="shotgun-event-org">{event.organization}</div>
+                    <div className="shotgun-event-category">{event.category}</div>
+                  </div>
+                  
+                  <h3 className="shotgun-event-title">{event.title}</h3>
+                  
+                  <div className="shotgun-event-meta">
+                    <div className="shotgun-event-details">
+                                    <span className="shotgun-event-date">{event.date}, {event.time}</span>
+              <span className="shotgun-event-location">{event.location}</span>
+                    </div>
+                    <div className="shotgun-event-attendance">
+                      <span className="shotgun-attendance-count">{event.attendees}/{event.maxAttendees}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="shotgun-event-actions-bottom">
+                    <button 
+                      className={`shotgun-rsvp-btn ${isUserAttending(event.id) ? 'attending' : ''} ${rsvpProcessing.has(event.id) ? 'processing' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRSVP(event);
+                      }}
+                      disabled={rsvpProcessing.has(event.id)}
+                    >
+                      {rsvpProcessing.has(event.id) ? 'Processing...' : 
+                       isUserAttending(event.id) ? '✓ Attending' : 'Join Event'}
+                    </button>
+                    <button 
+                      className="shotgun-details-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEventClick(event);
+                      }}
+                    >
+                      Details
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {viewMode === 'calendar' && (
-          <div className="events-calendar">
-            <div className="calendar-header">
-              <button className="calendar-nav-btn" onClick={prevMonth}>‹</button>
-              <h2>{formatDate(currentMonth)}</h2>
-              <button className="calendar-nav-btn" onClick={nextMonth}>›</button>
-            </div>
-            <div className="calendar-weekdays">
-              <div className="weekday">Sun</div>
-              <div className="weekday">Mon</div>
-              <div className="weekday">Tue</div>
-              <div className="weekday">Wed</div>
-              <div className="weekday">Thu</div>
-              <div className="weekday">Fri</div>
-              <div className="weekday">Sat</div>
-            </div>
-            <div className="calendar-grid">
-              {renderCalendar()}
-            </div>
-          </div>
-        )}
 
-        {viewMode === 'map' && (
-          <div className="events-map">
-            <div className="map-header">
-              <h2>Campus Map</h2>
-              <p>Click on locations to see events happening there</p>
-            </div>
-            <div className="map-container">
-              <div className="campus-map-image">
-                <img src={campusMap.image} alt="Campus Map" />
-                {campusMap.locations.map(location => {
-                  const locationEvents = getEventsForLocation(location.id);
-                  return (
-                    <div
-                      key={location.id}
-                      className={`map-marker ${locationEvents.length > 0 ? 'has-events' : 'no-events'}`}
-                      style={{
-                        left: `${location.x}%`,
-                        top: `${location.y}%`
-                      }}
-                      onClick={() => {
-                        if (locationEvents.length > 0) {
-                          const locationSection = document.getElementById(`location-${location.id}`);
-                          if (locationSection) {
-                            locationSection.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }
-                      }}
-                    >
-                      <div className="marker-pin">
-                        <span className="marker-icon">📍</span>
-                        {locationEvents.length > 0 && (
-                          <span className="event-count">{locationEvents.length}</span>
-                        )}
-                      </div>
-                      <div className="marker-tooltip">
-                        <h4>{location.name}</h4>
-                            <p>{locationEvents.length} event{locationEvents.length !== 1 ? 's' : ''}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-            <div className="map-legend">
-              <div className="legend-item">
-                      <div className="legend-marker has-events"></div>
-                      <span>Has Events</span>
-              </div>
-              <div className="legend-item">
-                      <div className="legend-marker no-events"></div>
-                      <span>No Events</span>
-              </div>
-            </div>
-              </div>
-                          </div>
-            )}
+
 
             {sortedEvents.length === 0 && (
               <div className="no-events">
                 <div className="no-events-icon">📅</div>
                 <h3>No events found</h3>
                 <p>Try adjusting your search or filters to find more events.</p>
-                              </div>
+              </div>
             )}
           </>
         )}
-        
+
         {activeTab === 'organizations' && (
-          <>
-
-
-            {/* Organizations Content */}
-            {showMyOrganizations ? (
-              <div className="my-organizations-section">
-                <h2>My Organizations</h2>
-                <div className="organizations-grid">
-                  {userOrganizations.map(org => (
-                    <div key={org.id} className="organization-card">
-                      <div className="org-image">
-                        <img src={org.image} alt={org.name} />
-                                </div>
-                      <div className="org-content">
-                        <h3>{org.name}</h3>
-                        <p className="org-type">{org.type}</p>
-                        <p className="org-description">{org.description}</p>
-                        <div className="org-stats">
-                          <span>👥 {org.members} members</span>
-                          <span>📅 {org.events} events</span>
-                        </div>
-                        <button className="view-org-btn" onClick={() => onNavigate('organization-profile', { organization: org })}>
-                          View Profile
-                                  </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-            ) : (
-              <div className="search-organizations-section">
-                <div className="organizations-grid">
-                  {filteredOrganizations.map(org => (
-                    <div key={org.id} className="organization-card">
-                      <div className="org-image">
-                        <img src={org.image} alt={org.name} />
-              </div>
-                      <div className="org-content">
-                        <h3>{org.name}</h3>
-                        <p className="org-type">{org.type}</p>
-                        <p className="org-description">{org.description}</p>
-                        <div className="org-stats">
-                          <span>👥 {org.members} members</span>
-                          <span>📅 {org.events} events</span>
-                        </div>
-                        <div className="org-actions">
-                          <button className="view-org-btn" onClick={() => onNavigate('organization-profile', { organization: org })}>
-                            View Profile
-                          </button>
-                          <button className="join-org-btn" onClick={() => handleJoinRequest(org)}>
-                            Request to Join
-                          </button>
+          <div className="organizations-grid">
+            {filteredOrganizations.map(org => (
+              <div key={org.id} className="organization-card">
+                <div className="org-image">
+                  <img src={org.image} alt={org.name} />
+                </div>
+                <div className="org-content">
+                  <h3>{org.name}</h3>
+                  <p className="org-type">{org.type}</p>
+                  <p className="org-description">{org.description}</p>
+                  <div className="org-stats">
+                    <span>👥 {org.members} members</span>
+                    <span>📅 {org.events} events</span>
+                  </div>
+                  <div className="org-actions">
+                    <button className="view-org-btn" onClick={() => onNavigate('organization-profile', { organization: org })}>
+                      View Profile
+                    </button>
                   </div>
                 </div>
-            </div>
-                  ))}
-          </div>
-          </div>
+              </div>
+            ))}
+            
+            {filteredOrganizations.length === 0 && (
+              <div className="no-organizations">
+                <div className="no-organizations-icon">🏛️</div>
+                <h3>No organizations found</h3>
+                <p>Try adjusting your search to find more organizations.</p>
+              </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
       {/* Enhanced Event Details Modal */}
       {selectedEvent && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-category">{selectedEvent.category}</div>
-              <h2>{selectedEvent.title}</h2>
-              <button className="modal-close" onClick={handleCloseModal}>×</button>
+        <div className="event-modal-overlay" onClick={handleCloseModal}>
+          <div className="event-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="event-modal-header">
+              <h3>Event Details</h3>
+              <button className="modal-close-btn" onClick={handleCloseModal}>×</button>
             </div>
             
-            <div className="modal-body">
-              <div className="modal-image-container">
-                <img src={selectedEvent.image} alt={selectedEvent.title} />
-                <div className="modal-image-overlay">
-                  <button className="share-btn-modal" onClick={() => handleShare(selectedEvent)}>
-                    📤 Share Event
-                  </button>
+            <div className="event-modal-content">
+              <div className="event-modal-header-info">
+                <div className="event-title-section">
+                  <h2 className="event-modal-title">{selectedEvent.title}</h2>
+                  <span className="event-modal-type-badge">{selectedEvent.category}</span>
                 </div>
               </div>
               
-              <div className="modal-organization">
-                <div className="org-info">
-                  <span className="org-icon">🏢</span>
-                  <strong>Hosted by:</strong> {selectedEvent.organization}
-                </div>
-                <button 
-                  className="view-org-profile-btn"
-                  onClick={() => {
-                    handleCloseModal();
-                    // Get the organization profile data and navigate to its profile
-                    const orgData = getOrganizationProfile(selectedEvent.organization);
-                    onNavigate('organization-profile', { organization: orgData });
-                  }}
-                >
-                  View Profile
-                </button>
-              </div>
-              
-              <p className="modal-description">{selectedEvent.description}</p>
-              
-              <div className="modal-details">
-                <div className="modal-detail">
-                  <span className="detail-icon">📅</span>
-                  <strong>Date:</strong> {selectedEvent.date}
-                </div>
-                <div className="modal-detail">
-                  <span className="detail-icon">🕒</span>
-                  <strong>Time:</strong> {selectedEvent.time}
-                </div>
-                <div className="modal-detail">
-                  <span className="detail-icon">📍</span>
-                  <strong>Location:</strong> {selectedEvent.location}
-                </div>
-                <div className="modal-detail">
-                  <span className="detail-icon">👥</span>
-                  <strong>Attendees:</strong> {selectedEvent.attendees}/{selectedEvent.maxAttendees}
-                </div>
-                {selectedEvent.isPaid && (
-                  <div className="modal-detail">
-                    <span className="detail-icon">💰</span>
-                    <strong>Price:</strong> ${selectedEvent.price}
+              <div className="event-modal-grid">
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Date & Time</span>
+                    <span className="event-modal-value">{selectedEvent.date}, {selectedEvent.time}</span>
                   </div>
-                )}
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Location</span>
+                    <span className="event-modal-value">{selectedEvent.location}</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Attendees</span>
+                    <span className="event-modal-value">{selectedEvent.attendees} people</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Organization</span>
+                    <span className="event-modal-value">{selectedEvent.organization}</span>
+                  </div>
+                </div>
+                
+                <div className="event-modal-info-item">
+                  <div className="event-modal-info-content">
+                    <span className="event-modal-label">Category</span>
+                    <span className="event-modal-value">{selectedEvent.category}</span>
+                  </div>
+                </div>
               </div>
-
-              <div className="modal-tags">
-                <strong>Tags:</strong>
-                {selectedEvent.tags.map(tag => (
-                  <span key={tag} className="modal-tag">#{tag}</span>
-                ))}
+              
+              <div className="event-modal-description">
+                <h4>Event Description</h4>
+                <p>{selectedEvent.description}</p>
               </div>
-            </div>
-            
-            <div className="modal-footer">
-              <button 
-                className={`rsvp-btn ${isUserAttending(selectedEvent.id) ? 'attending' : ''} ${rsvpProcessing.has(selectedEvent.id) ? 'processing' : ''}`}
-                onClick={() => handleRSVP(selectedEvent)}
-                disabled={rsvpProcessing.has(selectedEvent.id)}
-              >
-                {rsvpProcessing.has(selectedEvent.id) ? 'Processing...' : 
-                 isUserAttending(selectedEvent.id) ? '✓ Attending' : 'Join'}
-              </button>
-              <button className="close-btn" onClick={handleCloseModal}>
-                Close
-              </button>
             </div>
           </div>
         </div>
@@ -1155,7 +836,7 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
                   <div className="share-event-info">
                     <h4>{shareEvent.title}</h4>
                     <p>Hosted by: {shareEvent.organization}</p>
-                    <p>{shareEvent.date} at {shareEvent.time}</p>
+                    <p>{shareEvent.date}, {shareEvent.time}</p>
                     <p>{shareEvent.location}</p>
                   </div>
                 </div>
@@ -1242,52 +923,7 @@ const EventsScreen = ({ user, onNavigate, navigationData, joinedEvents, setJoine
         </div>
       )}
 
-      {/* Join Request Popup Modal */}
-      {showRequestPopup && selectedOrgForRequest && (
-        <div className="request-popup-overlay" onClick={handleCloseRequestPopup}>
-          <div className="request-popup" onClick={(e) => e.stopPropagation()}>
-            <div className="request-popup-header">
-              <h3>Join Request</h3>
-              <button className="popup-close-btn" onClick={handleCloseRequestPopup}>×</button>
-            </div>
-            
-            <div className="request-popup-content">
-              <div className="request-org-info">
-                <h4>{selectedOrgForRequest.name}</h4>
-                <p className="request-org-type">{selectedOrgForRequest.type}</p>
-              </div>
-              
-              <div className="request-form">
-                <label htmlFor="request-message">Why would you like to join this organization?</label>
-                <textarea
-                  id="request-message"
-                  value={requestMessage}
-                  onChange={(e) => setRequestMessage(e.target.value)}
-                  placeholder="Tell us about your interest in this organization, your relevant experience, and why you'd be a great fit..."
-                  rows="4"
-                  className="request-message-input"
-                />
-                
-                <div className="request-actions">
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={handleCloseRequestPopup}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={handleSubmitRequest}
-                    disabled={!requestMessage.trim()}
-                  >
-                    Submit Request
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };

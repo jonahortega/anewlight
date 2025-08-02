@@ -3,6 +3,49 @@ import './SettingsScreen.css';
 
 const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
   const [activeTab, setActiveTab] = useState('profile');
+  
+  // Mock join requests data
+  const joinRequests = [
+    {
+      id: 1,
+      organization: "Delta Epsilon Zeta",
+      status: "pending",
+      date: "2024-03-10",
+      message: "Your application is under review"
+    },
+    {
+      id: 2,
+      organization: "Computer Science Club",
+      status: "approved",
+      date: "2024-03-05",
+      message: "Welcome to the club!"
+    },
+    {
+      id: 3,
+      organization: "Environmental Club",
+      status: "denied",
+      date: "2024-03-01",
+      message: "Unfortunately, we cannot accept your application at this time"
+    }
+  ];
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'approved': return 'green';
+      case 'denied': return 'red';
+      case 'pending': return 'orange';
+      default: return 'gray';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'approved': return '✅';
+      case 'denied': return '❌';
+      case 'pending': return '⏳';
+      default: return '❓';
+    }
+  };
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([
     {
@@ -222,8 +265,6 @@ const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
         <button className="back-btn" onClick={() => onNavigate('home')}>
           ← Back
         </button>
-        <h1>Settings</h1>
-        <p>Manage your account preferences and payment methods</p>
       </header>
 
       <div className="settings-container">
@@ -234,6 +275,13 @@ const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
           >
             <span className="tab-icon">👤</span>
             Profile
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
+            onClick={() => setActiveTab('requests')}
+          >
+            <span className="tab-icon">📋</span>
+            Requests
           </button>
           <button 
             className={`tab-btn ${activeTab === 'payments' ? 'active' : ''}`}
@@ -574,6 +622,47 @@ const SettingsScreen = ({ user, onNavigate, onLogout, onProfileUpdate }) => {
                     <button className="delete-btn" onClick={handleDeleteAccount}>Delete Account</button>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'requests' && (
+            <div className="requests-section">
+              <div className="requests-header">
+                <h2>Join Requests</h2>
+                <p>Track your organization and club membership requests</p>
+                <button className="btn btn-primary" onClick={() => onNavigate('events', { defaultTab: 'organizations' })}>
+                  Discover New Organizations
+                </button>
+              </div>
+
+              <div className="requests-list">
+                {joinRequests.length > 0 ? (
+                  joinRequests.map(request => (
+                    <div key={request.id} className={`request-card ${request.status}`}>
+                      <div className="request-header">
+                        <h4>{request.organization}</h4>
+                        <span className={`status-badge ${getStatusColor(request.status)}`}>
+                          {getStatusIcon(request.status)} {request.status}
+                        </span>
+                      </div>
+                      <div className="request-details">
+                        <p className="request-date">Submitted: {request.date}</p>
+                        <p className="request-message">{request.message}</p>
+                      </div>
+                      {request.status === 'denied' && (
+                        <button className="btn btn-secondary">
+                          Reapply
+                        </button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-requests">
+                    <p>No join requests found.</p>
+                    <p>Start exploring organizations to submit join requests!</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
