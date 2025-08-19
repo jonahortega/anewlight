@@ -38,6 +38,7 @@ function App() {
   const [showMyEvents, setShowMyEvents] = useState(false);
   const [activeTab, setActiveTab] = useState('events');
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const [searchType, setSearchType] = useState('both'); // 'events', 'organizations', or 'both'
   
   // View mode state for home screen
   const [homeViewMode, setHomeViewMode] = useState('list');
@@ -403,6 +404,8 @@ function App() {
           setShowMyEvents={setShowMyEvents}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          searchType={searchType}
+          setSearchType={setSearchType}
         />;
       case 'messages':
         return <MessagesScreen 
@@ -421,7 +424,7 @@ function App() {
           joinedEvents={joinedEvents}
         />;
       case 'profile':
-        return <ProfileScreen user={user} onNavigate={handleNavigate} />;
+        return <ProfileScreen user={user} onNavigate={handleNavigate} joinedEvents={joinedEvents} setJoinedEvents={setJoinedEvents} />;
       case 'settings':
         return <SettingsScreen user={user} onNavigate={handleNavigate} onLogout={handleLogout} onProfileUpdate={updatedProfile => setUser(prev => ({ ...prev, ...updatedProfile }))} />;
       case 'help':
@@ -494,20 +497,6 @@ function App() {
                       />
                     </div>
                     <div className="header-search-filters">
-                      <div className="search-type-selector">
-                        <button 
-                          className={`search-type-btn ${activeTab === 'events' ? 'active' : ''}`}
-                          onClick={() => setActiveTab('events')}
-                        >
-                          📅
-                        </button>
-                        <button 
-                          className={`search-type-btn ${activeTab === 'organizations' ? 'active' : ''}`}
-                          onClick={() => setActiveTab('organizations')}
-                        >
-                          🏛️
-                        </button>
-                      </div>
                       <button 
                         className="filter-btn"
                         onClick={() => setShowFilterPopup(!showFilterPopup)}
@@ -536,7 +525,7 @@ function App() {
                       }}
                     >
                       <div className="filter-popup-header">
-                        <h3>Filter {activeTab === 'events' ? 'Events' : 'Organizations'}</h3>
+                        <h3>Search Filters</h3>
                         <button 
                           className="filter-close-btn" 
                           onClick={(e) => {
@@ -550,65 +539,119 @@ function App() {
                       </div>
                       
                       <div className="filter-popup-content">
-                        <div className="current-search-type">
-                          <div className="search-type-display">
-                            <span className="search-type-icon">
-                              {activeTab === 'events' ? '📅' : '🏛️'}
-                            </span>
-                            <span className="search-type-text">
-                              Searching: {activeTab === 'events' ? 'Events' : 'Organizations'}
-                            </span>
+                        <div className="filter-section">
+                          <h4>Search Type</h4>
+                          <div className="filter-options">
                             <button 
-                              className="change-type-btn"
+                              className={`filter-option ${searchType === 'both' ? 'active' : ''}`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                setActiveTab(activeTab === 'events' ? 'organizations' : 'events');
+                                setSearchType('both');
                               }}
                             >
-                              Switch to {activeTab === 'events' ? 'Organizations' : 'Events'}
+                              📅🏛️ Both Events & Organizations
+                            </button>
+                            <button 
+                              className={`filter-option ${searchType === 'events' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSearchType('events');
+                              }}
+                            >
+                              📅 Events Only
+                            </button>
+                            <button 
+                              className={`filter-option ${searchType === 'organizations' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSearchType('organizations');
+                              }}
+                            >
+                              🏛️ Organizations Only
                             </button>
                           </div>
                         </div>
                         
-                        <div className="filter-section">
-                          <h4>
-                            {activeTab === 'events' ? 'Event Categories' : 'Organization Types'}
-                          </h4>
-                          <div className="filter-options">
-                            {searchCategories.map(category => (
-                              <button 
-                                key={category.id}
-                                className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setSearchCategory(category.id);
-                                }}
-                              >
-                                {category.name}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {activeTab === 'events' && (
+                        {(searchType === 'events' || searchType === 'both') && (
                           <div className="filter-section">
-                            <h4>My Events</h4>
+                            <h4>Event Categories</h4>
                             <div className="filter-options">
-                              <button 
-                                className={`filter-option ${showMyEvents ? 'active' : ''}`}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setShowMyEvents(!showMyEvents);
-                                }}
-                              >
-                                My Events ({joinedEvents.length})
-                              </button>
+                              {eventCategories.map(category => (
+                                <button 
+                                  key={category.id}
+                                  className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSearchCategory(category.id);
+                                  }}
+                                >
+                                  {category.name}
+                                </button>
+                              ))}
                             </div>
                           </div>
                         )}
+                        
+                        {(searchType === 'organizations' || searchType === 'both') && (
+                          <div className="filter-section">
+                            <h4>Organization Types</h4>
+                            <div className="filter-options">
+                              {organizationCategories.map(category => (
+                                <button 
+                                  key={category.id}
+                                  className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSearchCategory(category.id);
+                                  }}
+                                >
+                                  {category.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="filter-section">
+                          <h4>Content Type Filter</h4>
+                          <div className="filter-options">
+                            <button 
+                              className={`filter-option ${searchType === 'both' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSearchType('both');
+                              }}
+                            >
+                              🎯 All Content
+                            </button>
+                            <button 
+                              className={`filter-option ${searchType === 'events' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSearchType('events');
+                              }}
+                            >
+                              📅 Events Only
+                            </button>
+                            <button 
+                              className={`filter-option ${searchType === 'organizations' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSearchType('organizations');
+                              }}
+                            >
+                              🏛️ Organizations Only
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       
                       <div className="filter-popup-footer">
@@ -617,6 +660,7 @@ function App() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            setSearchType('both');
                             setSearchCategory('all');
                             setShowMyEvents(false);
                           }}

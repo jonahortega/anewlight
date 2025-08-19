@@ -1822,6 +1822,8 @@
   font-size: 0.7rem;
 }
 
+
+
 .no-organizations {
   text-align: center;
   padding: 20px;
@@ -2977,5 +2979,664 @@
   
   .event-selector-modal {
     max-width: 95%;
+  }
+}
+
+/* Events Section Styles */
+.events-section {
+  padding: 1rem;
+}
+
+.events-subsection {
+  margin-bottom: 2rem;
+}
+
+.events-subsection-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+/* Shotgun Event Feed Styles - Reused from HomeScreen */
+.shotgun-events-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.shotgun-event-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.shotgun-event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.shotgun-event-card.past-event {
+  opacity: 0.8;
+}
+
+.shotgun-event-card.past-event:hover {
+  opacity: 1;
+}
+
+.shotgun-event-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.shotgun-event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.shotgun-event-card:hover .shotgun-event-image img {
+  transform: scale(1.05);
+}
+
+.shotgun-event-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.shotgun-event-card:hover .shotgun-event-overlay {
+  opacity: 1;
+}
+
+.shotgun-event-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.shotgun-price-badge {
+  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.shotgun-attending-badge {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shotgun-past-badge {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.shotgun-event-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.shotgun-share-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.shotgun-share-btn:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.shotgun-event-content {
+  padding: 1.5rem;
+}
+
+.shotgun-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.shotgun-event-org {
+  font-size: 0.85rem;
+  color: #667eea;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shotgun-event-category {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.shotgun-event-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.shotgun-event-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.shotgun-event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shotgun-event-date,
+.shotgun-event-time,
+.shotgun-event-location {
+  font-size: 0.85rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.shotgun-event-attendance {
+  text-align: right;
+}
+
+.shotgun-attendance-count {
+  background: #f7fafc;
+  color: #4a5568;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+}
+
+.shotgun-event-actions-bottom {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.shotgun-rsvp-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.shotgun-rsvp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.shotgun-rsvp-btn.attending {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.shotgun-rsvp-btn.attending:hover {
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+}
+
+.shotgun-rsvp-btn.past {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+}
+
+.shotgun-rsvp-btn.past:hover {
+  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+}
+
+.shotgun-details-btn {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+       .shotgun-details-btn:hover {
+         background: rgba(102, 126, 234, 0.2);
+         transform: translateY(-2px);
+       }
+
+       /* Empty Events State */
+       .empty-events-state {
+         text-align: center;
+         padding: 3rem 2rem;
+         background: #f8fafc;
+         border-radius: 16px;
+         border: 2px dashed #cbd5e0;
+         margin: 1rem 0;
+       }
+
+       .empty-events-icon {
+         font-size: 3rem;
+         margin-bottom: 1rem;
+         opacity: 0.6;
+       }
+
+       .empty-events-state h4 {
+         font-size: 1.2rem;
+         font-weight: 600;
+         color: #4a5568;
+         margin-bottom: 0.5rem;
+       }
+
+       .empty-events-state p {
+         color: #718096;
+         font-size: 0.9rem;
+         margin: 0;
+       }
+
+/* Events Section Styles - Modern Mobile Design */
+.events-section {
+  padding: 12px 16px 24px 16px;
+  background: transparent;
+  max-width: 100%;
+}
+
+/* Events Toggle Buttons */
+.events-toggle-container {
+  display: flex;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.1);
+}
+
+.events-toggle-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.events-toggle-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.events-toggle-btn:hover:not(.active) {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.events-category {
+  margin-bottom: 32px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+}
+
+.events-category:last-child {
+  margin-bottom: 0;
+}
+
+.events-category-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 20px;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.category-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25);
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.attending-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.attending-icon::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.attended-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.attended-icon::before {
+  content: '✓';
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Modern Event Card Styles */
+.shotgun-event-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.12);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.shotgun-event-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.2);
+}
+
+.shotgun-event-card.past-event {
+  opacity: 0.8;
+}
+
+.shotgun-event-card.past-event:hover {
+  opacity: 1;
+}
+
+.shotgun-event-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.shotgun-event-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.shotgun-event-card:hover .shotgun-event-image img {
+  transform: scale(1.05);
+}
+
+.shotgun-event-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+}
+
+.shotgun-event-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.shotgun-attending-badge {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+.shotgun-attended-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.shotgun-event-content {
+  padding: 24px 20px 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.shotgun-event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.shotgun-event-org {
+  font-size: 0.85rem;
+  color: #667eea;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shotgun-event-category {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.shotgun-event-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin: 0 0 16px 0;
+  line-height: 1.25;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.shotgun-event-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.shotgun-event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shotgun-event-date,
+.shotgun-event-time,
+.shotgun-event-location {
+  font-size: 0.85rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.shotgun-event-attendance {
+  text-align: right;
+}
+
+.shotgun-attendance-count {
+  background: #f7fafc;
+  color: #4a5568;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+}
+
+/* Responsive Design - Modern Mobile First */
+@media (max-width: 768px) {
+  .events-section {
+    padding: 8px 12px 20px 12px;
+  }
+  
+  .events-toggle-container {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    padding: 3px;
+  }
+  
+  .events-toggle-btn {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+  
+  .events-category {
+    margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .events-category-title {
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    gap: 10px;
+  }
+  
+  .category-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .shotgun-event-card {
+    border-radius: 16px;
+  }
+  
+  .shotgun-event-content {
+    padding: 20px 16px 16px 16px;
+  }
+  
+  .shotgun-event-title {
+    font-size: 1.1rem;
+  }
+  
+  .shotgun-event-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .shotgun-event-attendance {
+    text-align: left;
   }
 }

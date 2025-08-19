@@ -437,7 +437,7 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
                            university.includes('Columbia') ? 'Columbia' :
                            university.split(',')[0]; // Use first part of university name
 
-    // Use the same events data as EventsScreen
+    // Enhanced events data with more event-specific information
     const eventsData = [
       {
         id: 1,
@@ -453,7 +453,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: true,
         price: 25,
         category: "Social",
-        tags: ["formal", "dancing", "music"]
+        tags: ["formal", "dancing", "music"],
+        status: "upcoming", // upcoming, ongoing, completed, cancelled
+        rsvpDeadline: "July 3, 2025",
+        dressCode: "Formal Attire",
+        includes: ["Live Music", "Dinner", "Dancing", "Photo Booth"],
+        contactInfo: "events@abgfraternity.com"
       },
       {
         id: 2,
@@ -469,7 +474,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: true,
         price: 35,
         category: "Philanthropy",
-        tags: ["charity", "fundraiser", "awareness"]
+        tags: ["charity", "fundraiser", "awareness"],
+        status: "upcoming",
+        rsvpDeadline: "July 10, 2025",
+        dressCode: "Cocktail Attire",
+        includes: ["Gourmet Dinner", "Silent Auction", "Guest Speakers", "Raffle"],
+        contactInfo: "philanthropy@dezsorority.com"
       },
       {
         id: 3,
@@ -485,7 +495,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: false,
         price: null,
         category: "Service",
-        tags: ["community", "volunteer", "impact"]
+        tags: ["community", "volunteer", "impact"],
+        status: "upcoming",
+        rsvpDeadline: "July 13, 2025",
+        dressCode: "Casual (Work Clothes)",
+        includes: ["Lunch Provided", "Community Service Hours", "T-Shirt"],
+        contactInfo: "service@tikfraternity.com"
       },
       {
         id: 4,
@@ -501,7 +516,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: true,
         price: 20,
         category: "Leadership",
-        tags: ["workshop", "skills", "professional"]
+        tags: ["workshop", "skills", "professional"],
+        status: "upcoming",
+        rsvpDeadline: "July 16, 2025",
+        dressCode: "Business Casual",
+        includes: ["Workshop Materials", "Certificate", "Networking", "Refreshments"],
+        contactInfo: "leadership@greekcouncil.edu"
       },
       {
         id: 5,
@@ -517,7 +537,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: false,
         price: null,
         category: "Social",
-        tags: ["beach", "outdoor", "fun"]
+        tags: ["beach", "outdoor", "fun"],
+        status: "upcoming",
+        rsvpDeadline: "July 20, 2025",
+        dressCode: "Beach Casual",
+        includes: ["BBQ Lunch", "Beach Games", "Volleyball", "Sunscreen Provided"],
+        contactInfo: "social@abgfraternity.com"
       },
       {
         id: 6,
@@ -533,7 +558,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: false,
         price: null,
         category: "Academic",
-        tags: ["study", "tutoring", "academic"]
+        tags: ["study", "tutoring", "academic"],
+        status: "upcoming",
+        rsvpDeadline: "July 23, 2025",
+        dressCode: "Casual",
+        includes: ["Tutoring Support", "Study Materials", "Snacks", "Quiet Space"],
+        contactInfo: "academic@tikfraternity.com"
       },
       {
         id: 7,
@@ -549,7 +579,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: false,
         price: null,
         category: "Social",
-        tags: ["competition", "sports", "team"]
+        tags: ["competition", "sports", "team"],
+        status: "upcoming",
+        rsvpDeadline: "July 26, 2025",
+        dressCode: "Athletic Wear",
+        includes: ["Team Registration", "Trophies", "Refreshments", "Greek Pride"],
+        contactInfo: "olympics@greekcouncil.edu"
       },
       {
         id: 8,
@@ -565,21 +600,26 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         isPaid: true,
         price: 15,
         category: "Professional",
-        tags: ["networking", "career", "alumni"]
+        tags: ["networking", "career", "alumni"],
+        status: "upcoming",
+        rsvpDeadline: "July 28, 2025",
+        dressCode: "Business Professional",
+        includes: ["Networking Session", "Resume Review", "Alumni Panel", "Hors d'oeuvres"],
+        contactInfo: "career@profgreek.org"
       }
     ];
 
-    // Convert events to feed posts
+    // Convert events to enhanced feed posts with event-specific features
     return eventsData.map((event, index) => {
       const captions = [
-        `Exciting news! Our annual ${event.title} is just around the corner! Join us for an unforgettable experience. This is one event you won't want to miss! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `Join us for ${event.title}! ${event.description.split('.')[0]}. Let's make memories together! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `${event.title} is coming up! ${event.description.split('.')[0]}. Everyone is welcome! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `${event.title} is back! ${event.description.split('.')[0]}. Don't miss this opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `${event.title} is happening! ${event.description.split('.')[0]}. Can't wait to see you there! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `${event.title} is here! ${event.description.split('.')[0]}. Perfect for academic success! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `${event.title} is coming! ${event.description.split('.')[0]}. Show your Greek pride! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
-        `${event.title} is approaching! ${event.description.split('.')[0]}. Great networking opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`
+        `🎉 NEW EVENT: ${event.title} is coming up! ${event.description.split('.')[0]}. Don't miss out on this amazing opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `📅 EVENT ALERT: ${event.title} - ${event.date} at ${event.time}! ${event.description.split('.')[0]}. RSVP now! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🔥 HOT EVENT: ${event.title} is happening soon! ${event.description.split('.')[0]}. Limited spots available! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🌟 FEATURED EVENT: ${event.title} - ${event.date}! ${event.description.split('.')[0]}. Join us for an unforgettable experience! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `⚡ EVENT UPDATE: ${event.title} is approaching! ${event.description.split('.')[0]}. Get your tickets now! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🎯 SPECIAL EVENT: ${event.title} - ${event.date}! ${event.description.split('.')[0]}. Perfect for your goals! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `🏆 PREMIUM EVENT: ${event.title} is coming! ${event.description.split('.')[0]}. Show your Greek pride! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`,
+        `💼 PROFESSIONAL EVENT: ${event.title} - ${event.date}! ${event.description.split('.')[0]}. Great networking opportunity! #${event.category} #GreekLife #${universityShort.replace(/\s+/g, '')}`
       ];
 
       // Use the same organization profile images as shown in organization profiles
@@ -600,6 +640,22 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
         "Greek Life Council": "Council",
         "Professional Greek Association": "Professional Association"
       };
+
+      // Calculate event urgency and status
+      const eventDate = new Date(event.date);
+      const now = new Date();
+      const daysUntilEvent = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+      
+      let urgencyLevel = 'normal';
+      if (daysUntilEvent <= 1) urgencyLevel = 'urgent';
+      else if (daysUntilEvent <= 3) urgencyLevel = 'soon';
+      else if (daysUntilEvent <= 7) urgencyLevel = 'upcoming';
+
+      // Calculate attendance percentage
+      const attendancePercentage = Math.round((event.attendees / event.maxAttendees) * 100);
+      let capacityStatus = 'available';
+      if (attendancePercentage >= 90) capacityStatus = 'almost-full';
+      else if (attendancePercentage >= 100) capacityStatus = 'full';
 
       return {
         id: event.id,
@@ -625,7 +681,18 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
             price: event.price,
             attendees: event.attendees,
             maxAttendees: event.maxAttendees,
-            category: event.category
+            category: event.category,
+            // Enhanced event details
+            status: event.status,
+            rsvpDeadline: event.rsvpDeadline,
+            dressCode: event.dressCode,
+            includes: event.includes,
+            contactInfo: event.contactInfo,
+            tags: event.tags,
+            urgencyLevel: urgencyLevel,
+            capacityStatus: capacityStatus,
+            attendancePercentage: attendancePercentage,
+            daysUntilEvent: daysUntilEvent
           }
         },
         likes: Math.floor(Math.random() * 200) + 50,
@@ -661,7 +728,12 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
                        index === 5 ? 18 :
                        24,
         isLiked: false,
-        isSaved: false
+        isSaved: false,
+        // Event-specific engagement
+        rsvpCount: event.attendees,
+        interestedCount: Math.floor(Math.random() * 100) + 20,
+        isUserRSVPd: false, // Will be updated based on user's RSVPs
+        isUserInterested: false
       };
     });
   };
@@ -771,26 +843,42 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
     setSelectedEvent(null);
   };
 
-  const handleEventRSVP = () => {
+  const handleEventRSVP = (event = null) => {
+    // Use passed event or fall back to selectedEvent
+    const eventToProcess = event || selectedEvent;
+    
+    if (!eventToProcess) {
+      console.error('No event provided to handleEventRSVP');
+      return;
+    }
+    
     // Handle RSVP logic here
-    console.log('Join for event:', selectedEvent);
-    console.log('isPaid:', selectedEvent.isPaid);
-    console.log('price:', selectedEvent.price);
+    console.log('Join for event:', eventToProcess);
+    console.log('isPaid:', eventToProcess.isPaid);
+    console.log('price:', eventToProcess.price);
     
     // If it's a paid event, show payment modal
-    if (selectedEvent.isPaid || selectedEvent.price) {
+    if (eventToProcess.isPaid || eventToProcess.price) {
       console.log('Showing payment modal');
+      setSelectedEvent(eventToProcess);
       setShowPaymentModal(true);
       setShowEventModal(false);
     } else {
       console.log('Closing modal - free event');
       // For free events, add to joined events and close modal
-      addToJoinedEvents(selectedEvent);
-      closeEventModal();
+      addToJoinedEvents(eventToProcess);
+      if (selectedEvent) {
+        closeEventModal();
+      }
     }
   };
 
   const addToJoinedEvents = (event) => {
+    if (!event) {
+      console.error('No event provided to addToJoinedEvents');
+      return;
+    }
+    
     const eventWithId = {
       ...event,
       id: event.id || `event_${Date.now()}`,
@@ -824,6 +912,29 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
     setSharePost(eventPost);
     setShowEventModal(false);
     setShowShareModal(true);
+  };
+
+  // Event-specific action handlers
+  const handleRSVP = (postId) => {
+    setFeedPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === postId 
+          ? { ...post, isUserRSVPd: !post.isUserRSVPd }
+          : post
+      )
+    );
+    console.log('RSVP toggled for post:', postId);
+  };
+
+  const handleInterested = (postId) => {
+    setFeedPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === postId 
+          ? { ...post, isUserInterested: !post.isUserInterested }
+          : post
+      )
+    );
+    console.log('Interested toggled for post:', postId);
   };
 
   const handleActionClick = (action) => {
@@ -918,9 +1029,11 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
           <span className="caption-text">{post.content.caption}</span>
         </div>
 
-        {/* Enhanced Event Card */}
+        {/* Simple Event Indicator */}
         {post.content.eventDetails && (
-          <div className="event-card" onClick={() => handleEventClick(post.content.eventDetails)}>
+          <div className="event-indicator">
+            <span className="event-icon">📅</span>
+            <span className="event-text">Event: {post.content.eventDetails.title}</span>
           </div>
         )}
 
@@ -942,6 +1055,8 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
           <button className="action-btn" onClick={() => handleShare(post.id)}>
             <span className="action-icon">📤</span>
           </button>
+          
+
         </div>
       </div>
 
@@ -959,10 +1074,75 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
       
       <div className="home-content">
         {viewMode === 'list' && (
-          <div className="community-feed-full">
-            <div className="feed-list">
-              {feedPosts.map(renderFeedPost)}
-            </div>
+          <div className="shotgun-events-feed">
+            {feedPosts.filter(post => post.content.eventDetails).map(post => (
+              <div key={post.id} className="shotgun-event-card" onClick={() => handleLearnMore(post.content.eventDetails, post)}>
+                <div className="shotgun-event-image">
+                  <img src={post.content.image} alt={post.content.eventDetails.title} />
+                  <div className="shotgun-event-overlay">
+                    <div className="shotgun-event-badges">
+                      {post.content.eventDetails.isPaid && (
+                        <div className="shotgun-price-badge">${post.content.eventDetails.price}</div>
+                      )}
+                      {isUserAttending(post.content.eventDetails.id) && (
+                        <div className="shotgun-attending-badge">✓</div>
+                      )}
+                    </div>
+                    <div className="shotgun-event-actions">
+                      <button 
+                        className="shotgun-share-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShare(post.id);
+                        }}
+                      >
+                        📤
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="shotgun-event-content">
+                  <div className="shotgun-event-header">
+                    <div className="shotgun-event-org">{post.author.name}</div>
+                    <div className="shotgun-event-category">{post.content.eventDetails.category}</div>
+                  </div>
+                  
+                  <h3 className="shotgun-event-title">{post.content.eventDetails.title}</h3>
+                  
+                  <div className="shotgun-event-meta">
+                    <div className="shotgun-event-details">
+                      <span className="shotgun-event-date">{post.content.eventDetails.date}, {post.content.eventDetails.time}</span>
+                      <span className="shotgun-event-location">{post.content.eventDetails.location}</span>
+                    </div>
+                    <div className="shotgun-event-attendance">
+                      <span className="shotgun-attendance-count">{post.content.eventDetails.attendees}/{post.content.eventDetails.maxAttendees}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="shotgun-event-actions-bottom">
+                    <button 
+                      className={`shotgun-rsvp-btn ${isUserAttending(post.content.eventDetails.id) ? 'attending' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEventRSVP(post.content.eventDetails);
+                      }}
+                    >
+                      {isUserAttending(post.content.eventDetails.id) ? '✓ Attending' : 'Join Event'}
+                    </button>
+                    <button 
+                      className="shotgun-details-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLearnMore(post.content.eventDetails, post);
+                      }}
+                    >
+                      Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -1024,16 +1204,7 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
                   );
                 })}
               </div>
-              <div className="map-legend">
-                <div className="legend-item">
-                  <div className="legend-marker has-events"></div>
-                  <span>Has Events</span>
-                </div>
-                <div className="legend-item">
-                  <div className="legend-marker no-events"></div>
-                  <span>No Events</span>
-                </div>
-              </div>
+
             </div>
           </div>
         )}
@@ -1293,8 +1464,8 @@ const HomeScreen = ({ user, onNavigate, joinedEvents, setJoinedEvents, viewMode,
 
                 <div className="event-modal-actions">
                   <button 
-                    className="event-modal-rsvp-btn"
-                    onClick={handleEventRSVP}
+                    className={`event-modal-rsvp-btn ${isUserAttending(selectedEvent.id) ? 'attending' : ''}`}
+                    onClick={() => handleEventRSVP(selectedEvent)}
                   >
                     {isUserAttending(selectedEvent.id) ? '✓ Joined' : 'RSVP'}
                   </button>

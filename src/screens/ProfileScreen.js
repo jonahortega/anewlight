@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './ProfileScreen.css';
 
 const ProfileScreen = ({ user, onNavigate }) => {
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState('upcoming');
   const [selectedPost, setSelectedPost] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
@@ -189,16 +189,23 @@ const ProfileScreen = ({ user, onNavigate }) => {
     }
   ]);
 
-  // Mock user organizations data
-  const userOrganizations = user?.organizations || (user?.organization ? [
+  // Mock user organizations data - showing actual organizations from profile
+  const userOrganizations = [
     {
       id: 1,
-      name: user.organization,
-      type: "Greek Organization",
-      role: "Member",
+      name: "Alpha Sigma Phi Fraternity",
+      type: "Fraternity",
+      role: "President",
       joinedDate: "2023-09-15"
+    },
+    {
+      id: 2,
+      name: "Computer Science Club",
+      type: "Academic Club",
+      role: "Leader",
+      joinedDate: "2023-08-20"
     }
-  ] : []);
+  ];
 
 
 
@@ -515,8 +522,8 @@ const ProfileScreen = ({ user, onNavigate }) => {
     setShowOrganizationsPopup(false);
   };
 
-  const handleEventClick = (post) => {
-    setSelectedEvent(post.eventDetails);
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
     setShowEventModal(true);
   };
 
@@ -712,44 +719,53 @@ const ProfileScreen = ({ user, onNavigate }) => {
         {/* Tab Navigation */}
         <div className="profile-tabs">
           <button 
-            className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('posts')}
+            className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
+            onClick={() => setActiveTab('upcoming')}
           >
-            Posts
+            Upcoming
           </button>
           <button 
-            className={`tab-button ${activeTab === 'organization' ? 'active' : ''}`}
-            onClick={() => setActiveTab('organization')}
+            className={`tab-button ${activeTab === 'attended' ? 'active' : ''}`}
+            onClick={() => setActiveTab('attended')}
           >
-            Organization
+            Attended
           </button>
-
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'posts' && (
-          <div className="posts-section">
-            <div className="posts-grid">
-              {posts.map(post => (
-                <div key={post.id} className="post-item" onClick={() => handlePostClick(post)}>
-                  <img src={post.content} alt="Post" className="post-image" />
-                  <div className="post-overlay">
-                    <div className="post-actions">
-                      <button 
-                        className={`like-btn ${likedPosts.has(post.id) ? 'liked' : ''}`}
-                        onClick={(e) => handleLikePost(post.id, e)}
-                      >
-                        {likedPosts.has(post.id) ? '❤️' : '🤍'} {post.likes}
-                      </button>
-                      <button 
-                        className="comment-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCommentClick(post);
-                        }}
-                      >
-                        💬 {(post.comments || []).length}
-                      </button>
+        {activeTab === 'upcoming' && (
+          <div className="events-section">
+            <div className="events-list">
+              {attendedEvents.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate > new Date();
+              }).map(event => (
+                <div key={event.id} className="shotgun-event-card" onClick={() => handleEventClick(event)}>
+                  <div className="shotgun-event-image">
+                    <img src={event.image} alt={event.name} />
+                    <div className="shotgun-event-overlay">
+                      <div className="shotgun-event-badges">
+                        <div className="shotgun-attending-badge">✓</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="shotgun-event-content">
+                    <div className="shotgun-event-header">
+                      <div className="shotgun-event-org">{event.organization}</div>
+                      <div className="shotgun-event-category">{event.category}</div>
+                    </div>
+                    
+                    <h3 className="shotgun-event-title">{event.name}</h3>
+                    
+                    <div className="shotgun-event-meta">
+                      <div className="shotgun-event-details">
+                        <span className="shotgun-event-date">{event.date}, {event.time}</span>
+                        <span className="shotgun-event-location">{event.location}</span>
+                      </div>
+                      <div className="shotgun-event-attendance">
+                        <span className="shotgun-attendance-count">{event.attendees} attendees</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -758,109 +774,48 @@ const ProfileScreen = ({ user, onNavigate }) => {
           </div>
         )}
 
-        {activeTab === 'organization' && (
-          <div className="organization-section">
-            <div className="organizations-grid">
-              {/* Alpha Sigma Phi Fraternity */}
-              <div className="organization-card">
-                <div className="org-header">
-                  <h4>Alpha Sigma Phi Fraternity</h4>
-                </div>
-                
-                <p className="org-description">
-                  Building better men through brotherhood, scholarship, and service. 
-                  We strive to develop well-rounded individuals through academic excellence, 
-                  social responsibility, and lifelong friendships.
-                </p>
-                
-                <div className="org-info">
-                  <p>Fraternity</p>
-                  <div className="org-stats">
-                    <span 
-                      className="clickable" 
-                      onClick={() => handleMembersClick('Alpha Sigma Phi Fraternity')}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      👥 45 Members
-                    </span>
+        {activeTab === 'attended' && (
+          <div className="events-section">
+            <div className="events-list">
+              {attendedEvents.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate <= new Date();
+              }).map(event => (
+                <div key={event.id} className="shotgun-event-card past-event" onClick={() => handleEventClick(event)}>
+                  <div className="shotgun-event-image">
+                    <img src={event.image} alt={event.name} />
+                    <div className="shotgun-event-overlay">
+                      <div className="shotgun-event-badges">
+                        <div className="shotgun-attended-badge">✓</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="shotgun-event-content">
+                    <div className="shotgun-event-header">
+                      <div className="shotgun-event-org">{event.organization}</div>
+                      <div className="shotgun-event-category">{event.category}</div>
+                    </div>
+                    
+                    <h3 className="shotgun-event-title">{event.name}</h3>
+                    
+                    <div className="shotgun-event-meta">
+                      <div className="shotgun-event-details">
+                        <span className="shotgun-event-date">{event.date}, {event.time}</span>
+                        <span className="shotgun-event-location">{event.location}</span>
+                      </div>
+                      <div className="shotgun-event-attendance">
+                        <span className="shotgun-attendance-count">{event.attendees} attendees</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                <div className="org-actions">
-                  <button className="btn btn-primary" onClick={() => handleManageClick('Alpha Sigma Phi Fraternity')}>
-                    Manage
-                  </button>
-                  <button className="btn btn-secondary" onClick={() => onNavigate('organization-profile', { 
-                    organization: {
-                      name: 'Alpha Sigma Phi Fraternity',
-                      type: 'Fraternity',
-                      description: 'Building better men through brotherhood, scholarship, and service. We strive to develop well-rounded individuals through academic excellence, social responsibility, and lifelong friendships.',
-                      members: 45,
-                      image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop'
-                    }
-                  })}>
-                    View Profile
-                  </button>
-                </div>
-              </div>
-
-              {/* Computer Science Club */}
-              <div className="organization-card">
-                <div className="org-header">
-                  <h4>Computer Science Club</h4>
-                  <span className="leader-badge">👑 Leader</span>
-                </div>
-                
-                <p className="org-description">
-                  Exploring technology and programming together. We focus on coding projects, 
-                  hackathons, and building a community of tech enthusiasts.
-                </p>
-                
-                <div className="org-info">
-                  <p>Academic Club</p>
-                  <div className="org-stats">
-                    <span 
-                      className="clickable" 
-                      onClick={() => handleMembersClick('Computer Science Club')}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      👥 28 Members
-                    </span>
-                  </div>
-                </div>
-
-                <div className="org-actions">
-                  <button className="btn btn-primary" onClick={() => handleManageClick('Computer Science Club')}>
-                    Manage
-                  </button>
-                  <button className="btn btn-secondary" onClick={() => onNavigate('organization-profile', { 
-                    organization: {
-                      name: 'Computer Science Club',
-                      type: 'Academic Club',
-                      description: 'Exploring technology and programming together. We focus on coding projects, hackathons, and building a community of tech enthusiasts.',
-                      members: 28,
-                      image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=400&fit=crop'
-                    }
-                  })}>
-                    View Profile
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="search-organizations-section">
-              <div className="search-org-card">
-                <div className="search-org-content">
-                  <h4>Looking for More Organizations?</h4>
-                  <p>Discover and join new clubs, fraternities, sororities, and campus organizations</p>
-                  <button className="btn btn-primary search-org-btn" onClick={() => onNavigate('events', { defaultTab: 'organizations' })}>
-                    🔍 Search Organizations
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         )}
+
+
 
 
       </div>
@@ -941,9 +896,24 @@ const ProfileScreen = ({ user, onNavigate }) => {
                     </div>
                     <button 
                       className="btn btn-secondary org-popup-btn"
-                      onClick={() => onNavigate('organizations')}
+                      onClick={() => {
+                        handleCloseOrganizationsPopup();
+                        onNavigate('organization-profile', { 
+                          organization: {
+                            name: org.name,
+                            type: org.type,
+                            description: org.name === 'Alpha Sigma Phi Fraternity' ? 
+                              'Building better men through brotherhood, scholarship, and service. We strive to develop well-rounded individuals through academic excellence, social responsibility, and lifelong friendships.' : 
+                              'Exploring technology and programming together. We focus on coding projects, hackathons, and building a community of tech enthusiasts.',
+                            members: org.name === 'Alpha Sigma Phi Fraternity' ? 45 : 28,
+                            image: org.name === 'Alpha Sigma Phi Fraternity' ? 
+                              'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop' : 
+                              'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=400&fit=crop'
+                          }
+                        });
+                      }}
                     >
-                      Manage
+                      Visit
                     </button>
                   </div>
                 ))

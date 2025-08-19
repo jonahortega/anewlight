@@ -15,6 +15,7 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   const [updatedConversations, setUpdatedConversations] = useState({});
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -376,6 +377,12 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
 
   // Enhanced messages for different conversations
   const getConversationMessages = (conversation) => {
+    // Safety check to prevent runtime errors
+    if (!conversation) {
+      console.warn('getConversationMessages called with null/undefined conversation');
+      return [];
+    }
+    
     // Check if this conversation has updated messages
     const updatedConv = updatedConversations[conversation.id];
     
@@ -423,23 +430,13 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
         time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isOwn: false,
         type: msg.type || 'message',
+        reactions: msg.reactions || [],
         avatar: msg.avatar
       }));
     }
     
-    // Default messages for demo purposes
-    return [
-      { 
-        id: 1, 
-        sender: conversation.name, 
-        senderRole: conversation.type,
-        message: conversation.lastMessage, 
-        time: conversation.time, 
-        isOwn: false,
-        type: 'message',
-        avatar: conversation.avatar
-      }
-    ];
+    // Default empty array if no messages found
+    return [];
   };
 
   const handleSendMessage = () => {
@@ -516,8 +513,20 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
 
   const handleGroupMembersClick = (conversation, e) => {
     e.stopPropagation();
-    setSelectedGroup(conversation);
-    setShowGroupMembers(true);
+    console.log('Members button clicked for:', conversation);
+    try {
+      if (!conversation) {
+        console.error('No conversation provided to handleGroupMembersClick');
+        return;
+      }
+      console.log('Setting selectedGroup to:', conversation);
+      setSelectedGroup(conversation);
+      setShowGroupMembers(true);
+      console.log('Members modal should now be visible');
+    } catch (error) {
+      console.error('Error in handleGroupMembersClick:', error);
+      // Don't crash the app, just log the error
+    }
   };
 
   const handleProfileClick = (conversation) => {
@@ -531,24 +540,36 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
   };
 
   const generateGroupMembers = (group) => {
-    const members = [];
-    const roles = ['President', 'Vice President', 'Secretary', 'Treasurer', 'Member'];
-    const years = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
-    const majors = ['Computer Science', 'Business', 'Engineering', 'Psychology', 'Biology'];
-    
-    for (let i = 0; i < (group.members || 10); i++) {
-      members.push({
-        id: `member-${i}`,
-        name: `Member ${i + 1}`,
-        role: roles[i % roles.length],
-        year: years[i % years.length],
-        major: majors[i % majors.length],
-        avatar: `https://i.pravatar.cc/150?img=${i + 1}`,
-        isOnline: Math.random() > 0.5
-      });
+    try {
+      if (!group) {
+        console.error('No group provided to generateGroupMembers');
+        return [];
+      }
+      
+      const members = [];
+      const roles = ['President', 'Vice President', 'Secretary', 'Treasurer', 'Member'];
+      const years = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
+      const majors = ['Computer Science', 'Business', 'Engineering', 'Psychology', 'Biology'];
+      
+      const memberCount = group.members || 10;
+      
+      for (let i = 0; i < memberCount; i++) {
+        members.push({
+          id: `member-${i}`,
+          name: `Member ${i + 1}`,
+          role: roles[i % roles.length],
+          year: years[i % years.length],
+          major: majors[i % majors.length],
+          avatar: `https://i.pravatar.cc/150?img=${i + 1}`,
+          isOnline: Math.random() > 0.5
+        });
+      }
+      
+      return members;
+    } catch (error) {
+      console.error('Error in generateGroupMembers:', error);
+      return [];
     }
-    
-    return members;
   };
 
   const renderConversationsList = () => (
@@ -627,193 +648,288 @@ const MessagesScreen = ({ user, onNavigate, conversations, setConversations, act
     </div>
   );
 
-  const renderChatView = () => (
-    <div className="clean-chat-view">
-      <div className="clean-chat-header">
-        <button 
-          className="back-btn"
-          onClick={() => setSelectedConversationId(null)}
-        >
-          ←
-        </button>
-        <div className="chat-info" onClick={() => selectedConversation && handleProfileClick(selectedConversation)}>
-          <div className="chat-avatar">
-            <div className="avatar-circle" style={{ backgroundColor: selectedConversation.color }}>
-              {selectedConversation.avatar}
-            </div>
-            {selectedConversation.isOnline && <div className="online-dot"></div>}
-          </div>
-          <div className="chat-details">
-            <h3>{selectedConversation.name}</h3>
-            <span className="chat-status">
-              {selectedConversation.type === 'individual' ? (
-                selectedConversation.status
-              ) : (
-                `${selectedConversation.members} members`
-              )}
-            </span>
-          </div>
-        </div>
-        <div className="chat-actions">
-          <button className="action-btn" title="Voice Call">📞</button>
-          <button className="action-btn" title="Video Call">📹</button>
-          <button className="action-btn" title="More Options">⋯</button>
-        </div>
-      </div>
-
-      <div className="clean-chat-messages">
-        {getConversationMessages(selectedConversation).map(message => (
-          <div key={message.id} className={`clean-message ${message.isOwn ? 'own' : ''} ${message.type}`}>
-            {!message.isOwn && message.avatar && (
-              <div className="message-avatar">
-                <img src={message.avatar} alt={message.sender} />
-              </div>
-            )}
-            <div className="clean-message-content">
-              {!message.isOwn && (
-                <div className="message-sender">
-                  <span className="sender-name">{message.sender}</span>
-                  {message.senderRole && (
-                    <span className="sender-role">{message.senderRole}</span>
-                  )}
-                </div>
-              )}
-              <div className="message-text">{message.message}</div>
-              {message.reactions && (
-                <div className="message-reactions">
-                  {Object.entries(message.reactions).map(([emoji, count]) => (
-                    <span key={emoji} className="reaction">
-                      {emoji} {count}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div className="message-time">{message.time}</div>
-            </div>
-          </div>
-        ))}
-        {isTyping && (
-          <div className="clean-message typing">
-            <div className="clean-message-content">
-              <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="clean-chat-input">
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleFileSelect}
-        />
-        <button className="clean-input-btn attachment-btn" onClick={handleFileUpload} title="Attach file">
-          📎
-        </button>
-        <div className="clean-input-container">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={newMessage}
-            onChange={handleTyping}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            className="clean-message-input"
-          />
-          <button
-            className="clean-input-btn emoji-btn"
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            title="Add emoji"
-          >
-            😊
-          </button>
-        </div>
-        <button
-          className="clean-input-btn send-btn"
-          onClick={handleSendMessage}
-          disabled={!newMessage.trim() || isSending}
-          title="Send message"
-        >
-          📤
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderGroupMembersModal = () => {
-    if (!showGroupMembers || !selectedGroup) return null;
-    
-    const members = generateGroupMembers(selectedGroup);
-    
-    return (
-      <div className="group-members-modal-overlay" onClick={() => setShowGroupMembers(false)}>
-        <div className="group-members-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <h3>{selectedGroup.name} Members</h3>
+  const renderChatView = () => {
+    // Safety check to prevent runtime errors
+    if (!selectedConversation) {
+      return (
+        <div className="clean-chat-view">
+          <div className="clean-chat-header">
             <button 
-              className="close-modal-btn"
-              onClick={() => setShowGroupMembers(false)}
+              className="back-btn"
+              onClick={() => setSelectedConversationId(null)}
             >
-              ✕
+              ←
             </button>
-          </div>
-          
-          <div className="members-list">
-            <div className="members-header">
-              <h4>Members ({selectedGroup.members})</h4>
+            <div className="chat-info">
+              <div className="chat-details">
+                <h3>Conversation not found</h3>
+              </div>
             </div>
-            
-            <div className="members-grid">
-              {members.map(member => (
-                <div key={member.id} className="member-item">
-                  <div className="member-avatar">
-                    <img src={member.avatar} alt={member.name} />
-                    <span className={`status-dot ${member.isOnline ? 'online' : 'offline'}`}></span>
-                  </div>
-                  <div className="member-info">
-                    <h5>{member.name}</h5>
-                    <span className="member-role">{member.role}</span>
-                    <span className="member-status">{member.year} • {member.major}</span>
-                  </div>
+          </div>
+          <div className="clean-chat-messages">
+            <div className="empty-state">
+              <p>This conversation could not be loaded.</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="clean-chat-view">
+        <div className="clean-chat-header">
+          <button 
+            className="back-btn"
+            onClick={() => setSelectedConversationId(null)}
+          >
+            ←
+          </button>
+          <div className="chat-info">
+            <div className="chat-avatar">
+              <div className="avatar-circle" style={{ backgroundColor: selectedConversation.color || '#667eea' }}>
+                {selectedConversation.avatar || '🏛️'}
+              </div>
+              {selectedConversation.isOnline && <div className="online-dot"></div>}
+            </div>
+            <div className="chat-details">
+              <h3>{selectedConversation.name || 'Unknown'}</h3>
+              <span className="chat-status">
+                {selectedConversation.type === 'individual' ? (
+                  selectedConversation.status || 'Online'
+                ) : (
+                  `${selectedConversation.members || 0} members`
+                )}
+              </span>
+            </div>
+          </div>
+          <div className="chat-actions">
+            <div className="more-options-container">
+              <button 
+                className="action-btn more-options-btn" 
+                title="More Options"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMoreOptions(!showMoreOptions);
+                }}
+              >
+                ⋯
+              </button>
+              {showMoreOptions && (
+                <div className="more-options-dropdown">
                   <button 
-                    className="message-member-btn" 
-                    title="Send message"
-                    onClick={() => {
-                      // Create a new individual conversation
-                      const newConversation = {
-                        id: `member-${member.id}`,
-                        type: 'individual',
-                        name: member.name,
-                        avatar: member.avatar,
-                        isOnline: member.isOnline,
-                        lastMessage: '',
-                        time: 'Now',
-                        unread: 0
-                      };
-                      setConversations(prev => [newConversation, ...prev]);
-                      setSelectedConversationId(newConversation.id);
-                      setShowGroupMembers(false);
+                    className="dropdown-item"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleGroupMembersClick(selectedConversation, e);
+                      setShowMoreOptions(false);
                     }}
                   >
-                    💬
+                    👥 View Members
+                  </button>
+                  <button 
+                    className="dropdown-item"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (selectedConversation) {
+                        handleProfileClick(selectedConversation);
+                      }
+                      setShowMoreOptions(false);
+                    }}
+                  >
+                    👤 Visit Profile
                   </button>
                 </div>
-              ))}
+              )}
             </div>
           </div>
+        </div>
+
+        <div className="clean-chat-messages">
+          {getConversationMessages(selectedConversation).map(message => (
+            <div key={message.id} className={`clean-message ${message.isOwn ? 'own' : ''} ${message.type}`}>
+              {!message.isOwn && message.avatar && (
+                <div className="message-avatar">
+                  <img src={message.avatar} alt={message.sender} />
+                </div>
+              )}
+              <div className="clean-message-content">
+                {!message.isOwn && (
+                  <div className="message-sender">
+                    <span className="sender-name">{message.sender}</span>
+                    {message.senderRole && (
+                      <span className="sender-role">{message.senderRole}</span>
+                    )}
+                  </div>
+                )}
+                <div className="message-text">{message.message}</div>
+                {message.reactions && (
+                  <div className="message-reactions">
+                    {Object.entries(message.reactions).map(([emoji, count]) => (
+                      <span key={emoji} className="reaction">
+                        {emoji} {count}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="message-time">{message.time}</div>
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="clean-message typing">
+              <div className="clean-message-content">
+                <div className="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="clean-chat-input">
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+          />
+          <button className="clean-input-btn attachment-btn" onClick={handleFileUpload} title="Attach file">
+            📎
+          </button>
+          <div className="clean-input-container">
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={newMessage}
+              onChange={handleTyping}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              className="clean-message-input"
+            />
+            <button
+              className="clean-input-btn emoji-btn"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              title="Add emoji"
+            >
+              😊
+            </button>
+          </div>
+          <button
+            className="clean-input-btn send-btn"
+            onClick={handleSendMessage}
+            disabled={!newMessage.trim() || isSending}
+            title="Send message"
+          >
+            📤
+          </button>
         </div>
       </div>
     );
+  };
+
+  const renderGroupMembersModal = () => {
+    try {
+      if (!showGroupMembers || !selectedGroup) {
+        console.log('Modal not showing - showGroupMembers:', showGroupMembers, 'selectedGroup:', selectedGroup);
+        return null;
+      }
+      
+      console.log('Rendering members modal for:', selectedGroup);
+      const members = generateGroupMembers(selectedGroup);
+      
+      return (
+        <div className="group-members-modal-overlay" onClick={() => setShowGroupMembers(false)}>
+          <div className="group-members-modal modern-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header modern-header">
+              <div className="modal-title-section">
+                <div className="modal-org-avatar">
+                  <div className="modal-avatar-circle" style={{ backgroundColor: selectedGroup.color || '#667eea' }}>
+                    {selectedGroup.avatar || '🏛️'}
+                  </div>
+                </div>
+                <div className="modal-title-content">
+                  <h3>{selectedGroup.name} Members</h3>
+                  <span className="modal-subtitle">{selectedGroup.members} members • {selectedGroup.type}</span>
+                </div>
+              </div>
+              <button 
+                className="close-modal-btn modern-close-btn"
+                onClick={() => setShowGroupMembers(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="members-list modern-members-list">
+              <div className="members-header modern-members-header">
+                <h4>Organization Members</h4>
+                <div className="members-search">
+                  <input 
+                    type="text" 
+                    placeholder="Search members..." 
+                    className="member-search-input"
+                  />
+                </div>
+              </div>
+              
+              <div className="members-grid modern-members-grid">
+                {members.map(member => (
+                  <div key={member.id} className="member-item modern-member-item">
+                    <div className="member-avatar modern-member-avatar">
+                      <img src={member.avatar} alt={member.name} />
+                      <span className={`status-dot modern-status-dot ${member.isOnline ? 'online' : 'offline'}`}></span>
+                    </div>
+                    <div className="member-info modern-member-info">
+                      <h5 className="member-name">{member.name}</h5>
+                      <span className="member-role modern-role">{member.role}</span>
+                      <span className="member-status modern-status">{member.year} • {member.major}</span>
+                    </div>
+                    <div className="member-actions">
+                      <button 
+                        className="message-member-btn modern-message-btn" 
+                        title="Send message"
+                        onClick={() => {
+                          try {
+                            // Create a new individual conversation
+                            const newConversation = {
+                              id: `member-${member.id}`,
+                              type: 'individual',
+                              name: member.name,
+                              avatar: member.avatar,
+                              isOnline: member.isOnline,
+                              lastMessage: '',
+                              time: 'Now',
+                              unread: 0
+                            };
+                            setConversations(prev => [newConversation, ...prev]);
+                            setSelectedConversationId(newConversation.id);
+                            setShowGroupMembers(false);
+                          } catch (error) {
+                            console.error('Error creating new conversation:', error);
+                          }
+                        }}
+                      >
+                        💬
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } catch (error) {
+      console.error('Error in renderGroupMembersModal:', error);
+      return null;
+    }
   };
 
   const renderNewConversationModal = () => {

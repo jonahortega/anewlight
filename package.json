@@ -1,7 +1,7 @@
 {
-  "name": "theGreekLifeapp",
-  "version": "1.0.0",
-  "description": "The Greek Life App - A comprehensive platform for Greek life organizations",
+  "name": "greek-life-redesign",
+  "version": "2.0.0",
+  "description": "Greek Life App Redesign - A modern redesign of the Greek life platform",
   "main": "server.js",
   "scripts": {
     "start": "react-scripts start",

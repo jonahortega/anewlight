@@ -144,7 +144,7 @@ const TicketsScreen = ({ user, onNavigate, joinedEvents }) => {
             {!searchTerm && filterStatus === 'all' && (
               <button 
                 className="browse-events-btn"
-                onClick={() => onNavigate('events')}
+                onClick={() => onNavigate('events', { searchType: 'events' })}
               >
                 Browse Events
               </button>

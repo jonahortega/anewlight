@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Starting The Greek Life App..."
+echo "🚀 Starting Greek Life App Redesign..."
 echo "📍 Location: $(pwd)"
 echo ""
 
@@ -29,7 +29,7 @@ PORT=3002 npm start &
 FRONTEND_PID=$!
 
 echo ""
-echo "✅ The Greek Life App is now running!"
+echo "✅ Greek Life App Redesign is now running!"
 echo "   Frontend: http://localhost:3002"
 echo "   Backend:  http://localhost:3003"
 echo "   Dashboard: http://localhost:3003/dashboard"

@@ -61,6 +61,12 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
 
   // Organization-specific events based on type and category
   const getOrganizationEvents = (org) => {
+    // Safety check to prevent runtime errors
+    if (!org || !org.type) {
+      console.warn('getOrganizationEvents called with invalid organization:', org);
+      return [];
+    }
+    
     const baseEvents = {
       'Fraternity': [
         {
@@ -233,6 +239,12 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
 
   // Organization-specific members based on type
   const getOrganizationMembers = (org) => {
+    // Safety check to prevent runtime errors
+    if (!org || !org.type) {
+      console.warn('getOrganizationMembers called with invalid organization:', org);
+      return [];
+    }
+    
     const baseMembers = {
       'Fraternity': [
         {
@@ -459,6 +471,12 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
 
   // Organization-specific posts based on type
   const getOrganizationPosts = (org) => {
+    // Safety check to prevent runtime errors
+    if (!org || !org.type) {
+      console.warn('getOrganizationPosts called with invalid organization:', org);
+      return [];
+    }
+    
     const basePosts = {
       'Fraternity': [
         {
@@ -619,8 +637,8 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
     return basePosts[org.type] || basePosts['Academic Club'];
   };
 
-  const organizationEvents = getOrganizationEvents(organization);
-  const organizationMembers = getOrganizationMembers(organization);
+  const organizationEvents = organization ? getOrganizationEvents(organization) : [];
+  const organizationMembers = organization ? getOrganizationMembers(organization) : [];
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -1087,213 +1105,251 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
   return (
     <div className="profile-screen">
       <div className="profile-container">
-
         
-        {/* Request Button - Top Right */}
-        {!isUserMember() && (
-          <button className="modern-request-btn" onClick={handleRequestClick}>
-            Request
-        </button>
-        )}
-        
-        {/* New Event/Post Button - Top Right */}
-        {isUserLeader() && (
-          <div className="create-options-container">
-            <button className="new-event-top-btn" onClick={handlePlusButtonClick}>
-              <span>+</span>
-            </button>
-            {showCreateOptions && (
-              <div className="create-options-dropdown">
+        {/* Safety check for undefined organization */}
+        {!organization ? (
+          <div className="profile-container">
+            <div className="profile-header-section">
+              <div className="profile-avatar-container">
+                <div className="profile-avatar-border">
+                  <div className="profile-avatar-placeholder">🏛️</div>
+                </div>
+              </div>
+            </div>
+            <div className="profile-info-section">
+              <div className="profile-details">
+                <h1>Organization Not Found</h1>
+                <p>This organization could not be loaded.</p>
                 <button 
-                  className="create-option-btn"
-                  onClick={() => handleCreateOptionClick('event')}
+                  className="back-btn"
+                  onClick={() => onNavigate('messages')}
                 >
-                  📅 Create Event
+                  ← Back to Messages
                 </button>
-                <button 
-                  className="create-option-btn"
-                  onClick={() => handleCreateOptionClick('post')}
-                >
-                  📝 Create Post
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Request Button - Top Right */}
+            {!isUserMember() && (
+              <button className="modern-request-btn" onClick={handleRequestClick}>
+                Request
+              </button>
+            )}
+            
+            {/* New Event/Post Button - Top Right */}
+            {isUserLeader() && (
+              <div className="create-options-container">
+                <button className="new-event-top-btn" onClick={handlePlusButtonClick}>
+                  <span>+</span>
                 </button>
+                {showCreateOptions && (
+                  <div className="create-options-dropdown">
+                    <button 
+                      className="create-option-btn"
+                      onClick={() => handleCreateOptionClick('event')}
+                    >
+                      📅 Create Event
+                    </button>
+                    <button 
+                      className="create-option-btn"
+                      onClick={() => handleCreateOptionClick('post')}
+                    >
+                      📝 Create Post
+                    </button>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-
-
-        {/* Profile Header Section with Avatar at Top */}
-        <div className="profile-header-section">
-          <div className="profile-avatar-container">
-            <div className="profile-avatar-border">
-              <img 
-                src={organization.image} 
-                alt={organization.name} 
-                className="profile-avatar"
-              />
-            </div>
-            </div>
-          </div>
-          
-        {/* Profile Info Section */}
-        <div className="profile-info-section">
-          <div className="profile-details">
-            <div className="profile-name-section">
-              <h2 className="profile-name">{organization.name}</h2>
-            <span className="profile-username">@{organization.name.toLowerCase().replace(/\s+/g, '').replace('club', '')}</span>
-            </div>
-            
-            <div className="profile-stats">
-              <div className="stat-item clickable" onClick={handleMembersClick}>
-                <span className="stat-number">{organization.members}</span>
-                <span className="stat-label">members</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{organizationEvents.length}</span>
-                <span className="stat-label">events</span>
-              </div>
-              <div className="stat-item">
-              <span className="stat-number">{organization.type.replace(' Club', '')}</span>
-                <span className="stat-label">club</span>
+            {/* Profile Header Section with Avatar at Top */}
+            <div className="profile-header-section">
+              <div className="profile-avatar-container">
+                <div className="profile-avatar-border">
+                  <img 
+                    src={organization.image} 
+                    alt={organization.name} 
+                    className="profile-avatar"
+                  />
+                </div>
               </div>
             </div>
             
-            <div className="profile-bio-section">
-              <p className="profile-bio">{organization.description}</p>
+            {/* Profile Info Section */}
+            <div className="profile-info-section">
+              <div className="profile-details">
+                <div className="profile-name-section">
+                  <h2 className="profile-name">{organization.name}</h2>
+                  <span className="profile-username">@{organization.name.toLowerCase().replace(/\s+/g, '').replace('club', '')}</span>
+                </div>
+                
+                <div className="profile-stats">
+                  <div className="stat-item clickable" onClick={handleMembersClick}>
+                    <span className="stat-number">{organization.members}</span>
+                    <span className="stat-label">members</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{organizationEvents.length}</span>
+                    <span className="stat-label">events</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">{organization.type.replace(' Club', '')}</span>
+                    <span className="stat-label">club</span>
+                  </div>
+                </div>
+                
+                <div className="profile-bio-section">
+                  <p className="profile-bio">{organization.description}</p>
+                </div>
+              </div>
             </div>
-        </div>
-      </div>
 
-      {/* Tab Navigation */}
-      <div className="profile-tabs">
-        <button 
-          className={`tab-button ${activeTab === 'events' ? 'active' : ''}`}
-          onClick={() => setActiveTab('events')}
-        >
-          📅 Events
-        </button>
+            {/* Tab Navigation */}
+            <div className="profile-tabs">
+              <button 
+                className={`tab-button ${activeTab === 'events' ? 'active' : ''}`}
+                onClick={() => setActiveTab('events')}
+              >
+                📅 Events
+              </button>
 
-        <button 
-          className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
-          onClick={() => setActiveTab('posts')}
-        >
-          📝 Posts
-        </button>
-      </div>
+              <button 
+                className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
+                onClick={() => setActiveTab('posts')}
+              >
+                📝 Posts
+              </button>
+            </div>
 
-      {/* Tab Content */}
-      <div className="profile-content">
-        {activeTab === 'events' && (
-          <div className="shotgun-events-feed">
-              {organizationEvents.map(event => (
-              <div key={event.id} className="shotgun-event-card">
-                <div className="shotgun-event-image">
-                  <img src={event.image} alt={event.title} />
-                  <div className="shotgun-event-overlay">
-                    <div className="shotgun-event-badges">
-                      {event.isPaid && (
-                        <div className="shotgun-price-badge">${event.price}</div>
-                      )}
-                      {isUserAttending(event.id) && (
-                        <div className="shotgun-attending-badge">✓</div>
-                      )}
-                    </div>
-                    <div className="shotgun-event-actions">
-                      <button 
-                        className="shotgun-share-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleShare(event);
-                        }}
-                      >
-                        📤
-                      </button>
-                    </div>
-                  </div>
-                  </div>
-                  
-                <div className="shotgun-event-content">
-                  <div className="shotgun-event-header">
-                    <div className="shotgun-event-org">{organization.name}</div>
-                    <div className="shotgun-event-category">{event.category || 'Event'}</div>
-                  </div>
-                  
-                  <h3 className="shotgun-event-title">{event.title}</h3>
-                  
-                  <div className="shotgun-event-meta">
-                    <div className="shotgun-event-details">
-                      <span className="shotgun-event-date">{formatDate(event.date)}, {event.time}</span>
-                      <span className="shotgun-event-location">{event.location}</span>
-                    </div>
-                    <div className="shotgun-event-attendance">
-                      <span className="shotgun-attendance-count">{event.attendees}/{event.maxAttendees || 'Unlimited'}</span>
-                    </div>
+            {/* Tab Content */}
+            <div className="profile-content">
+              {activeTab === 'events' && (
+                <div className="shotgun-events-feed">
+                  {organizationEvents.map(event => (
+                    <div key={event.id} className="shotgun-event-card">
+                      <div className="shotgun-event-image">
+                        <img src={event.image} alt={event.title} />
+                        <div className="shotgun-event-overlay">
+                          <div className="shotgun-event-badges">
+                            {event.isPaid && (
+                              <div className="shotgun-price-badge">${event.price}</div>
+                            )}
+                            {isUserAttending(event.id) && (
+                              <div className="shotgun-attending-badge">✓</div>
+                            )}
+                          </div>
+                          <div className="shotgun-event-actions">
+                            <button 
+                              className="shotgun-share-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleShare(event);
+                              }}
+                            >
+                              📤
+                            </button>
+                          </div>
+                        </div>
                       </div>
                       
-                  <div className="shotgun-event-actions-bottom">
-                      <button 
-                      className={`shotgun-rsvp-btn ${isUserAttending(event.id) ? 'attending' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRSVP(event.id);
-                        }}
-                      >
-                      {isUserAttending(event.id) ? '✓ Attending' : 'Join Event'}
-                      </button>
-                    <button 
-                      className="shotgun-details-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEventClick(event);
-                      }}
-                    >
-                        Details
-                      </button>
+                      <div className="shotgun-event-content">
+                        <div className="shotgun-event-header">
+                          <div className="shotgun-event-org">{organization.name}</div>
+                          <div className="shotgun-event-category">{event.category || 'Event'}</div>
+                        </div>
+                        
+                        <h3 className="shotgun-event-title">{event.title}</h3>
+                        
+                        <div className="shotgun-event-meta">
+                          <div className="shotgun-event-details">
+                            <span className="shotgun-event-date">{formatDate(event.date)}, {event.time}</span>
+                            <span className="shotgun-event-location">{event.location}</span>
+                          </div>
+                          <div className="shotgun-event-attendance">
+                            <span className="shotgun-attendance-count">{event.attendees}/{event.maxAttendees || 'Unlimited'}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="shotgun-event-actions-bottom">
+                          <button 
+                            className={`shotgun-rsvp-btn ${isUserAttending(event.id) ? 'attending' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRSVP(event.id);
+                            }}
+                          >
+                            {isUserAttending(event.id) ? '✓ Attending' : 'Join Event'}
+                          </button>
+                          <button 
+                            className="shotgun-details-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEventClick(event);
+                            }}
+                          >
+                            Details
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-          </div>
-        )}
+              )}
 
-
-
-        {activeTab === 'posts' && (
-          <div className="posts-section">
-            <div className="posts-grid">
-              {organizationPosts.map(post => (
-                <div key={post.id} className="post-item" onClick={() => handlePostClick(post)}>
-                  <img 
-                    src={post.image || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=400&fit=crop'} 
-                    alt="Post" 
-                    className="post-image" 
-                  />
-                  <div className="post-overlay">
-                    <div className="post-actions">
-                      <button 
-                        className={`like-btn ${likedPosts.has(post.id) ? 'liked' : ''}`}
-                        onClick={(e) => handleLikePost(post.id, e)}
-                      >
-                        {likedPosts.has(post.id) ? '❤️' : '🤍'} {post.likes}
-                      </button>
-                      <button 
-                        className="comment-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCommentClick(post);
-                        }}
-                      >
-                        💬 {(post.comments || []).length}
-                      </button>
+              {activeTab === 'posts' && (
+                <div className="organization-posts-feed">
+                  {organizationPosts.map(post => (
+                    <div key={post.id} className="organization-post-card">
+                      <div className="post-header">
+                        <div className="post-author">
+                          <img src={post.authorAvatar} alt={post.author} className="post-author-avatar" />
+                          <div className="post-author-info">
+                            <span className="post-author-name">{post.author}</span>
+                            <span className="post-author-role">{post.authorRole}</span>
+                          </div>
+                        </div>
+                        <div className="post-actions">
+                          <button 
+                            className="post-action-btn"
+                            onClick={() => handleShare(post)}
+                          >
+                            📤
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="post-content">
+                        <p>{post.content}</p>
+                        {post.image && (
+                          <img src={post.image} alt="Post" className="post-image" />
+                        )}
+                      </div>
+                      
+                      <div className="post-footer">
+                        <div className="post-engagement">
+                          <button 
+                            className={`post-like-btn ${likedPosts.has(post.id) ? 'liked' : ''}`}
+                            onClick={() => handleLikePost(post.id)}
+                          >
+                            ❤️ {post.likes}
+                          </button>
+                          <button 
+                            className="post-comment-btn"
+                            onClick={() => handleCommentClick(post)}
+                          >
+                            💬 {post.comments}
+                          </button>
+                        </div>
+                        <span className="post-timestamp">{post.timestamp}</span>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          </div>
+          </>
         )}
-      </div>
       </div>
 
       {/* Join Request Popup Modal */}
