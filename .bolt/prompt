@@ -1,0 +1,12 @@
+Use a modern, clean design system that matches 21st.dev’s aesthetic: Tailwind CSS + shadcn/ui + lucide icons. 
+Follow these rules consistently:
+- Grid-based layouts with proper spacing (8/16/24 px rhythm). 
+- Rounded-2xl corners on cards, inputs, and buttons. 
+- Soft shadows (shadow-md to shadow-lg) for depth. 
+- Responsive design: mobile-first, then scale up to desktop. 
+- Use shadcn/ui components for buttons, inputs, dialogs, tabs, dropdowns, tables, sidebars, and modals. 
+- Use lucide-react icons for all UI icons. 
+- Keep typography minimal and modern (font sizes: sm/base/lg/xl/2xl). 
+- Navigation should use a top app bar + optional left sidebar. 
+- Consistent color system: neutral grays for backgrounds, 21st-style accent color for primary actions. 
+Never break the functional logic or API connections — only refactor the UI to follow this system.
