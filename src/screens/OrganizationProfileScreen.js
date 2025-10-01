@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './OrganizationProfileScreen.css';
 
 const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConversation, joinedEvents, setJoinedEvents }) => {
-  const [activeTab, setActiveTab] = useState('events');
+  const [activeTab, setActiveTab] = useState('upcoming');
   const [rsvpStatus, setRsvpStatus] = useState({});
   const [showRequestPopup, setShowRequestPopup] = useState(false);
   const [likedPosts, setLikedPosts] = useState(new Set());
@@ -94,7 +94,7 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 1,
           title: "Brotherhood Retreat",
-          date: "2024-03-25",
+          date: "2025-03-25",
           time: "7:00 PM",
           location: "Campus Center Ballroom",
           description: "Annual brotherhood bonding event with team building activities and social networking.",
@@ -105,7 +105,7 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 2,
           title: "Philanthropy Fundraiser",
-          date: "2024-03-30",
+          date: "2025-03-30",
           time: "6:00 PM",
           location: "Greek Row",
           description: "Charity event to raise funds for our national philanthropy cause.",
@@ -116,20 +116,55 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 3,
           title: "Academic Excellence Workshop",
-          date: "2024-04-05",
+          date: "2025-04-05",
           time: "3:00 PM",
           location: "Library Study Room",
           description: "Study skills workshop and academic support session for brothers.",
           attendees: 25,
           maxAttendees: 35,
           image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=200&fit=crop"
+        },
+        {
+          id: 4,
+          title: "Spring Formal 2025",
+          date: "2025-04-15",
+          time: "8:00 PM",
+          location: "Grand Ballroom Downtown",
+          description: "Our annual spring formal dance with dinner, music, and brotherhood celebration.",
+          attendees: 52,
+          maxAttendees: 75,
+          image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=200&fit=crop",
+          isPaid: true,
+          price: 45
+        },
+        {
+          id: 5,
+          title: "Intramural Basketball Championship",
+          date: "2025-04-22",
+          time: "6:00 PM",
+          location: "Campus Rec Center",
+          description: "Compete for the Greek Life Basketball Championship against other fraternities.",
+          attendees: 28,
+          maxAttendees: 40,
+          image: "https://images.unsplash.com/photo-1546519638-68e109498573?w=400&h=200&fit=crop"
+        },
+        {
+          id: 6,
+          title: "Alumni Networking Night",
+          date: "2025-05-01",
+          time: "7:00 PM",
+          location: "Alumni Center",
+          description: "Connect with successful alumni in various industries for career guidance and networking.",
+          attendees: 18,
+          maxAttendees: 30,
+          image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=200&fit=crop"
         }
       ],
       'Sorority': [
         {
           id: 1,
           title: "Sisterhood Social",
-          date: "2024-03-25",
+          date: "2025-03-25",
           time: "7:00 PM",
           location: "Sorority House",
           description: "Monthly sisterhood bonding event with activities and sister connections.",
@@ -140,7 +175,7 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 2,
           title: "Philanthropy Fashion Show",
-          date: "2024-03-30",
+          date: "2025-03-30",
           time: "8:00 PM",
           location: "Student Union",
           description: "Annual fashion show to raise awareness and funds for our national philanthropy.",
@@ -151,20 +186,66 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 3,
           title: "Leadership Development Seminar",
-          date: "2024-04-05",
+          date: "2025-04-05",
           time: "2:00 PM",
           location: "Conference Center",
           description: "Professional development workshop for sisters.",
           attendees: 28,
           maxAttendees: 40,
           image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop"
+        },
+        {
+          id: 4,
+          title: "Spring Formal Gala",
+          date: "2025-04-12",
+          time: "7:30 PM",
+          location: "Hilton Garden Inn Ballroom",
+          description: "Elegant evening celebrating sisterhood with dinner, dancing, and formal photos.",
+          attendees: 38,
+          maxAttendees: 60,
+          image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=200&fit=crop",
+          isPaid: true,
+          price: 55
+        },
+        {
+          id: 5,
+          title: "Breast Cancer Awareness Walk",
+          date: "2025-04-20",
+          time: "9:00 AM",
+          location: "Campus Quad",
+          description: "Annual charity walk supporting our national philanthropy for breast cancer research.",
+          attendees: 45,
+          maxAttendees: 80,
+          image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=400&h=200&fit=crop"
+        },
+        {
+          id: 6,
+          title: "Big Little Reveal Week",
+          date: "2025-04-28",
+          time: "6:00 PM",
+          location: "Sorority House",
+          description: "Special week celebrating our big sister and little sister relationships with activities and gifts.",
+          attendees: 32,
+          maxAttendees: 45,
+          image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=200&fit=crop"
+        },
+        {
+          id: 7,
+          title: "Professional Women's Panel",
+          date: "2025-05-05",
+          time: "4:00 PM",
+          location: "Student Union Conference Room",
+          description: "Career development panel featuring successful sorority alumni in various professional fields.",
+          attendees: 22,
+          maxAttendees: 35,
+          image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop"
         }
       ],
       'Academic Club': [
         {
           id: 1,
           title: "Math Competition Prep",
-          date: "2024-03-25",
+          date: "2025-03-25",
           time: "4:00 PM",
           location: "Math Building",
           description: "Preparation session for upcoming math competitions and problem-solving practice.",
@@ -175,20 +256,53 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 2,
           title: "Guest Speaker Series",
-          date: "2024-03-30",
+          date: "2025-03-30",
           time: "6:00 PM",
           location: "Lecture Hall",
           description: "Renowned mathematician speaking on advanced mathematical concepts.",
           attendees: 22,
           maxAttendees: 30,
           image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=200&fit=crop"
+        },
+        {
+          id: 3,
+          title: "Study Group Finals Prep",
+          date: "2025-04-10",
+          time: "7:00 PM",
+          location: "Library Conference Room",
+          description: "Collaborative study session preparing for final exams with peer tutoring and resource sharing.",
+          attendees: 25,
+          maxAttendees: 35,
+          image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=200&fit=crop"
+        },
+        {
+          id: 4,
+          title: "Academic Research Symposium",
+          date: "2025-04-18",
+          time: "1:00 PM",
+          location: "Academic Hall",
+          description: "Student research presentations and poster sessions showcasing academic achievements.",
+          attendees: 30,
+          maxAttendees: 50,
+          image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400&h=200&fit=crop"
+        },
+        {
+          id: 5,
+          title: "Career Fair Networking",
+          date: "2025-04-25",
+          time: "10:00 AM",
+          location: "Student Union",
+          description: "Academic club members network with potential employers and graduate school representatives.",
+          attendees: 20,
+          maxAttendees: 30,
+          image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop"
         }
       ],
       'Sports Club': [
         {
           id: 1,
           title: "Soccer Tournament",
-          date: "2024-03-25",
+          date: "2025-03-25",
           time: "2:00 PM",
           location: "University Fields",
           description: "Intramural soccer tournament with multiple teams competing.",
@@ -199,20 +313,42 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
         {
           id: 2,
           title: "Fitness Training Session",
-          date: "2024-03-30",
+          date: "2025-03-30",
           time: "5:00 PM",
           location: "Rec Center",
           description: "Group fitness training and conditioning for team members.",
           attendees: 20,
           maxAttendees: 28,
           image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=200&fit=crop"
+        },
+        {
+          id: 3,
+          title: "Basketball League Championship",
+          date: "2025-04-08",
+          time: "7:00 PM",
+          location: "Campus Basketball Courts",
+          description: "Final championship game of our intramural basketball league season.",
+          attendees: 35,
+          maxAttendees: 50,
+          image: "https://images.unsplash.com/photo-1546519638-68e109498573?w=400&h=200&fit=crop"
+        },
+        {
+          id: 4,
+          title: "Spring Sports Festival",
+          date: "2025-04-15",
+          time: "12:00 PM",
+          location: "Athletic Fields",
+          description: "Campus-wide sports festival with multiple athletic competitions and activities.",
+          attendees: 42,
+          maxAttendees: 60,
+          image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=200&fit=crop"
         }
       ],
       'Service Club': [
         {
           id: 1,
           title: "Community Cleanup Day",
-          date: "2024-03-25",
+          date: "2025-03-25",
           time: "9:00 AM",
           location: "Local Park",
           description: "Volunteer event to clean up local parks and community spaces.",
@@ -639,6 +775,17 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
 
   const organizationEvents = organization ? getOrganizationEvents(organization) : [];
   const organizationMembers = organization ? getOrganizationMembers(organization) : [];
+
+  // Filter events into upcoming and previous
+  const currentDate = new Date();
+  const upcomingEvents = organizationEvents.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate >= currentDate;
+  });
+  const previousEvents = organizationEvents.filter(event => {
+    const eventDate = new Date(event.date);
+    return eventDate < currentDate;
+  });
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -1208,25 +1355,25 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
             {/* Tab Navigation */}
             <div className="profile-tabs">
               <button 
-                className={`tab-button ${activeTab === 'events' ? 'active' : ''}`}
-                onClick={() => setActiveTab('events')}
+                className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
+                onClick={() => setActiveTab('upcoming')}
               >
-                📅 Events
+                Upcoming
               </button>
 
               <button 
-                className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
-                onClick={() => setActiveTab('posts')}
+                className={`tab-button ${activeTab === 'previous' ? 'active' : ''}`}
+                onClick={() => setActiveTab('previous')}
               >
-                📝 Posts
+                Previous
               </button>
             </div>
 
             {/* Tab Content */}
             <div className="profile-content">
-              {activeTab === 'events' && (
+              {activeTab === 'upcoming' && (
                 <div className="shotgun-events-feed">
-                  {organizationEvents.map(event => (
+                  {upcomingEvents.map(event => (
                     <div key={event.id} className="shotgun-event-card">
                       <div className="shotgun-event-image">
                         <img src={event.image} alt={event.title} />
@@ -1297,51 +1444,59 @@ const OrganizationProfileScreen = ({ organization, user, onNavigate, onStartConv
                 </div>
               )}
 
-              {activeTab === 'posts' && (
-                <div className="organization-posts-feed">
-                  {organizationPosts.map(post => (
-                    <div key={post.id} className="organization-post-card">
-                      <div className="post-header">
-                        <div className="post-author">
-                          <img src={post.authorAvatar} alt={post.author} className="post-author-avatar" />
-                          <div className="post-author-info">
-                            <span className="post-author-name">{post.author}</span>
-                            <span className="post-author-role">{post.authorRole}</span>
+              {activeTab === 'previous' && (
+                <div className="shotgun-events-feed">
+                  {previousEvents.map(event => (
+                    <div key={event.id} className="shotgun-event-card past-event">
+                      <div className="shotgun-event-image">
+                        <img src={event.image} alt={event.title} />
+                        <div className="shotgun-event-overlay">
+                          <div className="shotgun-event-badges">
+                            <div className="shotgun-attended-badge">✓</div>
+                          </div>
+                          <div className="shotgun-event-actions">
+                            <button 
+                              className="shotgun-share-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleShare(event);
+                              }}
+                            >
+                              📤
+                            </button>
                           </div>
                         </div>
-                        <div className="post-actions">
-                          <button 
-                            className="post-action-btn"
-                            onClick={() => handleShare(post)}
-                          >
-                            📤
-                          </button>
-                        </div>
                       </div>
                       
-                      <div className="post-content">
-                        <p>{post.content}</p>
-                        {post.image && (
-                          <img src={post.image} alt="Post" className="post-image" />
-                        )}
-                      </div>
-                      
-                      <div className="post-footer">
-                        <div className="post-engagement">
+                      <div className="shotgun-event-content">
+                        <div className="shotgun-event-header">
+                          <div className="shotgun-event-org">{organization.name}</div>
+                          <div className="shotgun-event-category">{event.category || 'Event'}</div>
+                        </div>
+                        
+                        <h3 className="shotgun-event-title">{event.title}</h3>
+                        
+                        <div className="shotgun-event-meta">
+                          <div className="shotgun-event-details">
+                            <span className="shotgun-event-date">{formatDate(event.date)}, {event.time}</span>
+                            <span className="shotgun-event-location">{event.location}</span>
+                          </div>
+                          <div className="shotgun-event-attendance">
+                            <span className="shotgun-attendance-count">{event.attendees} attendees</span>
+                          </div>
+                        </div>
+                        
+                        <div className="shotgun-event-actions-bottom">
                           <button 
-                            className={`post-like-btn ${likedPosts.has(post.id) ? 'liked' : ''}`}
-                            onClick={() => handleLikePost(post.id)}
+                            className="shotgun-details-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEventClick(event);
+                            }}
                           >
-                            ❤️ {post.likes}
-                          </button>
-                          <button 
-                            className="post-comment-btn"
-                            onClick={() => handleCommentClick(post)}
-                          >
-                            💬 {post.comments}
+                            Details
                           </button>
                         </div>
-                        <span className="post-timestamp">{post.timestamp}</span>
                       </div>
                     </div>
                   ))}

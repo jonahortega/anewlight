@@ -16,11 +16,13 @@ import TicketsScreen from './screens/TicketsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import HelpScreen from './screens/HelpScreen';
+import LabScreen from './screens/LabScreen';
 import Navigation from './components/Navigation';
 import Notifications from './components/Notifications';
 import MessagesDropdown from './components/MessagesDropdown';
 import DarkModeToggle from './components/DarkModeToggle';
 import WelcomeModal from './components/WelcomeModal';
+
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('welcome');
@@ -429,6 +431,8 @@ function App() {
         return <SettingsScreen user={user} onNavigate={handleNavigate} onLogout={handleLogout} onProfileUpdate={updatedProfile => setUser(prev => ({ ...prev, ...updatedProfile }))} />;
       case 'help':
         return <HelpScreen user={user} onNavigate={handleNavigate} />;
+      case 'lab':
+        return <LabScreen onNavigate={handleNavigate} />;
       default:
         return <HomeScreen user={user} onNavigate={handleNavigate} />;
     }
@@ -445,6 +449,292 @@ function App() {
     excludedScreens: ['welcome', 'user-info', 'login', 'university', 'greek-question', 'clubs']
   });
 
+  // //return (
+  //   <ErrorBoundary>
+  //     <div className={`App ${isDarkMode ? 'dark-mode' : ''}`}>
+  //       {showNavigation && (
+  //         <div className="top-bar">
+  //           <div className="top-bar-content">
+  //             <div className="top-bar-left">
+  //               {currentScreen === 'home' ? (
+  //                 <div className="header-actions">
+  //                   <button 
+  //                     className={`university-btn ${homeViewMode === 'list' ? 'active' : ''}`}
+  //                     onClick={() => setHomeViewMode('list')}
+  //                     title={user?.university || 'University of California, Berkeley'}
+  //                   >
+  //                     <span className="university-name">
+  //                       {user?.university || 'UC Berkeley'}
+  //                     </span>
+  //                   </button>
+  //                   <button 
+  //                     className={`view-toggle-btn ${homeViewMode === 'calendar' ? 'active' : ''}`}
+  //                     onClick={() => {
+  //                       setHomeViewMode('calendar');
+  //                       setHomeCurrentMonth(new Date(2025, 6, 1));
+  //                     }}
+  //                   >
+  //                     <span className="view-icon">📅</span>
+  //                   </button>
+  //                   <button 
+  //                     className={`view-toggle-btn ${homeViewMode === 'map' ? 'active' : ''}`}
+  //                     onClick={() => setHomeViewMode('map')}
+  //                   >
+  //                     <span className="view-icon">🗺️</span>
+  //                   </button>
+  //                 </div>
+  //               ) : currentScreen !== 'events' && currentScreen !== 'profile' && currentScreen !== 'messages' && currentScreen !== 'organization-profile' && currentScreen !== 'tickets' && (
+  //                 <h2 className="app-title">@{user?.username || 'jonahortega'}</h2>
+  //               )}
+  //             </div>
+  //             <div className="top-bar-center">
+  //               {currentScreen === 'events' && (
+  //                 <div className="header-search-container">
+  //                   <div className="header-search-input">
+  //                     <span className="search-icon"></span>
+  //                     <input
+  //                       type="text"
+  //                       placeholder="Search events, organizations, or keywords..."
+  //                       value={searchTerm}
+  //                       onChange={(e) => setSearchTerm(e.target.value)}
+  //                       className="header-search-field"
+  //                     />
+  //                   </div>
+  //                   <div className="header-search-filters">
+  //                     <button 
+  //                       className="filter-btn"
+  //                       onClick={() => setShowFilterPopup(!showFilterPopup)}
+  //                     >
+  //                       Filters
+  //                     </button>
+  //                   </div>
+  //                 </div>
+  //               )}
+                
+  //               {/* Filter Popup - Fixed */}
+  //               {showFilterPopup && currentScreen === 'events' && (
+  //                 <div 
+  //                   className="filter-popup-overlay" 
+  //                   onClick={(e) => {
+  //                     e.preventDefault();
+  //                     e.stopPropagation();
+  //                     setShowFilterPopup(false);
+  //                   }}
+  //                 >
+  //                   <div 
+  //                     className="filter-popup" 
+  //                     onClick={(e) => {
+  //                       e.preventDefault();
+  //                       e.stopPropagation();
+  //                     }}
+  //                   >
+  //                     <div className="filter-popup-header">
+  //                       <h3>Search Filters</h3>
+  //                       <button 
+  //                         className="filter-close-btn" 
+  //                         onClick={(e) => {
+  //                           e.preventDefault();
+  //                           e.stopPropagation();
+  //                           setShowFilterPopup(false);
+  //                         }}
+  //                       >
+  //                         ×
+  //                       </button>
+  //                     </div>
+                      
+  //                     <div className="filter-popup-content">
+  //                       <div className="filter-section">
+  //                         <h4>Search Type</h4>
+  //                         <div className="filter-options">
+  //                           <button 
+  //                             className={`filter-option ${searchType === 'both' ? 'active' : ''}`}
+  //                             onClick={(e) => {
+  //                               e.preventDefault();
+  //                               e.stopPropagation();
+  //                               setSearchType('both');
+  //                             }}
+  //                           >
+  //                             📅🏛️ Both Events & Organizations
+  //                           </button>
+  //                           <button 
+  //                             className={`filter-option ${searchType === 'events' ? 'active' : ''}`}
+  //                             onClick={(e) => {
+  //                               e.preventDefault();
+  //                               e.stopPropagation();
+  //                               setSearchType('events');
+  //                             }}
+  //                           >
+  //                             📅 Events Only
+  //                           </button>
+  //                           <button 
+  //                             className={`filter-option ${searchType === 'organizations' ? 'active' : ''}`}
+  //                             onClick={(e) => {
+  //                               e.preventDefault();
+  //                               e.stopPropagation();
+  //                               setSearchType('organizations');
+  //                             }}
+  //                           >
+  //                             🏛️ Organizations Only
+  //                           </button>
+  //                         </div>
+  //                       </div>
+                        
+  //                       {(searchType === 'events' || searchType === 'both') && (
+  //                         <div className="filter-section">
+  //                           <h4>Event Categories</h4>
+  //                           <div className="filter-options">
+  //                             {eventCategories.map(category => (
+  //                               <button 
+  //                                 key={category.id}
+  //                                 className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
+  //                                 onClick={(e) => {
+  //                                   e.preventDefault();
+  //                                   e.stopPropagation();
+  //                                   setSearchCategory(category.id);
+  //                                 }}
+  //                               >
+  //                                 {category.name}
+  //                               </button>
+  //                             ))}
+  //                           </div>
+  //                         </div>
+  //                       )}
+                        
+  //                       {(searchType === 'organizations' || searchType === 'both') && (
+  //                         <div className="filter-section">
+  //                           <h4>Organization Types</h4>
+  //                           <div className="filter-options">
+  //                             {organizationCategories.map(category => (
+  //                               <button 
+  //                                 key={category.id}
+  //                                 className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
+  //                                 onClick={(e) => {
+  //                                   e.preventDefault();
+  //                                   e.stopPropagation();
+  //                                   setSearchCategory(category.id);
+  //                                 }}
+  //                               >
+  //                                 {category.name}
+  //                               </button>
+  //                             ))}
+  //                           </div>
+  //                         </div>
+  //                       )}
+                        
+  //                       <div className="filter-section">
+  //                         <h4>Content Type Filter</h4>
+  //                         <div className="filter-options">
+  //                           <button 
+  //                             className={`filter-option ${searchType === 'both' ? 'active' : ''}`}
+  //                             onClick={(e) => {
+  //                               e.preventDefault();
+  //                               e.stopPropagation();
+  //                               setSearchType('both');
+  //                             }}
+  //                           >
+  //                             🎯 All Content
+  //                           </button>
+  //                           <button 
+  //                             className={`filter-option ${searchType === 'events' ? 'active' : ''}`}
+  //                             onClick={(e) => {
+  //                               e.preventDefault();
+  //                               e.stopPropagation();
+  //                               setSearchType('events');
+  //                             }}
+  //                           >
+  //                             📅 Events Only
+  //                           </button>
+  //                           <button 
+  //                             className={`filter-option ${searchType === 'organizations' ? 'active' : ''}`}
+  //                             onClick={(e) => {
+  //                               e.preventDefault();
+  //                               e.stopPropagation();
+  //                               setSearchType('organizations');
+  //                             }}
+  //                           >
+  //                             🏛️ Organizations Only
+  //                           </button>
+  //                         </div>
+  //                       </div>
+  //                     </div>
+                      
+  //                     <div className="filter-popup-footer">
+  //                       <button 
+  //                         className="filter-clear-btn"
+  //                         onClick={(e) => {
+  //                           e.preventDefault();
+  //                           e.stopPropagation();
+  //                           setSearchType('both');
+  //                           setSearchCategory('all');
+  //                           setShowMyEvents(false);
+  //                         }}
+  //                       >
+  //                         Clear Filters
+  //                       </button>
+  //                       <button 
+  //                         className="filter-apply-btn"
+  //                         onClick={(e) => {
+  //                           e.preventDefault();
+  //                           e.stopPropagation();
+  //                           setShowFilterPopup(false);
+  //                         }}
+  //                       >
+  //                         Apply
+  //                       </button>
+  //                     </div>
+  //                   </div>
+  //                 </div>
+  //               )}
+  //             </div>
+  //             <div className="top-bar-right">
+  //               {currentScreen !== 'events' && (
+  //                 <>
+  //                   <MessagesDropdown 
+  //                     conversations={conversations}
+  //                     onNavigate={handleNavigate}
+  //                     onStartConversation={handleStartConversation}
+  //                   />
+  //                   <Notifications 
+  //                     notifications={notifications}
+  //                     onDismiss={handleNotificationDismiss}
+  //                     onMarkAsRead={handleNotificationMarkAsRead}
+  //                     onNavigate={handleNavigate}
+  //                   />
+  //                   {currentScreen === 'profile' && (
+  //                     <button 
+  //                       className="settings-btn"
+  //                       onClick={() => handleNavigate('settings')}
+  //                     >
+  //                       <span className="settings-icon">⚙️</span>
+  //                     </button>
+  //                   )}
+  //                 </>
+  //               )}
+  //             </div>
+  //           </div>
+  //         </div>
+  //       )}
+        
+  //       {showNavigation && (
+  //         <Navigation 
+  //           currentScreen={currentScreen} 
+  //           onNavigate={handleNavigate}
+  //         />
+  //       )}
+        
+  //       <main className="main-content">
+  //         {renderScreen()}
+  //       </main>
+        
+  //       <WelcomeModal 
+  //         isOpen={showWelcomeModal}
+  //         onClose={handleCloseWelcomeModal}
+  //         user={user}
+  //       />
+  //     </div>
+  //   </ErrorBoundary>
+  // );
+  
   return (
     <ErrorBoundary>
       <div className={`App ${isDarkMode ? 'dark-mode' : ''}`}>
@@ -479,7 +769,7 @@ function App() {
                       <span className="view-icon">🗺️</span>
                     </button>
                   </div>
-                ) : currentScreen !== 'events' && currentScreen !== 'profile' && currentScreen !== 'messages' && currentScreen !== 'organization-profile' && currentScreen !== 'tickets' && (
+                ) : currentScreen !== 'events' && currentScreen !== 'profile' && currentScreen !== 'messages' && currentScreen !== 'organization-profile' && currentScreen !== 'tickets' && currentScreen !== 'lab' && (
                   <h2 className="app-title">@{user?.username || 'jonahortega'}</h2>
                 )}
               </div>
@@ -506,185 +796,17 @@ function App() {
                     </div>
                   </div>
                 )}
-                
-                {/* Filter Popup - Fixed */}
-                {showFilterPopup && currentScreen === 'events' && (
-                  <div 
-                    className="filter-popup-overlay" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowFilterPopup(false);
-                    }}
-                  >
-                    <div 
-                      className="filter-popup" 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                    >
-                      <div className="filter-popup-header">
-                        <h3>Search Filters</h3>
-                        <button 
-                          className="filter-close-btn" 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowFilterPopup(false);
-                          }}
-                        >
-                          ×
-                        </button>
-                      </div>
-                      
-                      <div className="filter-popup-content">
-                        <div className="filter-section">
-                          <h4>Search Type</h4>
-                          <div className="filter-options">
-                            <button 
-                              className={`filter-option ${searchType === 'both' ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSearchType('both');
-                              }}
-                            >
-                              📅🏛️ Both Events & Organizations
-                            </button>
-                            <button 
-                              className={`filter-option ${searchType === 'events' ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSearchType('events');
-                              }}
-                            >
-                              📅 Events Only
-                            </button>
-                            <button 
-                              className={`filter-option ${searchType === 'organizations' ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSearchType('organizations');
-                              }}
-                            >
-                              🏛️ Organizations Only
-                            </button>
-                          </div>
-                        </div>
-                        
-                        {(searchType === 'events' || searchType === 'both') && (
-                          <div className="filter-section">
-                            <h4>Event Categories</h4>
-                            <div className="filter-options">
-                              {eventCategories.map(category => (
-                                <button 
-                                  key={category.id}
-                                  className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setSearchCategory(category.id);
-                                  }}
-                                >
-                                  {category.name}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {(searchType === 'organizations' || searchType === 'both') && (
-                          <div className="filter-section">
-                            <h4>Organization Types</h4>
-                            <div className="filter-options">
-                              {organizationCategories.map(category => (
-                                <button 
-                                  key={category.id}
-                                  className={`filter-option ${searchCategory === category.id ? 'active' : ''}`}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setSearchCategory(category.id);
-                                  }}
-                                >
-                                  {category.name}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="filter-section">
-                          <h4>Content Type Filter</h4>
-                          <div className="filter-options">
-                            <button 
-                              className={`filter-option ${searchType === 'both' ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSearchType('both');
-                              }}
-                            >
-                              🎯 All Content
-                            </button>
-                            <button 
-                              className={`filter-option ${searchType === 'events' ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSearchType('events');
-                              }}
-                            >
-                              📅 Events Only
-                            </button>
-                            <button 
-                              className={`filter-option ${searchType === 'organizations' ? 'active' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setSearchType('organizations');
-                              }}
-                            >
-                              🏛️ Organizations Only
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="filter-popup-footer">
-                        <button 
-                          className="filter-clear-btn"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSearchType('both');
-                            setSearchCategory('all');
-                            setShowMyEvents(false);
-                          }}
-                        >
-                          Clear Filters
-                        </button>
-                        <button 
-                          className="filter-apply-btn"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowFilterPopup(false);
-                          }}
-                        >
-                          Apply
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
               <div className="top-bar-right">
-                {currentScreen !== 'events' && (
+                {currentScreen !== 'events' && currentScreen !== 'lab' && (
                   <>
+                    <button 
+                      className="lab-btn"
+                      onClick={() => handleNavigate('lab')}
+                      title="Component Lab"
+                    >
+                      <span className="lab-icon">🧪</span>
+                    </button>
                     <MessagesDropdown 
                       conversations={conversations}
                       onNavigate={handleNavigate}
@@ -731,5 +853,6 @@ function App() {
     </ErrorBoundary>
   );
 }
+
 
 export default App;

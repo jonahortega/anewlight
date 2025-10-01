@@ -1402,6 +1402,35 @@ code {
   transform: rotate(30deg);
 }
 
+/* Lab Button */
+.lab-btn {
+  position: relative;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  margin-left: 8px;
+}
+
+.lab-btn:hover {
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+.lab-icon {
+  font-size: 20px;
+  color: #667eea;
+  transition: transform 0.3s ease;
+}
+
+.lab-btn:hover .lab-icon {
+  transform: scale(1.1);
+}
+
 /* Mobile responsive styles for filter popup */
 @media (max-width: 768px) {
   .filter-popup-overlay {
